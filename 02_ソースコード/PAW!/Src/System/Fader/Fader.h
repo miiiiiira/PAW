@@ -1,0 +1,73 @@
+#pragma once
+
+class Fader
+{
+public:
+	// 状態
+	enum class STATE
+	{
+		NONE, 
+		FADE_OUT,	// 徐々に暗転
+		FADE_IN,	// 徐々に明転
+		END
+	};
+
+	// タイプ
+	enum class TYPE
+	{
+		NORMAL,
+		SHUTTER,
+		WIPE,
+		CROSS,
+	};
+
+	//シングルトン
+	static void  CreateInstance(void){ if (instance_ == nullptr){instance_ = new Fader();} }
+	static Fader* GetInstance(void){ return instance_; }
+	static void DeleteInstance(void) { if (instance_ != nullptr) { delete instance_; } }
+
+	void Init(void);		//初期化処理
+	void Update(void);		//更新処理
+	void Draw(void);		//描画処理
+
+	// 状態の取得
+	STATE GetState(void);
+
+	// 指定フェードを開始する
+	void SetFade(STATE state, TYPE type = TYPE::NORMAL, unsigned int color = 0x000000);
+
+private:
+
+	// 最大アルファ値
+	static constexpr int ALPHA_MAX = 255;
+	// フェードが進む速さ
+	static constexpr int SPEED_ALPHA = 3;
+
+	// シャッター画像のサイズ
+	static constexpr int SHUTTER_SIZE_WID = 1024;
+	static constexpr int SHUTTER_SIZE_HIG = 320;
+	static constexpr int SHUTTER_IMG_NUM = 2;
+
+private:
+	// コンストラクタ・デストラクタ
+	Fader(void);
+	~Fader(void);
+
+	//静的インスタンス
+	static Fader* instance_;
+
+	// 状態
+	STATE state_;
+
+	// フェードタイプ
+	TYPE type_;
+
+	// 色情報 (unsignedはマイナスの値が使えない)
+	unsigned int color_;
+
+	// 透明度
+	int alpha_;
+
+	// シャッター画像
+	int shutterImg_[SHUTTER_IMG_NUM];
+};

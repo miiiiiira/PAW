@@ -1,17 +1,49 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="ソース ファイル">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="ヘッダー ファイル">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
-    <Filter Include="リソース ファイル">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
+    <ClCompile Include="Src\main.cpp" />
+    <ClCompile Include="Src\Application.cpp" />
+    <ClCompile Include="Src\System\FpsControl\FpsControl.cpp" />
+    <ClCompile Include="Src\Input\InputManager.cpp" />
+    <ClCompile Include="Src\Math\Math.cpp" />
+    <ClCompile Include="Src\Scene\Scenes\MainMenu\MainMenu.cpp" />
+    <ClCompile Include="Src\Scene\Scenes\Pause\Pause.cpp" />
+    <ClCompile Include="Src\Scene\Scenes\Title\TitleScene.cpp" />
+    <ClCompile Include="Src\Scene\SceneBase.cpp" />
+    <ClCompile Include="Src\Scene\SceneManager.cpp" />
+    <ClCompile Include="Src\System\Fader\Fader.cpp" />
+    <ClCompile Include="Src\Audio\AudioManager.cpp" />
+    <ClCompile Include="Src\Audio\SoundTable.cpp" />
+    <ClCompile Include="Src\Scene\Scenes\Loading\Loading.cpp" />
+    <ClCompile Include="Src\Collision\Collision.cpp" />
+    <ClCompile Include="Src\Input\MouseCursor\MouseCursor.cpp" />
+    <ClCompile Include="Src\Scene\Scenes\Confirm\Confirm.cpp" />
+    <ClCompile Include="Src\Scene\Scenes\Game\GameScene.cpp" />
+    <ClCompile Include="Src\Scene\Scenes\GameClear\GameClear.cpp" />
+    <ClCompile Include="Src\Scene\Scenes\GameOver\GameOver.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Src\Application.h" />
+    <ClInclude Include="Src\System\FpsControl\FpsControl.h" />
+    <ClInclude Include="Src\Input\InputManager.h" />
+    <ClInclude Include="Src\Math\Vector2.h" />
+    <ClInclude Include="Src\Math\Math.h" />
+    <ClInclude Include="Src\Scene\Scenes\MainMenu\MainMenu.h" />
+    <ClInclude Include="Src\Scene\Scenes\Pause\Pause.h" />
+    <ClInclude Include="Src\Scene\Scenes\Title\TitleScene.h" />
+    <ClInclude Include="Src\Scene\SceneBase.h" />
+    <ClInclude Include="Src\Scene\SceneManager.h" />
+    <ClInclude Include="Src\System\Fader\Fader.h" />
+    <ClInclude Include="Src\Scene\SceneTag.h" />
+    <ClInclude Include="Src\Audio\AudioManager.h" />
+    <ClInclude Include="Src\Audio\SoundInfo.h" />
+    <ClInclude Include="Src\Audio\SoundTable.h" />
+    <ClInclude Include="Src\Scene\Scenes\Loading\Loading.h" />
+    <ClInclude Include="Src\Collision\Collision.h" />
+    <ClInclude Include="Src\Input\MouseCursor\MouseCursor.h" />
+    <ClInclude Include="Src\Scene\Scenes\Confirm\Confirm.h" />
+    <ClInclude Include="Src\Scene\Scenes\Game\GameScene.h" />
+    <ClInclude Include="Src\Scene\Scenes\GameClear\GameClear.h" />
+    <ClInclude Include="Src\Scene\Scenes\GameOver\GameOver.h" />
   </ItemGroup>
 </Project>
