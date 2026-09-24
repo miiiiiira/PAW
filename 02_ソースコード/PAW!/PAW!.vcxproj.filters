@@ -21,6 +21,9 @@
     <ClCompile Include="Src\Scene\Scenes\Game\GameScene.cpp" />
     <ClCompile Include="Src\Scene\Scenes\GameClear\GameClear.cpp" />
     <ClCompile Include="Src\Scene\Scenes\GameOver\GameOver.cpp" />
+    <ClCompile Include="Src\Object\ObjectManager.cpp" />
+    <ClCompile Include="Src\Object\Component\Transform\Transform.cpp" />
+    <ClCompile Include="Src\Object\Player\Player.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Application.h" />
@@ -45,5 +48,13 @@
     <ClInclude Include="Src\Scene\Scenes\Game\GameScene.h" />
     <ClInclude Include="Src\Scene\Scenes\GameClear\GameClear.h" />
     <ClInclude Include="Src\Scene\Scenes\GameOver\GameOver.h" />
+    <ClInclude Include="Src\Object\Tag.h" />
+    <ClInclude Include="Src\Object\Object.h" />
+    <ClInclude Include="Src\Object\ObjectManager.h" />
+    <ClInclude Include="Src\Object\Component\Component.h" />
+    <ClInclude Include="Src\Object\Component\Transform\Transform2D.h" />
+    <ClInclude Include="Src\Object\Component\Transform\Transform.h" />
+    <ClInclude Include="Src\Object\Player\PlayerInfo.h" />
+    <ClInclude Include="Src\Object\Player\Player.h" />
   </ItemGroup>
 </Project>

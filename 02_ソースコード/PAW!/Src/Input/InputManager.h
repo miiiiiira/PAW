@@ -159,6 +159,8 @@ public:
 	// アナログキーの入力値から方向を取得
 	VECTOR GetDirectionXZAKey(int aKeyX, int aKeyY);
 
+public:
+
 	// マウスに切り替え
 	bool ChangeDeviceMouse(void);
 	// パッドに切り替え
@@ -186,6 +188,25 @@ public:
 	// 左
 	bool SelectLeftPad(void);
 
+	// プレイヤー操作
+	// 
+	// 移動
+	// 前
+	bool MoveBeforeButton(void);
+	// 後ろ
+	bool MoveBackButton(void);
+	// 右
+	bool MoveRightButton(void);
+	// 左
+	bool MoveLeftButton(void);
+	// ジャンプ
+	bool JumpButton(void);
+	// 攻撃
+	bool AttackButton(void);
+	// 回避
+	bool DodgeButton(void);
+
+public:
 	// デバイスの種類
 	enum class ActiveDevice
 	{

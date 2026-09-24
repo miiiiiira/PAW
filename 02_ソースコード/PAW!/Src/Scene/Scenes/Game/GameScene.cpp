@@ -102,3 +102,11 @@ void GameScene::Release(void)
 	//AudioManager::GetInstance()->DeleteSceneSound(LoadScene::GAME);
 }
 
+void GameScene::CameraCreate(void)
+{
+}
+
+void GameScene::PlayerCreate(void)
+{
+}
+

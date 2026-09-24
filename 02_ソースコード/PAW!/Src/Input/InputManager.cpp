@@ -14,14 +14,12 @@ void InputManager::Init(void)
 	Add(KEY_INPUT_A);
 	Add(KEY_INPUT_S);
 	Add(KEY_INPUT_D);
+
 	// ジャンプ
 	Add(KEY_INPUT_SPACE);
 
-	Add(KEY_INPUT_E);
-	Add(KEY_INPUT_R);
-	Add(KEY_INPUT_F);
-	Add(KEY_INPUT_X);
-	Add(KEY_INPUT_Z);
+	// 回避
+	Add(KEY_INPUT_LSHIFT);
 
 	// キーボードでの視点
 	Add(KEY_INPUT_LEFT);
@@ -35,10 +33,6 @@ void InputManager::Init(void)
 	// デバッグ用
 	Add(KEY_INPUT_O);
 	Add(KEY_INPUT_C);
-	Add(KEY_INPUT_K);
-	Add(KEY_INPUT_L);
-	Add(KEY_INPUT_H);
-	Add(KEY_INPUT_B);
 
 	InputManager::MouseInfo info;
 
@@ -106,10 +100,6 @@ void InputManager::Update(void)
 		prevPadLStick_[i] = nowPadLStick_[i];
 		nowPadLStick_[i] = IsPadLStickNew(JOYPAD_NO::PAD1, static_cast<JOYPAD_STICK>(i));
 	}
-
-
-
-
 
 	// マウス選択中
 	if (activeDevice_== ActiveDevice::KEY_MOUSE)
@@ -200,14 +190,16 @@ bool InputManager::IsTrgUpMouseLeft(void) const
 
 bool InputManager::ChangeDeviceMouse(void)
 {
-	return  FindMouse(MOUSE_INPUT_LEFT).keyTrgDown || IsTrgDown(KEY_INPUT_E) || IsTrgDown(KEY_INPUT_Q)
-		|| IsTrgDown(KEY_INPUT_W) || IsTrgDown(KEY_INPUT_A) || IsTrgDown(KEY_INPUT_S) || IsTrgDown(KEY_INPUT_D);
+	return  FindMouse(MOUSE_INPUT_LEFT).keyTrgDown || FindMouse(MOUSE_INPUT_RIGHT).keyTrgDown
+		|| PushAnyButton();
 }
 
 bool InputManager::ChangeDevicePad(void)
 {
 	return IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::A) || IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::B)
 		|| IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::X) || IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::Y)
+		|| IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::L_TRIGGER) || IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::R_TRIGGER)
+		|| IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::LB) || IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::RB)
 		|| IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::DOWN) || IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::UP)
 		|| IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::LEFT) || IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::RIGHT)
 		|| IsPadLStickTrgDown(JOYPAD_NO::PAD1, JOYPAD_STICK::UP) || IsPadLStickTrgDown(JOYPAD_NO::PAD1, JOYPAD_STICK::DOWN)
@@ -255,6 +247,48 @@ bool InputManager::SelectRightPad(void)
 bool InputManager::SelectLeftPad(void)
 {
 	return IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::LEFT) || IsPadLStickTrgDown(JOYPAD_NO::PAD1, JOYPAD_STICK::LEFT);
+}
+
+bool InputManager::MoveBeforeButton(void)
+{
+	return  IsNew(KEY_INPUT_W) ||
+		IsPadLStickNew(JOYPAD_NO::PAD1, JOYPAD_STICK::UP);
+}
+
+bool InputManager::MoveBackButton(void)
+{
+	return  IsNew(KEY_INPUT_S) ||
+		IsPadLStickNew(JOYPAD_NO::PAD1, JOYPAD_STICK::DOWN);
+}
+
+bool InputManager::MoveRightButton(void)
+{
+	return  IsNew(KEY_INPUT_D) ||
+		IsPadLStickNew(JOYPAD_NO::PAD1, JOYPAD_STICK::RIGHT);
+}
+
+bool InputManager::MoveLeftButton(void)
+{
+	return  IsNew(KEY_INPUT_A) ||
+		IsPadLStickNew(JOYPAD_NO::PAD1, JOYPAD_STICK::LEFT);
+}
+
+bool InputManager::JumpButton(void)
+{
+	return  IsTrgDown(KEY_INPUT_SPACE) ||
+		IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::A);
+}
+
+bool InputManager::AttackButton(void)
+{
+	return  FindMouse(MOUSE_INPUT_LEFT).keyTrgDown ||
+		IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::Y);
+}
+
+bool InputManager::DodgeButton(void)
+{
+	return  IsTrgDown(KEY_INPUT_LSHIFT) ||
+		IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::B);
 }
 
 InputManager::InputManager(void)

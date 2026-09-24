@@ -7,6 +7,8 @@
 
 #include "../../SceneBase.h"
 
+class ObjectManager;
+
 class GameScene : public SceneBase
 {
 public:
@@ -23,7 +25,13 @@ public:
 
 private:
 
-	
+	void CameraCreate(void);	// カメラの作成
+
+	void PlayerCreate(void);	// プレイヤーの作成
+
 private:
+
+	// オブジェクトマネージャー
+	ObjectManager* objectManger_;
 
 };
