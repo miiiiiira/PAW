@@ -1,9 +1,9 @@
 #pragma once
 
-#include <DxLib.h>
 #include <vector>
 #include <string>
 #include <memory>
+#include <DxLib.h>
 
 #include "../../SceneBase.h"
 
@@ -25,13 +25,22 @@ public:
 
 private:
 
-	void CameraCreate(void);	// カメラの作成
-
-	void PlayerCreate(void);	// プレイヤーの作成
+	// オブジェクトマネージャー
+	ObjectManager* objectManger_ = nullptr;
 
 private:
 
-	// オブジェクトマネージャー
-	ObjectManager* objectManger_;
+	// オブジェクト作成
+	// カメラの作成
+	void CameraCreate(void);	
+	// プレイヤーの作成
+	void PlayerCreate(void);	
 
+	// 参照系
+	void SetUp(void);
+
+	// シーン遷移
+	void ChangePauseScene(void);		// ポーズシーン
+	void ChangeGameClearScene(void);	// ゲームクリア
+	void ChangeGameOverScene(void);		// ゲームオーバー
 };

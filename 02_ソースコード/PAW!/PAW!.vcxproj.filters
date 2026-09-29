@@ -24,6 +24,9 @@
     <ClCompile Include="Src\Object\ObjectManager.cpp" />
     <ClCompile Include="Src\Object\Component\Transform\Transform.cpp" />
     <ClCompile Include="Src\Object\Player\Player.cpp" />
+    <ClCompile Include="Src\Object\Component\Animation\Animation.cpp" />
+    <ClCompile Include="Src\Object\Component\Graphics\Render2D.cpp" />
+    <ClCompile Include="Src\Object\Component\Graphics\Render3D.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Application.h" />
@@ -56,5 +59,9 @@
     <ClInclude Include="Src\Object\Component\Transform\Transform.h" />
     <ClInclude Include="Src\Object\Player\PlayerInfo.h" />
     <ClInclude Include="Src\Object\Player\Player.h" />
+    <ClInclude Include="Src\Object\Component\Animation\Animation.h" />
+    <ClInclude Include="Src\Object\Component\Graphics\Render.h" />
+    <ClInclude Include="Src\Object\Component\Graphics\Render2D.h" />
+    <ClInclude Include="Src\Object\Component\Graphics\Render3D.h" />
   </ItemGroup>
 </Project>

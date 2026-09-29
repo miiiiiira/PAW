@@ -1,5 +1,4 @@
 #include "../Object.h"
-
 #include "../../Math/Math.h"
 #include "../Component/Transform/Transform.h"
 #include "../../Input/InputManager.h"
@@ -9,6 +8,8 @@
 
 Player::Player(void)
 {
+	
+
 	// テーブルに関数のポインタを格納
 	// 初期化関数
 	stateCtrl_.initTable_[PLAYER_STATE_IDLE] = IdleInit;
@@ -26,15 +27,16 @@ Player::Player(void)
 	stateCtrl_.updateTable_[PLAYER_STATE_DEAD] = DeadUpdate;
 }
 
-void Player::Load()
+void Player::Load(void)
 {
 }
 
 // 初期化
-void Player::Init()
+void Player::Init(void)
 {
-	// オーナーからTransform取得
-	transform_ = owner_->GetComponent<Transform>();
+	// 座標の設定
+	transform_ = owner_->AddComponent<Transform>();
+	transform_->pos_ = { 0.0f,0.0f,0.0f };
 
 	// 移動速度の初期化
 	info_.moveSpeed_ = MOVE_SPEED;
@@ -47,7 +49,7 @@ void Player::Init()
 }
 
 // 更新
-void Player::Update()
+void Player::Update(void)
 {
 	// 終了していたら処理を行わない
 	if (stateCtrl_.state_ == PLAYER_STATE::PLAYER_STATE_END)
@@ -74,7 +76,7 @@ void Player::Update()
 	IsReachedDeadPos();
 }
 
-void Player::Draw2D()
+void Player::Draw2D(void)
 {
 	// HP描画
 	DrawHP();
@@ -85,22 +87,6 @@ void Player::Draw2D()
 	DebugDraw();
 
 #endif // _DEBUG
-
-}
-
-Transform* Player::GetTransform()
-{
-	return transform_;
-}
-
-PLAYER_STATE Player::GetState(void)
-{
-	return stateCtrl_.state_;
-}
-
-int Player::GetInvincibleTime(void)
-{
-	return info_.invincibleTime_;
 }
 
 void Player::SetDamage(int damage)
@@ -289,7 +275,7 @@ void Player::EndUpdate(Player& player)
 {
 }
 
-void Player::ApplyGravity()
+void Player::ApplyGravity(void)
 {
 	// ステージコライダが無ければ処理を行わない
 	//if (!stageColl_) return;
@@ -438,6 +424,7 @@ void Player::DrawHP(void)
 
 void Player::DebugDraw(void)
 {
+	// プレイヤー座標表示
 	DrawFormatString(20,
 		300,
 		0xff0000,

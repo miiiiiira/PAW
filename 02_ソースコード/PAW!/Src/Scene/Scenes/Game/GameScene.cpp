@@ -1,5 +1,5 @@
-#include <EffekseerForDXLib.h>
 #include <algorithm>
+#include <EffekseerForDXLib.h>
 
 #include "../../../Application.h"
 #include "../../../Input/InputManager.h"
@@ -11,6 +11,9 @@
 #include "../../../Collision/Collision.h"
 #include "../../../Input/MouseCursor/MouseCursor.h"
 #include "../../../Math/Math.h"
+#include "../../../Object/ObjectManager.h"
+#include "../../../Object/Tag.h"
+#include "../../../Object/Player/Player.h"
 
 #include "GameScene.h"
 
@@ -26,12 +29,21 @@ GameScene::~GameScene(void)
 
 void GameScene::Init(void)
 {
+	// オブジェクトマネージャー初期化
+	objectManger_->Init();
+
 	// BGM再生
 	//AudioManager::GetInstance()->PlayBGM(SoundID::BGM_GAME_1);
 }
 
 void GameScene::Load(void)
 {
+	// オブジェクトマネージャーの生成
+	objectManger_ = new ObjectManager();
+
+	// プレイヤーの作成
+	PlayerCreate();
+
 	// サウンド読みこみ
 	//AudioManager::GetInstance()->LoadSceneSound(LoadScene::GAME);
 }
@@ -39,6 +51,9 @@ void GameScene::Load(void)
 void GameScene::LoadEnd(void)
 {
 	Init();
+
+	// 参照がほしいクラスにポインタを渡す
+	SetUp();
 }
 
 void GameScene::Update(void)
@@ -58,37 +73,36 @@ void GameScene::Update(void)
 
 #endif // _DEBUG
 
-	if (InputManager::GetInstance()->PauseButton())
-	{
-		// ポーズ画面を開いたサウンド
-		//AudioManager::GetInstance()->PlaySE(SoundID::SYS_PAUSE_ON);
-		// ポーズモードへ
-		SceneManager::GetInstance()->PushScene(std::make_shared<Pause>());
-		return;
-	}
+	// オブジェクトの更新
+	objectManger_->Update();
 
-	if (SceneManager::GetInstance()->GetIsClear())
-	{
-		// ステージ情報などを初期化する
-		SceneManager::GetInstance()->ResetGame();
-		// ゲームクリアシーンへ
-		SceneManager::GetInstance()->NextChangeScene(std::make_shared<GameClear>(),CLEAR);
-		return;
-	}
+	// Effekseerにより再生中のエフェクトを更新する
+	UpdateEffekseer3D();
 
-	if (SceneManager::GetInstance()->GetIsOver())
-	{
-		// ステージ情報などを初期化する
-		SceneManager::GetInstance()->ResetGame();
-		// ゲームオーバーシーンへ
-		SceneManager::GetInstance()->NextChangeScene(std::make_shared<GameOver>(),OVER);
-		return;
-	}
+	// ポーズシーン遷移
+	ChangePauseScene();
 
+	// ゲームクリア遷移
+	ChangeGameClearScene();
+
+	// ゲームオーバー遷移
+	ChangeGameOverScene();
 }
 
 void GameScene::Draw(void)
 {
+	// オブジェクトの描画前
+	objectManger_->PreDraw();
+
+	// オブジェクトの3D描画
+	objectManger_->Draw3D();
+
+	// Effekseerにより再生中のエフェクトを描画する
+	DrawEffekseer3D();
+
+	// オブジェクトの2D描画
+	objectManger_->Draw2D();
+
 #ifdef _DEBUG
 
 	DrawString(0, 0, "Game", 0xffffff);
@@ -98,6 +112,9 @@ void GameScene::Draw(void)
 
 void GameScene::Release(void)
 {
+	// オブジェクトマネージャー削除
+	delete objectManger_;
+
 	// 音の解放
 	//AudioManager::GetInstance()->DeleteSceneSound(LoadScene::GAME);
 }
@@ -108,5 +125,50 @@ void GameScene::CameraCreate(void)
 
 void GameScene::PlayerCreate(void)
 {
+	// プレイヤー生成
+	auto player = objectManger_->CreateObject();
+
+	// タグを付与
+	player->SetTagAndPriority(Tag_3D::Player,Tag_2D::Player);
+
+	// プレイヤー機能セット
+	player->AddComponent<Player>();
 }
 
+void GameScene::SetUp(void)
+{
+}
+
+void GameScene::ChangePauseScene(void)
+{
+	if (InputManager::GetInstance()->PauseButton())
+	{
+		// ポーズ画面を開いたサウンド
+		//AudioManager::GetInstance()->PlaySE(SoundID::SYS_PAUSE_ON);
+		// ポーズモードへ
+		SceneManager::GetInstance()->PushScene(std::make_shared<Pause>());
+		return;
+	}
+}
+
+void GameScene::ChangeGameClearScene(void)
+{
+	if (SceneManager::GetInstance()->GetIsClear())
+	{
+		// ステージ情報などを初期化する
+		SceneManager::GetInstance()->ResetGame();
+		// ゲームクリアシーンへ
+		SceneManager::GetInstance()->NextChangeScene(std::make_shared<GameClear>(), CLEAR);
+		return;
+	}
+}
+
+void GameScene::ChangeGameOverScene(void)
+{
+	if (SceneManager::GetInstance()->GetIsOver())
+	{
+		// ゲームオーバーシーンへ
+		SceneManager::GetInstance()->NextChangeScene(std::make_shared<GameOver>(), OVER);
+		return;
+	}
+}

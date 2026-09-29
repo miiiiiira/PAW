@@ -146,6 +146,9 @@
     <ClCompile Include="Src\Input\MouseCursor\MouseCursor.cpp" />
     <ClCompile Include="Src\main.cpp" />
     <ClCompile Include="Src\Math\Math.cpp" />
+    <ClCompile Include="Src\Object\Component\Animation\Animation.cpp" />
+    <ClCompile Include="Src\Object\Component\Graphics\Render2D.cpp" />
+    <ClCompile Include="Src\Object\Component\Graphics\Render3D.cpp" />
     <ClCompile Include="Src\Object\Component\Transform\Transform.cpp" />
     <ClCompile Include="Src\Object\ObjectManager.cpp" />
     <ClCompile Include="Src\Object\Player\Player.cpp" />
@@ -172,7 +175,11 @@
     <ClInclude Include="Src\Input\MouseCursor\MouseCursor.h" />
     <ClInclude Include="Src\Math\Math.h" />
     <ClInclude Include="Src\Math\Vector2.h" />
+    <ClInclude Include="Src\Object\Component\Animation\Animation.h" />
     <ClInclude Include="Src\Object\Component\Component.h" />
+    <ClInclude Include="Src\Object\Component\Graphics\Render.h" />
+    <ClInclude Include="Src\Object\Component\Graphics\Render2D.h" />
+    <ClInclude Include="Src\Object\Component\Graphics\Render3D.h" />
     <ClInclude Include="Src\Object\Component\Transform\Transform.h" />
     <ClInclude Include="Src\Object\Component\Transform\Transform2D.h" />
     <ClInclude Include="Src\Object\Object.h" />
