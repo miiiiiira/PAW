@@ -2,11 +2,11 @@
 
 #include <DxLib.h>
 
-#include "../Component.h"
-#include "../Transform/Transform.h"
+#include "../Component/Component.h"
+#include "../Component/Transform/Transform.h"
 
 class Transform;
-class PlayerController;
+class Player;
 
 class Camera : public Component
 {
@@ -15,46 +15,18 @@ public:
 	enum class MODE
 	{
 		NONE,
-		FIXED,
-		FREE,
-		FOLLOW,
+		FIXED,	// 固定カメラ
+		FREE,	// フリーカメラ
+		FOLLOW,	// 指定の物体に追従
 	};
 
 public:
-
-	// カメラ初期角度
-	static constexpr VECTOR CAMERA_ANGLE_STAGE_1 = { 0.0f, 90.0f * DX_PI_F / 180.0f, 0.0f };	// ステージ1
-	static constexpr VECTOR CAMERA_ANGLE_STAGE_2 = { 0.0f,0.0f,0.0f };							// ステージ2
-	static constexpr VECTOR CAMERA_ANGLE_STAGE_3 = { 0.0f, 90.0f * DX_PI_F / 180.0f, 0.0f };	// ステージ3
-
-	// マウス感度
-	static constexpr float MOUSE_SENSITIVITY = 0.003f;
-
-	// 追従対象から注視点への相対座標
-	static constexpr VECTOR FOLLOW_TARGET_LOCAL_POS = { 0.0f, 0.0f, 300.0f };
-
-	// カメラのクリップ範囲
-	static constexpr float VIEW_NEAR = 20.0f;
-	static constexpr float VIEW_FAR = 5000.0f;
-
-	// カメラのX回転上限度角
-	static constexpr float LIMIT_X_UP_RAD = -80.0f * (DX_PI_F / 180.0f);
-	static constexpr float LIMIT_X_DW_RAD = 70.0f * (DX_PI_F / 180.0f);
 
 	// 視点のしきい値(マウス)
 	static constexpr float THRESHOLD = 1.5f;
 
 	// 線形補間の係数
 	static constexpr float COEFFICIENT = 0.09f;
-
-	// 移動カウント最高値(カメラの揺らしタイミングに使用)
-	static constexpr float MOVE_COUNT_MAX = 100.0f;
-
-	// 移動時のカメラ揺らしの幅
-	static constexpr float SHAKE_SIZE = 10.0f;
-
-	// プレイヤーの速度から角度を求める際の微調整係数
-	static constexpr float SHAKE_ADJUST = 0.4f;
 
 public:
 
@@ -71,15 +43,33 @@ public:
 	void ChangeMode(MODE mode) { mode_ = mode; }
 
 	// 追従対象
-	void SetTarget(Transform* target) { target_ = target; }
+	void SetTarget(Transform* targetTransform) { targetTransform_ = targetTransform; }
 
 	// プレイヤーの情報をもらう　※プレイヤーの場合
-	void SetPlayerController(PlayerController* playerController) { playerController_ = playerController; }
+	void SetPlayer(Player* player) { player_ = player; }
 
 	// Transformを返す
 	Transform* GetTransform(void) { return transform_; }
 
 private:
+
+	// 追従対象からカメラへの相対座標
+	static constexpr VECTOR FOLLOW_CAMERA_LOCAL_POS = { 0.0f, 150.0f, -400.0f };
+
+	// 追従対象から注視点への相対座標
+	static constexpr VECTOR FOLLOW_TARGET_LOCAL_POS = { 0.0f, 150.0f, 200.0f };
+
+	// カメラのクリップ範囲
+	static constexpr float VIEW_NEAR = 20.0f;
+	static constexpr float VIEW_FAR = 5000.0f;
+
+	// カメラのX回転上限度角
+	static constexpr float LIMIT_X_UP_RAD = -80.0f * (DX_PI_F / 180.0f);	// 上上限
+	static constexpr float LIMIT_X_DW_RAD = 70.0f * (DX_PI_F / 180.0f);		// 下上限
+
+	// 感度
+	static constexpr float MOUSE_SENSITIVITY = 0.003f;	// マウス
+	static constexpr float PAD_SENSITIVITY = 0.03f;		// パッド
 
 	// デッドゾーン
 	static constexpr float DEAD_ZONE = 0.2f; 
@@ -97,10 +87,10 @@ private:
 	Transform* transform_ = nullptr;
 
 	// 追従対象Transform
-	Transform* target_ = nullptr;
+	Transform* targetTransform_ = nullptr;
 
 	// プレイヤー
-	PlayerController* playerController_ = nullptr;
+	Player* player_ = nullptr;
 
 private:
 
@@ -123,9 +113,9 @@ private:
 	void UpdateFollow(void);
 
 	// 描画前のカメラ設定
-	void SetBeforeDrawFixedPoint();
-	void SetBeforeDrawFree();
-	void SetBeforeDrawFollow();
+	void SetBeforeDrawFixedPoint(void);
+	void SetBeforeDrawFree(void);
+	void SetBeforeDrawFollow(void);
 
 	// カメラ操作		true = 視点操作(上下)上限有り / false = 視点操作(上下)上限なし
 	void ProcessRot(bool isLimit);
@@ -141,4 +131,6 @@ private:
 
 	// 注視点の移動
 	void TargetPosUpdate(MATRIX mat);
+	// カメラの移動
+	void CameraPosUpdate(MATRIX mat);
 };

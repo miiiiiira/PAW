@@ -27,6 +27,11 @@
     <ClCompile Include="Src\Object\Component\Animation\Animation.cpp" />
     <ClCompile Include="Src\Object\Component\Graphics\Render2D.cpp" />
     <ClCompile Include="Src\Object\Component\Graphics\Render3D.cpp" />
+    <ClCompile Include="Src\Object\Camera\Camera.cpp" />
+    <ClCompile Include="Src\Math\Easing.cpp" />
+    <ClCompile Include="Src\Object\Camera\CameraUtility.cpp" />
+    <ClCompile Include="Src\Math\MatrixUtility.cpp" />
+    <ClCompile Include="Src\Object\Grid\Grid.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Application.h" />
@@ -63,5 +68,10 @@
     <ClInclude Include="Src\Object\Component\Graphics\Render.h" />
     <ClInclude Include="Src\Object\Component\Graphics\Render2D.h" />
     <ClInclude Include="Src\Object\Component\Graphics\Render3D.h" />
+    <ClInclude Include="Src\Object\Camera\Camera.h" />
+    <ClInclude Include="Src\Math\Easing.h" />
+    <ClInclude Include="Src\Object\Camera\CameraUtility.h" />
+    <ClInclude Include="Src\Math\MatrixUtility.h" />
+    <ClInclude Include="Src\Object\Grid\Grid.h" />
   </ItemGroup>
 </Project>

@@ -14,6 +14,9 @@
 #include "../../../Object/ObjectManager.h"
 #include "../../../Object/Tag.h"
 #include "../../../Object/Player/Player.h"
+#include "../../../Object/Camera/Camera.h"
+#include "../../../Object/Camera/CameraUtility.h"
+#include "../../../Object/Grid/Grid.h"
 
 #include "GameScene.h"
 
@@ -32,6 +35,10 @@ void GameScene::Init(void)
 	// オブジェクトマネージャー初期化
 	objectManger_->Init();
 
+	// グリッド初期化
+	grid_ = new Grid();
+	grid_->Init();
+
 	// BGM再生
 	//AudioManager::GetInstance()->PlayBGM(SoundID::BGM_GAME_1);
 }
@@ -40,6 +47,9 @@ void GameScene::Load(void)
 {
 	// オブジェクトマネージャーの生成
 	objectManger_ = new ObjectManager();
+
+	// カメラの作成
+	CameraCreate();
 
 	// プレイヤーの作成
 	PlayerCreate();
@@ -94,6 +104,9 @@ void GameScene::Draw(void)
 	// オブジェクトの描画前
 	objectManger_->PreDraw();
 
+	// グリッド描画
+	grid_->Draw();
+
 	// オブジェクトの3D描画
 	objectManger_->Draw3D();
 
@@ -112,6 +125,10 @@ void GameScene::Draw(void)
 
 void GameScene::Release(void)
 {
+	// グリッド解放
+	grid_->Release();
+	delete grid_;
+
 	// オブジェクトマネージャー削除
 	delete objectManger_;
 
@@ -121,6 +138,17 @@ void GameScene::Release(void)
 
 void GameScene::CameraCreate(void)
 {
+	// カメラ生成
+	auto cameraObj = objectManger_->CreateObject();
+
+	// タグの付与
+	cameraObj->SetTagAndPriority(Tag_3D::Camera);
+
+	// カメラコンポーネントの付与
+	auto camera = cameraObj->AddComponent<Camera>();
+
+	// カメラのモードを変更
+	camera->ChangeMode(Camera::MODE::FOLLOW);
 }
 
 void GameScene::PlayerCreate(void)
@@ -137,6 +165,18 @@ void GameScene::PlayerCreate(void)
 
 void GameScene::SetUp(void)
 {
+	 // プレイヤーを取得
+	auto player = objectManger_->FindComponentWithTag<Player>(Tag_3D::Player);
+
+	// カメラの取得
+	auto camera = objectManger_->FindComponentWithTag<Camera>(Tag_3D::Camera);
+
+	// プレイヤーの情報をカメラに設定
+	camera->SetTarget(player->GetTransform());
+	camera->SetPlayer(player);
+
+	// カメラユーティリティにカメラのポインタを渡す
+	CameraUtility::SetCameraPoint(camera);
 }
 
 void GameScene::ChangePauseScene(void)

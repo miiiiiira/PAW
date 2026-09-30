@@ -3,6 +3,7 @@
 #include <DxLib.h>
 
 #include "../Component/Component.h"
+#include "../Component/Transform/Transform.h"
 #include "PlayerInfo.h"
 
 // 前方宣言
@@ -29,18 +30,22 @@ public:
 
 public:
 
-	Player(void);		// コンストラクタ
+	Player(void);					// コンストラクタ
 
 	void Load(void) override;		// 読み込み
 	void Init(void) override;		// 初期化
 	void Update(void) override;		// 更新
 	void Draw2D(void) override;		// 2D描画
+	void Draw3D(void) override;		// 3D描画
 
 public:
 
 	// Transformを返す
 	Transform* GetTransform(void) { return transform_; }
 	
+	// プレイヤーの頭座標を返す
+	VECTOR GetPlayerHeadPos(void) { return { transform_->pos_.x,transform_->pos_.y + HEAD_POS_OFFSET ,transform_->pos_.z }; }
+
 	// プレイヤー状態を取得
 	PLAYER_STATE GetState(void) { return stateCtrl_.state_; }
 	
@@ -116,7 +121,7 @@ private:
 	static constexpr int INVINCIBLE_TIME = 120;		// 無敵時間
 
 	// 移動設定
-	static constexpr float MOVE_SPEED = 7.0f;	// 移動速度
+	static constexpr float MOVE_SPEED = 10.0f;	// 移動速度
 
 	// 体力設定
 	static constexpr int DEFAULT_HP = 5;	// 初期HP
@@ -124,7 +129,7 @@ private:
 	// 重力
 	static constexpr float JUMP_POW = 25.0f;	// ジャンプ力
 	static constexpr float GRAVITY = -1.98f;	// 重力加速度
-	static constexpr float MAX_FALL = -40.0f;	// 最大落下速度
+	static constexpr float MAX_FALL = -15.0f;	// 最大落下速度
 
 	// ダメージ設定
 	static constexpr float HIT_REACT_FRICTION = 0.5f;	// ダメージ時のリアクション時の摩擦
@@ -135,6 +140,9 @@ private:
 	static constexpr int  HP_DRAW_POS_Y = 50;			// HPの描画Y軸
 	static constexpr int STATUS_DRAW_POS_OFFSET = 10;	// オフセット
 	static constexpr float COEFFICIENT = 0.2f;			// 線形補間の係数
+
+	// 頭座標
+	static constexpr float HEAD_POS_OFFSET = 100.0f;
 
 private:
 

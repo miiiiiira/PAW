@@ -8,6 +8,7 @@
 #include "../../SceneBase.h"
 
 class ObjectManager;
+class Grid;
 
 class GameScene : public SceneBase
 {
@@ -27,6 +28,9 @@ private:
 
 	// オブジェクトマネージャー
 	ObjectManager* objectManger_ = nullptr;
+
+	// グリッド線
+	Grid* grid_  = nullptr;
 
 private:
 

@@ -1,15 +1,13 @@
 #include "../Object.h"
 #include "../../Math/Math.h"
-#include "../Component/Transform/Transform.h"
 #include "../../Input/InputManager.h"
 #include "../../Scene/SceneManager.h"
+#include "../Camera/CameraUtility.h"
 
 #include "Player.h"
 
 Player::Player(void)
 {
-	
-
 	// テーブルに関数のポインタを格納
 	// 初期化関数
 	stateCtrl_.initTable_[PLAYER_STATE_IDLE] = IdleInit;
@@ -37,6 +35,7 @@ void Player::Init(void)
 	// 座標の設定
 	transform_ = owner_->AddComponent<Transform>();
 	transform_->pos_ = { 0.0f,0.0f,0.0f };
+	transform_->angle_ = { 0.0f,0.0f,0.0f };
 
 	// 移動速度の初期化
 	info_.moveSpeed_ = MOVE_SPEED;
@@ -87,6 +86,12 @@ void Player::Draw2D(void)
 	DebugDraw();
 
 #endif // _DEBUG
+}
+
+void Player::Draw3D(void)
+{
+	// プレイヤー描画
+	DrawCapsule3D(GetPlayerHeadPos(), transform_->pos_, 30.0f, 10, 0x0000ff, 0x0000ff, true);
 }
 
 void Player::SetDamage(int damage)
@@ -366,8 +371,8 @@ bool Player::InputMove(void)
 
 	// WASDで移動する
 	if (InputManager::GetInstance()->MoveBeforeButton()) { dir = VAdd(dir, { 0.0f, 0.0f, 1.0f }); }
-	if (InputManager::GetInstance()->MoveBackButton()) { dir = VAdd(dir, { -1.0f, 0.0f, 0.0f }); }
-	if (InputManager::GetInstance()->MoveLeftButton()) { dir = VAdd(dir, { 0.0f, 0.0f, -1.0f }); }
+	if (InputManager::GetInstance()->MoveBackButton()) { dir = VAdd(dir, { 0.0f, 0.0f, -1.0f });  }
+	if (InputManager::GetInstance()->MoveLeftButton()) { dir = VAdd(dir, { -1.0f, 0.0f, 0.0f }); }
 	if (InputManager::GetInstance()->MoveRightButton()) { dir = VAdd(dir, { 1.0f, 0.0f, 0.0f }); }
 
 	if (!Math::EqualsVZero(dir))
@@ -380,7 +385,7 @@ bool Player::InputMove(void)
 		MATRIX mat = MGetIdent();
 
 		// カメラのY軸角度回転行列を出す
-		//mat = MMult(mat, MGetRotY(CameraUtility::GetCameraAngle().y));
+		mat = MMult(mat, MGetRotY(CameraUtility::GetCameraAngle().y));
 
 		// 回転行列を使用して、ベクトルを回転させる
 		info_.moveDir_ = VTransform(dir, mat);

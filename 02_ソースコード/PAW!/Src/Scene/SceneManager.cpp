@@ -74,7 +74,7 @@ void SceneManager::Init3D(void)
 	SetUseLighting(true);
 
 	// 標準ライトをディレクショナルライトにする
-	ChangeLightTypeDir(VGet(-0.5f, -0.3f, -1.0f));
+	ChangeLightTypeDir(VGet( 0.3f, -0.7f, 0.8f ));
 
 	SetLightDifColor(GetColorF(0.0f, 0.0f, 0.0f, 1.0f));
 	

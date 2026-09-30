@@ -145,11 +145,16 @@
     <ClCompile Include="Src\Input\InputManager.cpp" />
     <ClCompile Include="Src\Input\MouseCursor\MouseCursor.cpp" />
     <ClCompile Include="Src\main.cpp" />
+    <ClCompile Include="Src\Math\Easing.cpp" />
     <ClCompile Include="Src\Math\Math.cpp" />
+    <ClCompile Include="Src\Math\MatrixUtility.cpp" />
+    <ClCompile Include="Src\Object\Camera\Camera.cpp" />
+    <ClCompile Include="Src\Object\Camera\CameraUtility.cpp" />
     <ClCompile Include="Src\Object\Component\Animation\Animation.cpp" />
     <ClCompile Include="Src\Object\Component\Graphics\Render2D.cpp" />
     <ClCompile Include="Src\Object\Component\Graphics\Render3D.cpp" />
     <ClCompile Include="Src\Object\Component\Transform\Transform.cpp" />
+    <ClCompile Include="Src\Object\Grid\Grid.cpp" />
     <ClCompile Include="Src\Object\ObjectManager.cpp" />
     <ClCompile Include="Src\Object\Player\Player.cpp" />
     <ClCompile Include="Src\Scene\SceneBase.cpp" />
@@ -173,8 +178,12 @@
     <ClInclude Include="Src\Collision\Collision.h" />
     <ClInclude Include="Src\Input\InputManager.h" />
     <ClInclude Include="Src\Input\MouseCursor\MouseCursor.h" />
+    <ClInclude Include="Src\Math\Easing.h" />
     <ClInclude Include="Src\Math\Math.h" />
+    <ClInclude Include="Src\Math\MatrixUtility.h" />
     <ClInclude Include="Src\Math\Vector2.h" />
+    <ClInclude Include="Src\Object\Camera\Camera.h" />
+    <ClInclude Include="Src\Object\Camera\CameraUtility.h" />
     <ClInclude Include="Src\Object\Component\Animation\Animation.h" />
     <ClInclude Include="Src\Object\Component\Component.h" />
     <ClInclude Include="Src\Object\Component\Graphics\Render.h" />
@@ -182,6 +191,7 @@
     <ClInclude Include="Src\Object\Component\Graphics\Render3D.h" />
     <ClInclude Include="Src\Object\Component\Transform\Transform.h" />
     <ClInclude Include="Src\Object\Component\Transform\Transform2D.h" />
+    <ClInclude Include="Src\Object\Grid\Grid.h" />
     <ClInclude Include="Src\Object\Object.h" />
     <ClInclude Include="Src\Object\ObjectManager.h" />
     <ClInclude Include="Src\Object\Player\Player.h" />

@@ -1,18 +1,21 @@
 #include <EffekseerForDXLib.h>
 
-#include "../../Object.h"
-#include "../../../Common/Math/Math.h"
-#include "../../../Common/Easing/Easing.h"
-#include "../../../Manager/Input/InputManager.h"
-#include "../../../Scene/SceneManager.h"
-#include "../../../Application.h"
-#include "../PlayerController/PlayerController.h"
+#include "../Object.h"
+#include "../../Math/Math.h"
+#include "../../Math/Easing.h"
+#include "../../Input/InputManager.h"
+#include "../../Scene/SceneManager.h"
+#include "../../Application.h"
+#include "../Player/Player.h"
 
 #include "Camera.h"
 
 void Camera::Init(void)
 {
-	transform_ = owner_->GetComponent<Transform>();
+	// 座標の設定
+	transform_ = owner_->AddComponent<Transform>();
+	transform_->pos_ = { 0.0f,0.0f,0.0f };
+	transform_->angle_ = { 0.0f,0.0f,0.0f };
 
 	// マウスカーソルを画面中央に戻す
 	SetMousePoint(Application::SCREEN_SIZE_X / 2, Application::SCREEN_SIZE_Y / 2);
@@ -89,65 +92,11 @@ void Camera::UpdateFollow(void)
 	mat = MMult(mat, MGetRotX(transform_->angle_.x));
 	mat = MMult(mat, MGetRotY(transform_->angle_.y));
 
-	// 追従対象の座標
-	VECTOR followPos = target_->pos_;
-
-	// カメラY軸座標を保持しておく
-	float prePosY = transform_->pos_.y;
-
-	VECTOR followCameraPos = {};
-
-	// 相対座標からワールド座標に直して、カメラ座標とする
-	// しゃがみ状態かスライディング状態であれば、カメラの位置を下げる
-	if (playerController_->GetState() == PLAYER_STATE::PLAYER_STATE_CROUCHING
-		|| playerController_->GetState() == PLAYER_STATE::PLAYER_STATE_SLIDING)
-	{
-		followCameraPos = VAdd(PlayerController::CROUCHING_CAP_START_OFFSET, PlayerController::STANDING_CAP_END_OFFSET);
-	}
-	// しゃがみ状態でなければ、カメラの位置は立ち状態のまま
-	else
-	{
-		followCameraPos = VAdd(PlayerController::STANDING_CAP_START_OFFSET, PlayerController::STANDING_CAP_END_OFFSET);
-	}
-
-	transform_->pos_ = VAdd(followPos, followCameraPos);
-
-	// プレイヤーの状態が移動しない状態であれば
-	if (playerController_->GetState() == PLAYER_STATE::PLAYER_STATE_CROUCHING
-		|| playerController_->GetState() == PLAYER_STATE::PLAYER_STATE_SLIDING
-		|| playerController_->GetState() == PLAYER_STATE::PLAYER_STATE_HIT_REACT)
-	{
-		// 移動カウントが動いていたら初期化
-		if (angleMoveCount > 0)
-		{
-			angleMoveCount = 0;
-		}
-	}
-
-	// プレイヤーの現在位置と前フレーム位置の移動ベクトルを作る
-	VECTOR playerMoveVec = VSub(playerController_->GetTransform()->pos_, playerController_->GetTransform()->prevPos_);
-
-	// Y軸移動は抜いたXZ軸の移動距離を計算
-	float playerMoveDis = VSize({ playerMoveVec.x,0.0f,playerMoveVec.z });
-
-	// プレイヤーの速度から角度の速度を計算
-	angleMoveCount += playerMoveDis * SHAKE_ADJUST;
-
-	// 少しでも動いていたら
-	if (playerMoveDis >= 1.0f)
-	{
-		// 角度を計算
-		float angle = (angleMoveCount / MOVE_COUNT_MAX) * DX_PI_F * 2.0f;
-
-		// sin波を使ってY座標を揺らす
-		transform_->pos_.y += sinf(angle) * SHAKE_SIZE;
-	}
-
-	// 線形補間で滑らかにする
-	transform_->pos_.y = Math::Lerp(prePosY, transform_->pos_.y, COEFFICIENT);
-	
 	// 注視点の移動
 	TargetPosUpdate(mat);
+
+	// カメラの移動
+	CameraPosUpdate(mat);
 }
 
 void Camera::SetBeforeDrawFixedPoint()
@@ -174,7 +123,7 @@ void Camera::SetBeforeDrawFree(void)
 
 void Camera::SetBeforeDrawFollow(void)
 {
-	if (!target_) return;
+	if (!targetTransform_) return;
 
 	// カメラの回転行列を作成
 	MATRIX mat = MGetIdent();
@@ -235,7 +184,7 @@ void Camera::RotKeyboard(bool isLimit)
 	float rotPow = 1.0f * DX_PI_F / 180.0f;
 
 	// isLimitがtrueだった場合カメラの視点操作(上下)に上限を付ける
-	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::CAMERA_DOWN))
+	if (InputManager::GetInstance()->IsNew(KEY_INPUT_UP))
 	{
 		transform_->angle_.x += rotPow;
 
@@ -245,7 +194,7 @@ void Camera::RotKeyboard(bool isLimit)
 		}
 	}
 
-	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::CAMERA_UP))
+	if (InputManager::GetInstance()->IsNew(KEY_INPUT_DOWN))
 	{
 		transform_->angle_.x -= rotPow;
 
@@ -256,8 +205,8 @@ void Camera::RotKeyboard(bool isLimit)
 	}
 
 	// 視点操作(左右)
-	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::CAMERA_RIGHT)) { transform_->angle_.y += rotPow; }
-	if (InputManager::GetInstance()->IsAction(INPUT_INFO::ACTION::CAMERA_LEFT)) { transform_->angle_.y -= rotPow; }
+	if (InputManager::GetInstance()->IsNew(KEY_INPUT_RIGHT)) { transform_->angle_.y += rotPow; }
+	if (InputManager::GetInstance()->IsNew(KEY_INPUT_LEFT)) { transform_->angle_.y -= rotPow; }
 }
 
 void Camera::RotGamePad(bool isLimit)
@@ -292,9 +241,6 @@ void Camera::RotGamePad(bool isLimit)
 	// ラジアンへ変換
 	float rotPow = rotPowDegree * DX_PI_F / 180.0f;
 
-	// デルタタイム
-	float deltaTime = SceneManager::GetInstance()->GetDeltaTime();
-
 	// スティックの方向ベクトル
 	float dirX = 0.0f;
 	float dirY = 0.0f;
@@ -304,8 +250,8 @@ void Camera::RotGamePad(bool isLimit)
 	}
 
 	// 角度に反映
-	transform_->angle_.y += dirX * rotPow * deltaTime;
-	transform_->angle_.x += dirY * rotPow * deltaTime;
+	transform_->angle_.y += dirX * rotPow * PAD_SENSITIVITY;
+	transform_->angle_.x += dirY * rotPow * PAD_SENSITIVITY;
 
 	// ピッチ角の角度制限（真上や真下を向きすぎないようにする）
 	if (isLimit && transform_->angle_.x > LIMIT_X_DW_RAD)
@@ -349,7 +295,7 @@ void Camera::RotMouse(bool isLimit)
 		transform_->angle_.x = LIMIT_X_UP_RAD;
 	}
 
-	//// マウスカーソルを画面中央に戻す
+	// マウスカーソルを画面中央に戻す
 	SetMousePoint(Application::SCREEN_SIZE_X / 2, Application::SCREEN_SIZE_Y / 2);
 }
 
@@ -359,8 +305,17 @@ void Camera::TargetPosUpdate(MATRIX mat)
 	VECTOR targetLocalRotPos = VTransform(FOLLOW_TARGET_LOCAL_POS, mat);
 
 	// カメラ座標との高さを一致させるためカメラ座標から回転させた相対座標を足す
-	targetPos_ = VAdd(transform_->pos_, targetLocalRotPos);
+	targetPos_ = VAdd(targetTransform_->pos_, targetLocalRotPos);
 
 	// 3Dサウンドのリスナーの位置とリスナーの前方位置を設定する
 	Set3DSoundListenerPosAndFrontPos_UpVecY(transform_->pos_, targetPos_);
+}
+
+void Camera::CameraPosUpdate(MATRIX mat)
+{
+	// 回転させた相対座標
+	VECTOR targetLocalRotPos = VTransform(FOLLOW_CAMERA_LOCAL_POS, mat);
+
+	// カメラ座標との高さを一致させるためカメラ座標から回転させた相対座標を足す
+	transform_->pos_ = VAdd(targetTransform_->pos_, targetLocalRotPos);
 }

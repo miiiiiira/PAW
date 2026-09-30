@@ -1,0 +1,62 @@
+#include "Camera.h"
+#include "../../Object/Component/Transform/Transform.h"
+#include "../../Math/MatrixUtility.h"
+
+#include "CameraUtility.h"
+
+void CameraUtility::SetCameraPoint(Camera* camera)
+{
+	// カメラのポインタを取得
+	camera_ = camera;
+}
+
+VECTOR CameraUtility::GetCameraPos(void)
+{
+	// カメラの座標を渡す
+	return camera_->GetTransform()->pos_;
+}
+
+VECTOR CameraUtility::GetCameraAngle(void)
+{
+	// カメラのアングルを渡す
+	return camera_->GetTransform()->angle_;
+}
+
+MATRIX CameraUtility::GetCameraMatrix(void)
+{
+	// カメラの回転行列
+	const auto& angle = camera_->GetTransform()->angle_;
+	VECTOR vec = { angle.x,angle.y,0.0f };
+	MATRIX matRot = Matrix::GetMatrixRotateXYZ(vec);
+
+	return matRot;
+}
+
+VECTOR CameraUtility::CameraRotToPos(VECTOR pos)
+{
+	// 指定の座標にカメラの回転を適用する
+	VECTOR localPosRot = VTransform(pos, GetCameraMatrix());
+
+	return  localPosRot;
+}
+
+MATRIX CameraUtility::AngleToMatrix(VECTOR angle)
+{
+	// 指定の角度を行列にする
+	MATRIX mat = Matrix::GetMatrixRotateXYZ(angle);
+
+	// プレイヤーの回転を行列に反映する
+	mat = Matrix::Multiplication(mat, GetCameraMatrix());
+
+	return mat;
+}
+
+VECTOR CameraUtility::AddCameraPosLocalPos(VECTOR localPos)
+{
+	// ローカル座標とカメラ座標を足す
+	VECTOR pos = VAdd(
+			camera_->GetTransform()->pos_,
+			CameraRotToPos(localPos));
+
+	return pos;
+}
