@@ -64,8 +64,8 @@ private:
 	static constexpr float VIEW_FAR = 5000.0f;
 
 	// カメラのX回転上限度角
-	static constexpr float LIMIT_X_UP_RAD = -80.0f * (DX_PI_F / 180.0f);	// 上上限
-	static constexpr float LIMIT_X_DW_RAD = 70.0f * (DX_PI_F / 180.0f);		// 下上限
+	static constexpr float LIMIT_X_UP_RAD = -60.0f * (DX_PI_F / 180.0f);	// 上上限
+	static constexpr float LIMIT_X_DW_RAD = 50.0f * (DX_PI_F / 180.0f);		// 下上限
 
 	// 感度
 	static constexpr float MOUSE_SENSITIVITY = 0.003f;	// マウス

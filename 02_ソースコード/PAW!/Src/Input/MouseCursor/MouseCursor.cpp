@@ -1,6 +1,7 @@
-#include "MouseCursor.h"
 #include "../InputManager.h"
 #include "../../Application.h"
+
+#include "MouseCursor.h"
 
 MouseCursor* MouseCursor::instance_ = nullptr;
 
@@ -11,7 +12,7 @@ MouseCursor::MouseCursor(void)
 void MouseCursor::Load(void)
 {
 	// マウス画像の読み込み
-	mouseImg_ = LoadGraph("Data/Image/Common/cursor.png");
+	mouseImg_ = LoadGraph("Data/Image/MouseCursor/MouseCursor.png");
 }
 
 void MouseCursor::Init(void)
@@ -29,11 +30,7 @@ void MouseCursor::Update(void)
 	if (mouseImg_ == -1)return;
 
 	// デバイスがパッドであれば処理を行わない
-	if (InputManager::GetInstance()->GetActiveDevice() == InputManager::ActiveDevice::PAD)
-	{
-		mousePos_ = { Application::SCREEN_SIZE_X / 2,Application::SCREEN_SIZE_Y / 2 };
-		return;
-	}
+	if (InputManager::GetInstance()->GetActiveDevice() == InputManager::ActiveDevice::PAD) { return; }
 
 	// 描画フラグが立っていなかったら処理を行わない
 	if (!mouseDrawFlg_)return;
@@ -57,12 +54,9 @@ void MouseCursor::Draw(void)
 	DrawRotaGraphF(mousePos_.x, mousePos_.y, 0.2, 0.0, mouseImg_, true);
 
 #ifdef _DEBUG
-	
 	// デバッグ表示
 	DebugDraw();
-
 #endif // _DEBUG
-
 }
 
 void MouseCursor::Destroy(void)
@@ -78,6 +72,12 @@ void MouseCursor::SetMouseDraw(bool flg)
 {
 	// 指定された描画フラグへ変更
 	mouseDrawFlg_ = flg;
+
+	if (mouseDrawFlg_)
+	{
+		mousePos_ = { Application::SCREEN_SIZE_X / 2,Application::SCREEN_SIZE_Y / 2 };
+		SetMousePoint(Application::SCREEN_SIZE_X / 2, Application::SCREEN_SIZE_Y / 2);
+	}
 }
 
 void MouseCursor::DebugDraw(void)

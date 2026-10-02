@@ -1,35 +1,18 @@
 #pragma once
+
 #include "../../Math/Vector2.h"
 
 class MouseCursor
 {
 public:
-
-	static constexpr int MOUSE_IMG_SIZE_WID = 30;	// マウス画像の横サイズ
-	static constexpr int MOUSE_IMG_SIZE_HIG = 40;	// マウス画像の縦サイズ
-
-public:
-
 	// シングルトン（生成・取得・削除）
 	static void  CreateInstance(void) { if (instance_ == nullptr) { instance_ = new MouseCursor(); } }
 	static MouseCursor* GetInstance(void) { return instance_; }
 	static void DeleteInstance(void) { if (instance_ != nullptr) { delete instance_; } }
 
-public:
-
-	MouseCursor(void);	// コンストラクタ
-
-	void Load(void);	// 読み込み
-	void Init(void);	// 初期化
-	void Update(void);	// 更新
-	void Draw(void);	// 描画
-	void Destroy(void);	// 解放
-	
-	void SetMouseDraw(bool flg);	// マウスの描画フラグを設定
-
 private:
-
-	static MouseCursor* instance_;	// 静的インスタンス
+	// 静的インスタンス
+	static MouseCursor* instance_;	
 
 	// コピー・ムーブ操作を禁止
 	MouseCursor(const MouseCursor&) = delete;
@@ -37,15 +20,36 @@ private:
 	MouseCursor(MouseCursor&&) = delete;
 	MouseCursor& operator=(MouseCursor&&) = delete;
 
+public:
+	// マウス画像のサイズ
+	static constexpr int MOUSE_IMG_SIZE_WID = 38;	// 横
+	static constexpr int MOUSE_IMG_SIZE_HIG = 45;	// 縦
+
+public:
+	MouseCursor(void);	// コンストラクタ
+
+	void Load(void);	// 読み込み
+	void Init(void);	// 初期化
+	void Update(void);	// 更新
+	void Draw(void);	// 描画
+	void Destroy(void);	// 解放
+
+public:
+	// マウスの描画を設定
+	void SetMouseDraw(bool flg);	
+
 private:
-
-	void DebugDraw(void);	// デバッグ表示
+	// デバッグ表示
+	void DebugDraw(void);	
 
 private:
+	// マウス画像
+	int mouseImg_ = -1;	
 
-	int mouseImg_ = -1;	// マウス画像
-	Vector2 mousePos_;	// マウス座標
+	// マウス座標
+	Vector2 mousePos_;
 	
-	bool mouseDrawFlg_ = true;	// マウス表示フラグ　true / 表示,false / 非表示
+	// マウス表示フラグ　true / 表示,false / 非表示
+	bool mouseDrawFlg_ = true;	
 };
 
