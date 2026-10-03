@@ -18,7 +18,7 @@ Pause::Pause(void)
 	confirm_ = nullptr;
 
 	// マウスの表示する
-	MouseCursor::GetInstance()->SetMouseDraw(true);
+	//MouseCursor::GetInstance()->SetMouseDraw(true);
 }
 
 Pause::~Pause(void)
@@ -143,7 +143,7 @@ void Pause::UpdateContinue(void)
 	SetMousePoint(Application::SCREEN_SIZE_X / 2, Application::SCREEN_SIZE_Y / 2);
 
 	// マウスの表示を消す
-	MouseCursor::GetInstance()->SetMouseDraw(false);
+	//MouseCursor::GetInstance()->SetMouseDraw(false);
 
 	// ゲームシーンへ戻る(ポーズモードを終了する)
 	//AudioManager::GetInstance()->PlaySE(SoundID::SYS_PAUSE_OFF);
@@ -217,18 +217,17 @@ void Pause::PadSelect(void)
 	switch (currentMenu_)
 	{
 	case PAUSE::NONE:
-
 		ChangeSelect(PAUSE::CONTINUE);
-
 		break;
+
 	case PAUSE::CONTINUE:
 		if (InputManager::GetInstance()->SelectDownPad())
 		{
 			ChangeSelect(PAUSE::MAINMENU);
 		}
 		break;
-	case PAUSE::MAINMENU:
 
+	case PAUSE::MAINMENU:
 		if (InputManager::GetInstance()->SelectUpPad())
 		{
 			ChangeSelect(PAUSE::CONTINUE);
@@ -238,16 +237,15 @@ void Pause::PadSelect(void)
 		{
 			ChangeSelect(PAUSE::QUIT);
 		}
-
 		break;
-	case PAUSE::QUIT:
 
+	case PAUSE::QUIT:
 		if (InputManager::GetInstance()->SelectUpPad())
 		{
 			ChangeSelect(PAUSE::MAINMENU);
 		}
-
 		break;
+
 	default:
 		break;
 	}

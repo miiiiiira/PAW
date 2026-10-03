@@ -4,11 +4,11 @@ enum class Tag_3D
 {
 	None,
 	Object,
-	Camera,
 	Stage,
 	Player,
 	Enemy,
 	Crosshair,
+	Camera,
 };
 
 // •`‰æ—Dæ‡‚Ì•À‚Ñ‚É‚µ‚Ä‚¨‚­(‰º‚É‚È‚ê‚Î‚È‚é‚Ù‚Çè‘O‚É•`‰æ)

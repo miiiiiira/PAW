@@ -59,7 +59,7 @@ void SceneManager::Init(void)
 void SceneManager::Init3D(void)
 {
 	// 背景色設定
-	SetBackgroundColor(0, 0, 0);
+	SetBackgroundColor(128, 128, 128);
 
 	// Zバッファを有効にする
 	SetUseZBuffer3D(true);

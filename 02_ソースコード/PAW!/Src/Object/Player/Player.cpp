@@ -6,23 +6,89 @@
 
 #include "Player.h"
 
+namespace
+{
+	// リミット設定
+	constexpr float DAMAGE_POS_Y = -2000.0f;	// プレイヤーがダメージを受ける座標
+	constexpr int INVINCIBLE_TIME = 120;		// 無敵時間
+
+	// 移動設定
+	constexpr float MOVE_SPEED = 10.0f;			// 移動速度
+	constexpr float AVOID_DISTANCE = 500.0f;	// 回避距離
+	constexpr float COEFFICIENT = 0.2f;			// 線形補間の係数
+	constexpr float AVOID_MIN_DISTANCE = 30.0f;	// 回避時の打ち切り距離
+
+	// 体力設定
+	constexpr int DEFAULT_HP = 5;	// 初期HP
+
+	// 重力設定
+	constexpr float JUMP_POW = 25.0f;	// ジャンプ力
+	constexpr float GRAVITY = -1.98f;	// 重力加速度
+	constexpr float MAX_FALL = -15.0f;	// 最大落下速度
+
+	// ダメージ設定
+	constexpr float HIT_REACT_FRICTION = 0.5f;	// ダメージ時のリアクション時の摩擦
+	constexpr int SHAKE_TIME = 20;				// 揺らす時間
+
+	// 描画設定
+	constexpr int  STATUS_DRAW_POS_X = 10;		// ステータス描画を始める座標
+	constexpr int  HP_DRAW_POS_Y = 50;			// HPの描画Y軸
+	constexpr int STATUS_DRAW_POS_OFFSET = 10;	// オフセット
+}
+
 Player::Player(void)
 {
 	// テーブルに関数のポインタを格納
+	
+	// プレイヤー状態
 	// 初期化関数
-	stateCtrl_.initTable_[PLAYER_STATE_IDLE] = IdleInit;
-	stateCtrl_.initTable_[PLAYER_STATE_MOVE] = MoveInit;
-	stateCtrl_.initTable_[PLAYER_STATE_ATTACK] = AttackInit;
-	stateCtrl_.initTable_[PLAYER_STATE_DODGE] = DodgeInit;
-	stateCtrl_.initTable_[PLAYER_STATE_HIT] = HitInit;
-	stateCtrl_.initTable_[PLAYER_STATE_DEAD] = DeadInit;
+	stateCtrl_.initStateTable_[PLAYER_STATE_IDLE] = InitIdle;
+	stateCtrl_.initStateTable_[PLAYER_STATE_MOVE] = InitMove;
+	stateCtrl_.initStateTable_[PLAYER_STATE_ATTACK] = InitAttack;
+	stateCtrl_.initStateTable_[PLAYER_STATE_AVOID] = InitAvoid;
+	stateCtrl_.initStateTable_[PLAYER_STATE_JUMP] = InitJump;
+	stateCtrl_.initStateTable_[PLAYER_STATE_HIT] = InitHit;
+	stateCtrl_.initStateTable_[PLAYER_STATE_DEAD] = InitDead;
+	stateCtrl_.initStateTable_[PLAYER_STATE_END] = InitEnd;
 	// 更新関数
-	stateCtrl_.updateTable_[PLAYER_STATE_IDLE] = IdleUpdate;
-	stateCtrl_.updateTable_[PLAYER_STATE_MOVE] = MoveUpdate;
-	stateCtrl_.updateTable_[PLAYER_STATE_ATTACK] = AttackUpdate;
-	stateCtrl_.updateTable_[PLAYER_STATE_DODGE] = DodgeUpdate;
-	stateCtrl_.updateTable_[PLAYER_STATE_HIT] = HitUpdate;
-	stateCtrl_.updateTable_[PLAYER_STATE_DEAD] = DeadUpdate;
+	stateCtrl_.updateStateTable_[PLAYER_STATE_IDLE] = UpdateIdle;
+	stateCtrl_.updateStateTable_[PLAYER_STATE_MOVE] = UpdateMove;
+	stateCtrl_.updateStateTable_[PLAYER_STATE_ATTACK] = UpdateAttack;
+	stateCtrl_.updateStateTable_[PLAYER_STATE_AVOID] = UpdateAvoid;
+	stateCtrl_.updateStateTable_[PLAYER_STATE_JUMP] = UpdateJump;
+	stateCtrl_.updateStateTable_[PLAYER_STATE_HIT] = UpdateHit;
+	stateCtrl_.updateStateTable_[PLAYER_STATE_DEAD] = UpdateDead;
+	stateCtrl_.updateStateTable_[PLAYER_STATE_END] = UpdateEnd;
+
+	// プレイヤー攻撃状態
+	// 初期化関数
+	stateCtrl_.initAttackTable_[PLAYER_ATTACK_1] = InitAttack1;
+	stateCtrl_.initAttackTable_[PLAYER_ATTACK_2] = InitAttack2;
+	stateCtrl_.initAttackTable_[PLAYER_ATTACK_3] = InitAttack3;
+	// 更新関数
+	stateCtrl_.updateAttackTable_[PLAYER_ATTACK_1] = UpdateAttack1;
+	stateCtrl_.updateAttackTable_[PLAYER_ATTACK_2] = UpdateAttack2;
+	stateCtrl_.updateAttackTable_[PLAYER_ATTACK_3] = UpdateAttack3;
+
+	// プレイヤージャンプ状態
+	// 初期化関数
+	stateCtrl_.initJumpTable_[PLAYER_JUMP_START] = InitJumpStart;
+	stateCtrl_.initJumpTable_[PLAYER_JUMPING] = InitJumping;
+	stateCtrl_.initJumpTable_[PLAYER_JUMP_END] = InitJumpEnd;
+	// 更新関数
+	stateCtrl_.updateJumpTable_[PLAYER_JUMP_START] = UpdateJumpStart;
+	stateCtrl_.updateJumpTable_[PLAYER_JUMPING] = UpdateJumping;
+	stateCtrl_.updateJumpTable_[PLAYER_JUMP_END] = UpdateJumpEnd;
+
+	// プレイヤー被ダメージ状態
+	// 初期化関数
+	stateCtrl_.initHitTable_[PLAYER_HIT_START] = InitHitStart;
+	stateCtrl_.initHitTable_[PLAYER_HIT_STUN] = InitHitStun;
+	stateCtrl_.initHitTable_[PLAYER_HIT_END] = InitHitEnd;
+	// 更新関数
+	stateCtrl_.updateHitTable_[PLAYER_HIT_START] = UpdateHitStart;
+	stateCtrl_.updateHitTable_[PLAYER_HIT_STUN] = UpdateHitStun;
+	stateCtrl_.updateHitTable_[PLAYER_HIT_END] = UpdateHitEnd;
 }
 
 void Player::Load(void)
@@ -51,25 +117,22 @@ void Player::Init(void)
 void Player::Update(void)
 {
 	// 終了していたら処理を行わない
-	if (stateCtrl_.state_ == PLAYER_STATE::PLAYER_STATE_END)
+	if (stateCtrl_.state_ == PLAYER_STATE_END)
 	{
 		return;
 	}
 
-	// 移動処理
-	StateUpdate();
-
-	// ジャンプ処理
-	Jump();
-
 	// 重力処理
 	ApplyGravity();
 
+	// 移動処理
+	UpdateState();
+
 	// 無敵時間を更新
-	InvincibleUodate();
+	UpdateInvincible();
 
 	// ヒットストップ更新
-	HitStopUodate();
+	UpdateHitStop();
 
 	// 死亡座標へ到達しているか
 	IsReachedDeadPos();
@@ -81,10 +144,8 @@ void Player::Draw2D(void)
 	DrawHP();
 
 #ifdef _DEBUG
-
 	// デバッグ表示
 	DebugDraw();
-
 #endif // _DEBUG
 }
 
@@ -110,7 +171,6 @@ void Player::SetDamage(int damage)
 
 		// 死亡ステートへ
 		ChangeState(PLAYER_STATE_DEAD);
-
 	}
 	else
 	{
@@ -140,91 +200,119 @@ void Player::SetHitReact(VECTOR moveDir, float moveSpeed, float jumpPow)
 	ChangeState(PLAYER_STATE_HIT);
 }
 
-void Player::ChangeState(PLAYER_STATE state)
-{
-	// 指定されたステートへ変更
-	stateCtrl_.state_ = state;
-
-	// nullチェック
-	if (stateCtrl_.initTable_[stateCtrl_.state_])
-	{
-		// 状態別初期化
-		stateCtrl_.initTable_[stateCtrl_.state_](*this);
-	}
-}
-
-void Player::StateUpdate(void)
+void Player::UpdateState(void)
 {
 	// Transformがなければ処理しない
 	if (!transform_) return;
 
 	// nullチェック
-	if (stateCtrl_.updateTable_[stateCtrl_.state_])
+	if (stateCtrl_.updateStateTable_[stateCtrl_.state_])
 	{
 		// 状態別更新
-		stateCtrl_.updateTable_[stateCtrl_.state_](*this);
+		stateCtrl_.updateStateTable_[stateCtrl_.state_](*this);
 	}
 }
 
-void Player::IdleInit(Player& player)
+void Player::InitIdle(Player& player)
 {
 	// 移動速度を初期化
 	player.info_.moveSpeed_ = 0.0f;
 }
 
-void Player::MoveInit(Player& player)
+void Player::InitMove(Player& player)
 {
-	// プレイヤーの移動速度を普通の移動速度にする
+	// プレイヤーの移動速度を設定
 	player.info_.moveSpeed_ = MOVE_SPEED;
 }
 
-void Player::AttackInit(Player& player)
+void Player::InitAttack(Player& player)
+{
+	// 初期化
+	player.ChangeAttackState(PLAYER_ATTACK_1);
+}
+
+void Player::InitHit(Player& player)
+{
+	// 最初の状態へ初期化
+	player.ChangeHitState(PLAYER_HIT_START);
+}
+
+void Player::InitAvoid(Player& player)
+{
+	// 移動していなかったら
+	if (!player.InputMove())
+	{
+		// カメラが向いている方向を設定
+		MATRIX mat = MGetRotY(CameraUtility::GetCameraAngle().y);
+
+		// 行列から回転成分を取る
+		player.info_.moveDir_.x = mat.m[2][0];
+		player.info_.moveDir_.y = mat.m[2][1];
+		player.info_.moveDir_.z = mat.m[2][2];
+	}
+
+	// 回避先の座標を算出
+	player.info_.avoidPos_ =
+		VAdd(player.transform_->pos_,
+			VScale(player.info_.moveDir_, AVOID_DISTANCE));
+
+	// 移動速度を初期化
+	player.info_.moveSpeed_ = 0.0f;
+}
+
+void Player::InitJump(Player& player)
+{
+	player.ChangeJumpState(PLAYER_JUMP_START);
+
+	// 移動速度を初期化
+	player.info_.moveSpeed_ = 0.0f;
+}
+
+void Player::InitDead(Player& player)
 {
 }
 
-void Player::HitInit(Player& player)
-{
-}
-
-void Player::DodgeInit(Player& player)
-{
-}
-
-void Player::DeadInit(Player& player)
-{
-}
-
-void Player::EndInit(Player& player)
+void Player::InitEnd(Player& player)
 {
 	// ゲームオーバーフラグを立てる
 	SceneManager::GetInstance()->TrueGameOver();
 }
 
-void Player::IdleUpdate(Player& player)
+void Player::UpdateIdle(Player& player)
 {
+	// 攻撃ボタンが押されていたら
+	if (InputManager::GetInstance()->AttackButton())
+	{
+		// 攻撃状態へ
+ 		player.ChangeState(PLAYER_STATE_ATTACK);
+		return;
+	}
+
+	// 回避ボタンが押されていたら
+	if (InputManager::GetInstance()->AvoidButton())
+	{
+		// 回避状態へ
+		player.ChangeState(PLAYER_STATE_AVOID);
+		return;
+	}
+
+	// ジャンプボタンを押されたかつ、ジャンプ中ではなかったら
+	if (InputManager::GetInstance()->JumpButton())
+	{
+		// ジャンプ状態へ
+		player.ChangeState(PLAYER_STATE_JUMP);
+		return;
+	}
+
 	// 移動していたら
 	if (player.InputMove())
 	{
 		// 移動状態へ
 		player.ChangeState(PLAYER_STATE_MOVE);
 	}
-
-	// 回避ボタンが押されていたら
-	if (InputManager::GetInstance()->DodgeButton())
-	{
-		// 回避状態へ
-		player.ChangeState(PLAYER_STATE_DODGE);
-	}
-
-	// 攻撃ボタンが押されていたら
-	if (InputManager::GetInstance()->AttackButton())
-	{
-		// 攻撃状態へ
-		player.ChangeState(PLAYER_STATE_ATTACK);
-	}
 }
 
-void Player::MoveUpdate(Player& player)
+void Player::UpdateMove(Player& player)
 {
 	// 移動していたら
 	if (player.InputMove())
@@ -243,22 +331,248 @@ void Player::MoveUpdate(Player& player)
 	{
 		// 攻撃状態へ
 		player.ChangeState(PLAYER_STATE_ATTACK);
+		return;
+	}
+
+	// 回避ボタンが押されていたら
+	if (InputManager::GetInstance()->AvoidButton())
+	{
+		// 回避状態へ
+		player.ChangeState(PLAYER_STATE_AVOID);
+		return;
+	}
+
+	// ジャンプボタンを押されたかつ、ジャンプ中ではなかったら
+	if (InputManager::GetInstance()->JumpButton())
+	{
+		// ジャンプ状態へ
+		player.ChangeState(PLAYER_STATE_JUMP);
+		return;
 	}
 }
 
-void Player::AttackUpdate(Player& player)
+void Player::UpdateAttack(Player& player)
+{
+	// nullチェック
+	if (player.stateCtrl_.updateAttackTable_[player.stateCtrl_.attackState_])
+	{
+		// 状態別初期化
+		player.stateCtrl_.updateAttackTable_[player.stateCtrl_.attackState_](player);
+	}
+
+	// 回避ボタンが押されていたら
+	if (InputManager::GetInstance()->AvoidButton())
+	{
+		// 回避状態へ
+		player.ChangeState(PLAYER_STATE_AVOID);
+		return;
+	}
+
+	// ジャンプボタンを押されたかつ、ジャンプ中ではなかったら
+	if (InputManager::GetInstance()->JumpButton())
+	{
+		// ジャンプ状態へ
+		player.ChangeState(PLAYER_STATE_JUMP);
+		return;
+	}
+}
+
+void Player::UpdateAvoid(Player& player)
+{
+	// 回避先の座標へ近づける
+	player.transform_->pos_ = Math::Lerp(player.transform_->pos_, player.info_.avoidPos_, COEFFICIENT);
+
+	// 現在地から回避先までの距離を算出
+	VECTOR vec = VSub(player.info_.avoidPos_, player.transform_->pos_);
+	vec.y = 0.0f;
+
+	float dis = VSize(vec);
+
+	// 回避先の座標にほぼ近ければ
+	if (dis < AVOID_MIN_DISTANCE)
+	{
+		// 待機状態へ
+		player.ChangeState(PLAYER_STATE_IDLE);
+	}
+}
+
+void Player::UpdateJump(Player& player)
+{
+	// 移動していたら
+	if (player.InputMove())
+	{
+		// プレイヤーの移動速度を設定
+		player.info_.moveSpeed_ = MOVE_SPEED;
+		// 指定された方向と移動速度を使用し座標に反映
+		player.Move();
+		player.info_.moveSpeed_ = 0.0f;
+	}
+
+	// 攻撃ボタンが押されていたら
+	if (InputManager::GetInstance()->AttackButton())
+	{
+		// 攻撃状態へ
+		player.ChangeState(PLAYER_STATE_ATTACK);
+		return;
+	}
+
+	// 回避ボタンが押されていたら
+	if (InputManager::GetInstance()->AvoidButton())
+	{
+		// 回避状態へ
+		player.ChangeState(PLAYER_STATE_AVOID);
+		return;
+	}
+
+	// nullチェック
+	if (player.stateCtrl_.updateJumpTable_[player.stateCtrl_.jumpState_])
+	{
+		// 状態別初期化
+		player.stateCtrl_.updateJumpTable_[player.stateCtrl_.jumpState_](player);
+	}
+}
+
+void Player::UpdateHit(Player& player)
+{
+	// nullチェック
+	if (player.stateCtrl_.updateHitTable_[player.stateCtrl_.hitState_])
+	{
+		// 状態別初期化
+		player.stateCtrl_.updateHitTable_[player.stateCtrl_.hitState_](player);
+	}
+}
+
+void Player::UpdateDead(Player& player)
+{
+	player.ChangeState(PLAYER_STATE_END);
+}
+
+void Player::UpdateEnd(Player& player)
+{
+}
+void Player::ChangeState(PLAYER_STATE state)
+{
+	// 指定されたステートへ変更
+	stateCtrl_.state_ = state;
+
+	// nullチェック
+	if (stateCtrl_.initStateTable_[stateCtrl_.state_])
+	{
+		// 状態別初期化
+		stateCtrl_.initStateTable_[stateCtrl_.state_](*this);
+	}
+}
+
+void Player::InitAttack1(Player& player)
+{
+}
+
+void Player::InitAttack2(Player& player)
+{
+}
+
+void Player::InitAttack3(Player& player)
+{
+}
+
+void Player::UpdateAttack1(Player& player)
 {
 	// 待機状態へ
 	player.ChangeState(PLAYER_STATE_IDLE);
 }
 
-void Player::DodgeUpdate(Player& player)
+void Player::UpdateAttack2(Player& player)
 {
 	// 待機状態へ
 	player.ChangeState(PLAYER_STATE_IDLE);
 }
 
-void Player::HitUpdate(Player& player)
+void Player::UpdateAttack3(Player& player)
+{
+	// 待機状態へ
+	player.ChangeState(PLAYER_STATE_IDLE);
+}
+
+void Player::ChangeAttackState(PLAYER_ATTACK_STATE state)
+{
+	// 指定されたステートへ変更
+	stateCtrl_.attackState_ = state;
+
+	// nullチェック
+	if (stateCtrl_.initAttackTable_[stateCtrl_.attackState_])
+	{
+		// 状態別初期化
+		stateCtrl_.initAttackTable_[stateCtrl_.attackState_](*this);
+	}
+}
+
+void Player::InitJumpStart(Player& player)
+{
+	// ジャンプ力を設定
+	player.info_.velocityY_ = JUMP_POW;
+}
+
+void Player::InitJumping(Player& player)
+{
+}
+
+void Player::InitJumpEnd(Player& player)
+{
+}
+
+void Player::UpdateJumpStart(Player& player)
+{
+	player.ChangeJumpState(PLAYER_JUMPING);
+}
+
+void Player::UpdateJumping(Player& player)
+{
+	// 床についているため
+	if (player.transform_->pos_.y <= 0.0f)
+	{
+		// ジャンプ終了状態へ
+ 		player.ChangeJumpState(PLAYER_JUMP_END);
+	}
+}
+
+void Player::UpdateJumpEnd(Player& player)
+{
+	// 待機状態へ
+	player.ChangeState(PLAYER_STATE_IDLE);
+}
+
+void Player::ChangeJumpState(PLAYER_JUMP_STATE state)
+{
+	// 指定されたステートへ変更
+	stateCtrl_.jumpState_ = state;
+
+	// nullチェック
+	if (stateCtrl_.initJumpTable_[stateCtrl_.jumpState_])
+	{
+		// 状態別初期化
+		stateCtrl_.initJumpTable_[stateCtrl_.jumpState_](*this);
+	}
+}
+
+void Player::InitHitStart(Player& player)
+{
+}
+
+void Player::InitHitStun(Player& player)
+{
+}
+
+void Player::InitHitEnd(Player& player)
+{
+
+}
+
+void Player::UpdateHitStart(Player& player)
+{
+	player.ChangeHitState(PLAYER_HIT_STUN);
+}
+
+void Player::UpdateHitStun(Player& player)
 {
 	// 移動速度が0より大きく移動している場合
 	if (player.info_.moveSpeed_ > 0.0f)
@@ -269,30 +583,45 @@ void Player::HitUpdate(Player& player)
 		// 指定された方向と移動速度を使用し座標に反映
 		player.Move();
 	}
+	else
+	{
+		player.ChangeHitState(PLAYER_HIT_END);
+	}
 }
 
-void Player::DeadUpdate(Player& player)
+void Player::UpdateHitEnd(Player& player)
 {
-	player.ChangeState(PLAYER_STATE_END);
+	// 待機状態へ
+	player.ChangeState(PLAYER_STATE_IDLE);
 }
 
-void Player::EndUpdate(Player& player)
+void Player::ChangeHitState(PLAYER_HIT_STATE state)
 {
+	// 指定されたステートへ変更
+	stateCtrl_.hitState_ = state;
+
+	// nullチェック
+	if (stateCtrl_.initHitTable_[stateCtrl_.hitState_])
+	{
+		// 状態別初期化
+		stateCtrl_.initHitTable_[stateCtrl_.hitState_](*this);
+	}
 }
 
 void Player::ApplyGravity(void)
 {
+	// 回避中は重力処理を行わない
+	if (stateCtrl_.state_ == PLAYER_STATE_AVOID)return;
+
 	// ステージコライダが無ければ処理を行わない
 	//if (!stageColl_) return;
-
 	// Y座標へ反映
 	transform_->pos_.y += info_.velocityY_;
-
 	// 接地判定
 	
 	// 空中
 	//if (!stageColl_->IsGround())
-	if (transform_->pos_.y > 0)
+	if (transform_->pos_.y > 0.0f)
 	{
 		// 重力加算
 		info_.velocityY_ += GRAVITY;
@@ -303,35 +632,15 @@ void Player::ApplyGravity(void)
 	}
 	else
 	{
-		transform_->pos_.y = 0;
+		transform_->pos_.y = 0.0f;
 
 		// 地面上なら少し下方向に押す
 		// 0だと浮く場合があるため
 		info_.velocityY_ = -0.1f;
-
-		// ジャンプ中フラグを折る
-		info_.jumpFlg = false;
 	}
 }
 
-void Player::Jump(void)
-{
-	// ダメージ時は処理を行わない
-	if (stateCtrl_.state_ == PLAYER_STATE_HIT)return;
-
-	// ジャンプボタンを押されたかつ、ジャンプ中ではなかったら
-	if (InputManager::GetInstance()->JumpButton()
-		&& !info_.jumpFlg)
-	{
-		// ジャンプ力を設定
-		info_.velocityY_ = JUMP_POW;
-
-		// ジャンプ中にする
-		info_.jumpFlg = true;
-	}
-}
-
-void Player::InvincibleUodate(void)
+void Player::UpdateInvincible(void)
 {
 	// 無敵時間を減らす
 	if (info_.invincibleTime_ > 0)
@@ -340,7 +649,7 @@ void Player::InvincibleUodate(void)
 	}
 }
 
-void Player::HitStopUodate(void)
+void Player::UpdateHitStop(void)
 {
 	// ヒットストップ更新処理
 	if (info_.hitStopCounter_ > 0) {
@@ -400,6 +709,9 @@ bool Player::InputMove(void)
 
 void Player::Move(void)
 {
+	// 移動速度が0以下であれば処理を行わない
+	if (info_.moveSpeed_ <= 0.0f)return;
+
 	// 方向×スピードで移動量を作って、座標に足して移動
 	transform_->pos_ =
 		VAdd(transform_->pos_,

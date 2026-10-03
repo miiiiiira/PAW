@@ -13,7 +13,6 @@ class Transform;
 class Player : public Component
 {
 public:
-
 	// プレイヤーのカプセルオフセット
 	static constexpr VECTOR STANDING_CAP_END_OFFSET = { 0.0f,30.0f,0.0f };		// エンド位置
 	static constexpr VECTOR STANDING_CAP_START_OFFSET = { 0.0f,150.0f,0.0f };	// 立ち状態スタート位置
@@ -29,7 +28,6 @@ public:
 	static constexpr float STEP_HEIGHT = 25.0f;
 
 public:
-
 	Player(void);					// コンストラクタ
 
 	void Load(void) override;		// 読み込み
@@ -39,7 +37,6 @@ public:
 	void Draw3D(void) override;		// 3D描画
 
 public:
-
 	// Transformを返す
 	Transform* GetTransform(void) { return transform_; }
 	
@@ -59,42 +56,76 @@ public:
 	void SetHitReact(VECTOR moveDir,float moveSpeed,float jumpPow);	
 
 private:
-
 	// 状態別更新処理
-	void StateUpdate(void);	
+	void UpdateState(void);	
 
 	// 状態別初期化
-	static void IdleInit(Player& player);		// 待機
-	static void MoveInit(Player& player);		// 移動
-	static void AttackInit(Player& player);		// 攻撃
-	static void DodgeInit(Player& player);		// 回避
-	static void HitInit(Player& player);		// ダメージを受けた
-	static void DeadInit(Player& player);		// 死亡
-	static void EndInit(Player& player);		// 終了
-
+	static void InitIdle(Player& player);		// 待機
+	static void InitMove(Player& player);		// 移動
+	static void InitAttack(Player& player);		// 攻撃
+	static void InitAvoid(Player& player);		// 回避
+	static void InitJump(Player& player);		// ジャンプ
+	static void InitHit(Player& player);		// ダメージを受けた
+	static void InitDead(Player& player);		// 死亡
+	static void InitEnd(Player& player);		// 終了
 	// 状態別更新
-	static void IdleUpdate(Player& player);		// 待機
-	static void MoveUpdate(Player& player);		// 移動
-	static void AttackUpdate(Player& player);	// 攻撃
-	static void DodgeUpdate(Player& player);	// 回避
-	static void HitUpdate(Player& player);		// ダメージを受けた
-	static void DeadUpdate(Player& player);		// 死亡
-	static void EndUpdate(Player& player);		// 終了
-
+	static void UpdateIdle(Player& player);		// 待機
+	static void UpdateMove(Player& player);		// 移動
+	static void UpdateAttack(Player& player);	// 攻撃
+	static void UpdateAvoid(Player& player);	// 回避
+	static void UpdateJump(Player& player);		// ジャンプ
+	static void UpdateHit(Player& player);		// ダメージを受けた
+	static void UpdateDead(Player& player);		// 死亡
+	static void UpdateEnd(Player& player);		// 終了
 	// 状態を変更させる
 	void ChangeState(PLAYER_STATE state);	
 
+	// 状態別初期化
+	static void InitAttack1(Player& player);	// 攻撃1
+	static void InitAttack2(Player& player);	// 攻撃2
+	static void InitAttack3(Player& player);	// 攻撃3
+	// 状態別更新
+	static void UpdateAttack1(Player& player);	// 攻撃1
+	static void UpdateAttack2(Player& player);	// 攻撃2
+	static void UpdateAttack3(Player& player);	// 攻撃3
+	// 攻撃状態を変更させる
+	void ChangeAttackState(PLAYER_ATTACK_STATE state);
+
+	// 状態別初期化
+	static void InitJumpStart(Player& player);	// ジャンプ開始
+	static void InitJumping(Player& player);	// ジャンプ中
+	static void InitJumpEnd(Player& player);	// ジャンプ終了
+	// 状態別更新
+	static void UpdateJumpStart(Player& player);	// ジャンプ開始
+	static void UpdateJumping(Player& player);		// ジャンプ中
+	static void UpdateJumpEnd(Player& player);		// ジャンプ終了
+	// ジャンプ状態を変更させる
+	void ChangeJumpState(PLAYER_JUMP_STATE state);
+
+	// 状態別初期化
+	static void InitHitStart(Player& player);	// ダメージ開始
+	static void InitHitStun(Player& player);	// ダメージ中
+	static void InitHitEnd(Player& player);		// 復帰
+	// 状態別更新
+	static void UpdateHitStart(Player& player);	// ダメージ開始
+	static void UpdateHitStun(Player& player);	// ダメージ中
+	static void UpdateHitEnd(Player& player);	// 復帰
+	// 被ダメージ状態を変更させる
+	void ChangeHitState(PLAYER_HIT_STATE state);
+
+private:
+	// 頭座標
+	static constexpr float HEAD_POS_OFFSET = 100.0f;
+
+private:
 	// 重力
 	void ApplyGravity(void);	
 
-	// ジャンプ
-	void Jump(void);	
-
 	// 無敵時間を更新
-	void InvincibleUodate(void);	
+	void UpdateInvincible(void);	
 
 	// ヒットストップ更新
-	void HitStopUodate(void);	
+	void UpdateHitStop(void);	
 	
 	// ヒットストップカウンタが0じゃない場合に揺らし量を計算
 	void GetShakeOffset(int& offset);	
@@ -115,42 +146,10 @@ private:
 	void DebugDraw(void);	
 
 private:
-
-	// リミット設定
-	static constexpr float DAMAGE_POS_Y = -2000.0f;	// プレイヤーがダメージを受ける座標
-	static constexpr int INVINCIBLE_TIME = 120;		// 無敵時間
-
-	// 移動設定
-	static constexpr float MOVE_SPEED = 10.0f;	// 移動速度
-
-	// 体力設定
-	static constexpr int DEFAULT_HP = 5;	// 初期HP
-
-	// 重力
-	static constexpr float JUMP_POW = 25.0f;	// ジャンプ力
-	static constexpr float GRAVITY = -1.98f;	// 重力加速度
-	static constexpr float MAX_FALL = -15.0f;	// 最大落下速度
-
-	// ダメージ設定
-	static constexpr float HIT_REACT_FRICTION = 0.5f;	// ダメージ時のリアクション時の摩擦
-	static constexpr int SHAKE_TIME = 20;				// 揺らす時間
-
-	// 描画設定
-	static constexpr int  STATUS_DRAW_POS_X = 10;		// ステータス描画を始める座標
-	static constexpr int  HP_DRAW_POS_Y = 50;			// HPの描画Y軸
-	static constexpr int STATUS_DRAW_POS_OFFSET = 10;	// オフセット
-	static constexpr float COEFFICIENT = 0.2f;			// 線形補間の係数
-
-	// 頭座標
-	static constexpr float HEAD_POS_OFFSET = 100.0f;
-
-private:
-
 	// Transform
 	Transform* transform_ = nullptr;		
 
 private:
-
 	// プレイヤー情報
 	playerInfo info_;	
 

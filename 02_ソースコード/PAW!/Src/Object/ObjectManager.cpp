@@ -26,6 +26,11 @@ void ObjectManager::Init(void)
 // 更新(全オブジェクト)
 void ObjectManager::Update(void)
 {
+	// 描画フェーズの最初で、プライオリティが低い順（奥から手前）に並び替える
+	std::sort(objects_.begin(), objects_.end(), [](const std::unique_ptr<Object>& a, const std::unique_ptr<Object>& b) {
+		return a->GetPriority3D() < b->GetPriority3D();
+		});
+
 	for (auto& obj : objects_)
 		obj->Update();
 }

@@ -285,7 +285,7 @@ bool InputManager::AttackButton(void)
 		IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::Y);
 }
 
-bool InputManager::DodgeButton(void)
+bool InputManager::AvoidButton(void)
 {
 	return  IsTrgDown(KEY_INPUT_LSHIFT) ||
 		IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::B);

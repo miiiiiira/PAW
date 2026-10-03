@@ -204,7 +204,7 @@ public:
 	// 攻撃
 	bool AttackButton(void);
 	// 回避
-	bool DodgeButton(void);
+	bool AvoidButton(void);
 
 public:
 	// デバイスの種類
