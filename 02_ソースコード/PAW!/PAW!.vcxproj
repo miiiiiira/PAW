@@ -138,6 +138,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Object\Enemy\Rat\Rat.cpp" />
     <ClCompile Include="Src\Application.cpp" />
     <ClCompile Include="Src\Audio\AudioManager.cpp" />
     <ClCompile Include="Src\Audio\SoundTable.cpp" />
@@ -171,6 +172,7 @@
     <ClCompile Include="Src\System\FpsControl\FpsControl.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Object\Enemy\Rat\Rat.h" />
     <ClInclude Include="Src\Application.h" />
     <ClInclude Include="Src\Audio\AudioManager.h" />
     <ClInclude Include="Src\Audio\SoundInfo.h" />
@@ -191,6 +193,7 @@
     <ClInclude Include="Src\Object\Component\Graphics\Render3D.h" />
     <ClInclude Include="Src\Object\Component\Transform\Transform.h" />
     <ClInclude Include="Src\Object\Component\Transform\Transform2D.h" />
+    <ClInclude Include="Src\Object\Enemy\Rat\RatInfo.h" />
     <ClInclude Include="Src\Object\Grid\Grid.h" />
     <ClInclude Include="Src\Object\Object.h" />
     <ClInclude Include="Src\Object\ObjectManager.h" />

@@ -28,13 +28,13 @@ public:
 	static constexpr float STEP_HEIGHT = 25.0f;
 
 public:
-	Player(void);					// コンストラクタ
+	Player(void);				// コンストラクタ
 
-	void Load(void) override;		// 読み込み
-	void Init(void) override;		// 初期化
-	void Update(void) override;		// 更新
-	void Draw2D(void) override;		// 2D描画
-	void Draw3D(void) override;		// 3D描画
+	void Load(void) override;	// 読み込み
+	void Init(void) override;	// 初期化
+	void Update(void) override;	// 更新
+	void Draw2D(void) override;	// 2D描画
+	void Draw3D(void) override;	// 3D描画
 
 public:
 	// Transformを返す
@@ -92,9 +92,9 @@ private:
 	void ChangeAttackState(PLAYER_ATTACK_STATE state);
 
 	// 状態別初期化
-	static void InitJumpStart(Player& player);	// ジャンプ開始
-	static void InitJumping(Player& player);	// ジャンプ中
-	static void InitJumpEnd(Player& player);	// ジャンプ終了
+	static void InitJumpStart(Player& player);		// ジャンプ開始
+	static void InitJumping(Player& player);		// ジャンプ中
+	static void InitJumpEnd(Player& player);		// ジャンプ終了
 	// 状態別更新
 	static void UpdateJumpStart(Player& player);	// ジャンプ開始
 	static void UpdateJumping(Player& player);		// ジャンプ中

@@ -1,4 +1,5 @@
 #pragma once
+
 #include <DxLib.h>
 
 class Player; // ‘O•ûéŒ¾

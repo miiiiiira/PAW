@@ -32,6 +32,7 @@
     <ClCompile Include="Src\Object\Camera\CameraUtility.cpp" />
     <ClCompile Include="Src\Math\MatrixUtility.cpp" />
     <ClCompile Include="Src\Object\Grid\Grid.cpp" />
+    <ClCompile Include="Src\Object\Enemy\Rat\Rat.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Application.h" />
@@ -73,5 +74,7 @@
     <ClInclude Include="Src\Object\Camera\CameraUtility.h" />
     <ClInclude Include="Src\Math\MatrixUtility.h" />
     <ClInclude Include="Src\Object\Grid\Grid.h" />
+    <ClInclude Include="Src\Object\Enemy\Rat\Rat.h" />
+    <ClInclude Include="Src\Object\Enemy\Rat\RatInfo.h" />
   </ItemGroup>
 </Project>

@@ -122,11 +122,11 @@ void Player::Update(void)
 		return;
 	}
 
+	// 状態別更新処理
+	UpdateState();
+
 	// 重力処理
 	ApplyGravity();
-
-	// 移動処理
-	UpdateState();
 
 	// 無敵時間を更新
 	UpdateInvincible();
