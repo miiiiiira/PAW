@@ -100,8 +100,8 @@ void Player::Init(void)
 {
 	// 座標の設定
 	transform_ = owner_->AddComponent<Transform>();
-	transform_->pos_ = { 0.0f,0.0f,0.0f };
-	transform_->angle_ = { 0.0f,0.0f,0.0f };
+	transform_->pos_ = {};
+	transform_->angle_ = {};
 
 	// 移動速度の初期化
 	info_.moveSpeed_ = MOVE_SPEED;
@@ -145,14 +145,15 @@ void Player::Draw2D(void)
 
 #ifdef _DEBUG
 	// デバッグ表示
-	DebugDraw();
+	DebugDraw2D();
 #endif // _DEBUG
 }
 
 void Player::Draw3D(void)
 {
-	// プレイヤー描画
-	DrawCapsule3D(GetPlayerHeadPos(), transform_->pos_, 30.0f, 10, 0x0000ff, 0x0000ff, true);
+#ifdef _DEBUG
+	DebugDraw3D();
+#endif // _DEBUG
 }
 
 void Player::SetDamage(int damage)
@@ -739,7 +740,7 @@ void Player::DrawHP(void)
 			info_.hp_);
 }
 
-void Player::DebugDraw(void)
+void Player::DebugDraw2D(void)
 {
 	// プレイヤー座標表示
 	DrawFormatString(20,
@@ -747,4 +748,17 @@ void Player::DebugDraw(void)
 		0xff0000,
 		"プレイヤー座標 : %.f,%.f,%.f",
 		transform_->pos_.x, transform_->pos_.y, transform_->pos_.z);
+}
+
+void Player::DebugDraw3D(void)
+{
+	// プレイヤー描画
+	DrawCapsule3D(
+		GetPlayerHeadPos(),
+		transform_->pos_,
+		30.0f,
+		10,
+		0x0000ff,
+		0x0000ff,
+		true);
 }

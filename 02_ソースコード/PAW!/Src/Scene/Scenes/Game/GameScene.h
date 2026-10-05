@@ -39,6 +39,8 @@ private:
 	void CameraCreate(void);	
 	// プレイヤーの作成
 	void PlayerCreate(void);	
+	// ネズミの作成
+	void RatCreate(void);	
 
 	// 参照系
 	void SetUp(void);

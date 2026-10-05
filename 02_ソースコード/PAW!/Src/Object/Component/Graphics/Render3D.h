@@ -42,5 +42,5 @@ private:
 private:
 
 	// •`‰æƒtƒ‰ƒO
-	bool isDraw_;
+	bool isDraw_ = true;
 };

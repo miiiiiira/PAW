@@ -14,6 +14,7 @@
 #include "../../../Object/ObjectManager.h"
 #include "../../../Object/Tag.h"
 #include "../../../Object/Player/Player.h"
+#include "../../../Object/Enemy/Rat/Rat.h"
 #include "../../../Object/Camera/Camera.h"
 #include "../../../Object/Camera/CameraUtility.h"
 #include "../../../Object/Grid/Grid.h"
@@ -53,6 +54,12 @@ void GameScene::Load(void)
 
 	// プレイヤーの作成
 	PlayerCreate();
+
+	// ねずみの作成
+	RatCreate();
+
+	// 各オブジェクトのロード
+	objectManger_->Load();
 
 	// サウンド読みこみ
 	//AudioManager::GetInstance()->LoadSceneSound(LoadScene::GAME);
@@ -142,7 +149,7 @@ void GameScene::CameraCreate(void)
 	auto cameraObj = objectManger_->CreateObject();
 
 	// タグの付与
-	cameraObj->SetTagAndPriority(Tag_3D::Camera);
+	cameraObj->SetTagAndPriority(TAG_3D::CAMERA);
 
 	// カメラコンポーネントの付与
 	auto camera = cameraObj->AddComponent<Camera>();
@@ -157,19 +164,31 @@ void GameScene::PlayerCreate(void)
 	auto player = objectManger_->CreateObject();
 
 	// タグを付与
-	player->SetTagAndPriority(Tag_3D::Player,Tag_2D::Player);
+	player->SetTagAndPriority(TAG_3D::PLAYER,TAG_2D::PLAYER);
 
 	// プレイヤー機能セット
 	player->AddComponent<Player>();
 }
 
+void GameScene::RatCreate(void)
+{
+	// プレイヤー生成
+	auto rat = objectManger_->CreateObject();
+
+	// タグを付与
+	rat->SetTagAndPriority(TAG_3D::RAT);
+
+	// プレイヤー機能セット
+	rat->AddComponent<Rat>();
+}
+
 void GameScene::SetUp(void)
 {
 	 // プレイヤーを取得
-	auto player = objectManger_->FindComponentWithTag<Player>(Tag_3D::Player);
+	auto player = objectManger_->FindComponentWithTag<Player>(TAG_3D::PLAYER);
 
 	// カメラの取得
-	auto camera = objectManger_->FindComponentWithTag<Camera>(Tag_3D::Camera);
+	auto camera = objectManger_->FindComponentWithTag<Camera>(TAG_3D::CAMERA);
 
 	// プレイヤーの情報をカメラに設定
 	camera->SetTarget(player->GetTransform());
@@ -177,6 +196,10 @@ void GameScene::SetUp(void)
 
 	// カメラユーティリティにカメラのポインタを渡す
 	CameraUtility::SetCameraPoint(camera);
+
+	// ねずみに読み取り専用でプレイヤー座標を渡す
+	auto rat = objectManger_->FindComponentWithTag<Rat>(TAG_3D::RAT);
+	rat->SetPlayerPos(&player->GetTransform()->pos_);
 }
 
 void GameScene::ChangePauseScene(void)

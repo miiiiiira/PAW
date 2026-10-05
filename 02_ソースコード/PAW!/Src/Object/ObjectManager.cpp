@@ -65,7 +65,7 @@ void ObjectManager::Draw3D(void)
 		obj->Draw3D();
 }
 
-Object* ObjectManager::FindWithTag(Tag_3D tag)
+Object* ObjectManager::FindWithTag(TAG_3D tag)
 {
 	for (auto& obj : objects_)
 	{

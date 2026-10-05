@@ -19,10 +19,10 @@ public:
 	void Draw2D(void);	// 2D描画(全オブジェクト)
 	void Draw3D(void);	// 3D描画(全オブジェクト)
 
-	Object* FindWithTag(Tag_3D tag);
+	Object* FindWithTag(TAG_3D tag);
 
 	template<class T>
-	T* FindComponentWithTag(Tag_3D tag);
+	T* FindComponentWithTag(TAG_3D tag);
 
 private:
 
@@ -31,7 +31,7 @@ private:
 };
 
 template<class T>
-inline T* ObjectManager::FindComponentWithTag(Tag_3D tag)
+inline T* ObjectManager::FindComponentWithTag(TAG_3D tag)
 {
 	for (auto& obj : objects_)
 	{

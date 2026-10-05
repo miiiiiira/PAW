@@ -51,7 +51,7 @@ public:
 	void Draw3D() { for (auto& c : components_)c->Draw3D(); }		// 全コンポーネント3D描画
 
 	// タグと優先度をセット
-	void SetTagAndPriority(Tag_3D tag3D, Tag_2D tag2D = Tag_2D::None)
+	void SetTagAndPriority(TAG_3D tag3D, TAG_2D tag2D = TAG_2D::NONE)
 	{
 		// 指定されたタグをセット
 		tag_ = tag3D;
@@ -61,7 +61,7 @@ public:
 		priority2D_ = static_cast<int>(tag2D);
 	}
 	
-	Tag_3D GetTag() const { return tag_; }	// タグを渡す
+	TAG_3D GetTag() const { return tag_; }	// タグを渡す
 
 	int GetPriority2D(void) { return priority2D_; }	// 2Dの描画優先度を渡す
 	int GetPriority3D(void) { return priority3D_; }	// 3Dの描画優先度を渡す
@@ -73,5 +73,5 @@ private:
 	int priority2D_ = 0;
 	int priority3D_ = 0;
 
-	Tag_3D tag_ = Tag_3D::None;
+	TAG_3D tag_ = TAG_3D::NONE;
 };

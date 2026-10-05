@@ -143,7 +143,8 @@ private:
 	void DrawHP(void);		
 
 	// デバッグ用描画
-	void DebugDraw(void);	
+	void DebugDraw2D(void);	
+	void DebugDraw3D(void);	
 
 private:
 	// Transform

@@ -1,16 +1,22 @@
 #include "../../Object.h"
+#include "../../Component/Graphics/Render3D.h"
+#include "../../Camera/CameraUtility.h"
 
 #include "Rat.h"
 
 namespace
 {
 	// 移動設定
-	constexpr float MOVE_SPEED = 10.0f;	// 移動速度
+	constexpr float MOVE_SPEED = 5.0f;		// 移動速度
+	constexpr float MIN_DISTANCE = 200.0f;	// プレイヤーとの距離をとる長さ
+
+	// 体力設定
+	constexpr int DEFAULT_HP = 5;	// 初期HP
 
 	// 重力設定
 	constexpr float JUMP_POW = 25.0f;	// ジャンプ力
 	constexpr float GRAVITY = -1.98f;	// 重力加速度
-	constexpr float MAX_FALL = -15.0f;	// 最大落下速度
+	constexpr float MAX_FALL = -10.0f;	// 最大落下速度
 
 	// ダメージ設定
 	constexpr float HIT_REACT_FRICTION = 0.5f;	// ダメージ時のリアクション時の摩擦
@@ -63,6 +69,22 @@ void Rat::Load(void)
 
 void Rat::Init(void)
 {
+	// 座標の設定
+	transform_ = owner_->AddComponent<Transform>();
+	transform_->pos_ = { 0.0f,0.0f,200.0f };
+	transform_->angle_ = {};
+
+	// 3D描画初期化
+	// モデル設定
+	render3D_ = owner_->AddComponent<Render3D>();
+	render3D_->SetModel("Data/Model/Enemy/Enemy.mv1");
+	render3D_->Init();
+
+	// HPの初期化
+	info_.hp_ = DEFAULT_HP;
+
+	// ねずみの状態初期化
+	ChangeState(RAT_STATE_IDLE);
 }
 
 void Rat::Update(void)
@@ -148,6 +170,8 @@ void Rat::UpdateState(void)
 
 void Rat::InitIdle(Rat& rat)
 {
+	// ねずみの移動速度を設定
+	rat.info_.moveSpeed_ = 0.0f;
 }
 
 void Rat::InitMove(Rat& rat)
@@ -178,10 +202,42 @@ void Rat::InitEnd(Rat& rat)
 
 void Rat::UpdateIdle(Rat& rat)
 {
+	// プレイヤーを見る
+	rat.LookPlayer();
+
+	// プレイヤーとの距離を算出
+	VECTOR vec = VSub(*rat.playerPos_, rat.transform_->pos_);
+	float distance = VSize(vec);
+
+	// プレイヤーと距離が取れたら
+	if (distance < MIN_DISTANCE)
+	{
+		// 待機中へ
+		rat.ChangeState(RAT_STATE_MOVE);
+	}
 }
 
 void Rat::UpdateMove(Rat& rat)
 {
+	// プレイヤーを見る
+	rat.LookPlayer();
+
+	rat.RetreatDir();
+
+	// プレイヤーとの距離を算出
+	VECTOR vec = VSub(*rat.playerPos_, rat.transform_->pos_);
+	float distance = VSize(vec);
+
+	// プレイヤーと距離が取れたら
+	if (distance >= MIN_DISTANCE)
+	{
+		// 待機中へ
+		rat.ChangeState(RAT_STATE_IDLE);
+	}
+	else
+	{
+		rat.Move();
+	}
 }
 
 void Rat::UpdateAttack(Rat& rat)
@@ -379,4 +435,43 @@ void Rat::Move(void)
 	transform_->pos_ =
 		VAdd(transform_->pos_,
 			VScale(info_.moveDir_, info_.moveSpeed_));
+}
+
+void Rat::LookPlayer(void)
+{
+	// 相手へのベクトルを計算(引き算)
+	VECTOR vec;
+	vec.x = playerPos_->x - transform_->pos_.x;
+	vec.z = playerPos_->z - transform_->pos_.z;
+
+	// Y軸の回転
+	transform_->angle_.y = atan2f(vec.x, vec.z);
+
+	// 今回のモデルのY軸向きが逆なので向きを反転させる
+	transform_->angle_.y += 180.0f * (DX_PI_F / 180.0f);
+
+	// モデルに向きを設定
+	MV1SetRotationXYZ(render3D_->GetHandle(), transform_->angle_);
+}
+
+void Rat::RetreatDir(void)
+{
+	// 相手へのベクトルを計算
+	VECTOR vec;
+	vec.x = playerPos_->x - transform_->pos_.x;
+	vec.z = playerPos_->z - transform_->pos_.z;
+
+	// ベクトルの正規化で単位ベクトル(方向)を取得する
+	float length = sqrtf(vec.x * vec.x + vec.z * vec.z);
+
+	if (length == 0.0f)
+	{
+		// プレイヤーと位置が全く同じだった場合、無理やり移動するように向きの情報を入れる
+		info_.moveDir_.x = 1.0f;
+		return;
+	}
+
+	// 大きさで割って単位ベクトルにする
+	info_.moveDir_.x = (vec.x / length) * -1.0f;
+	info_.moveDir_.z = (vec.z / length) * -1.0f;
 }

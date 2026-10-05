@@ -1,21 +1,22 @@
 #pragma once
 
-enum class Tag_3D
+enum class TAG_3D
 {
-	None,
-	Object,
-	Stage,
-	Player,
-	Enemy,
-	Crosshair,
-	Camera,
+	NONE,
+	OBJECT,
+	STAGE,
+	PLAYER,
+	RAT,
+	ROBOT,
+	CROSSHAIR,
+	CAMERA,
 };
 
 // •`‰æ—Dæ‡‚Ì•À‚Ñ‚É‚µ‚Ä‚¨‚­(‰º‚É‚È‚ê‚Î‚È‚é‚Ù‚Çè‘O‚É•`‰æ)
-enum class Tag_2D
+enum class TAG_2D
 {
-	None,
-	Object,
-	Crosshair,
-	Player,
+	NONE,
+	OBJECT,
+	CROSSHAIR,
+	PLAYER,
 };

@@ -6,6 +6,7 @@
 
 // 前方宣言
 class Transform;
+class Render3D;
 
 class Rat : public Component
 {
@@ -22,11 +23,14 @@ public:
 	// Transformを返す
 	Transform* GetTransform(void) { return transform_; }
 
-	// プレイヤー状態を取得
+	// 状態を取得
 	RAT_STATE GetState(void) { return stateCtrl_.state_; }
 
 	// 無敵時間を渡す
 	int GetInvincibleTime(void) { return info_.invincibleTime_; }
+
+	// プレイヤーの座標ポインタを取得
+	void SetPlayerPos(const VECTOR* vec) { playerPos_ = vec; }
 
 	// ダメージを与える
 	void SetDamage(int damage);
@@ -86,12 +90,24 @@ private:
 	// 無敵時間を更新
 	void UpdateInvincible(void);
 
-	// 方向×移動速度で移動量を作って、座標に足して移動させる
+	// 移動処理
 	void Move(void);
+
+	// プレイヤー側を向く
+	void LookPlayer(void);
+
+	// 後退方向を算出
+	void RetreatDir(void);
 
 private:
 	// Transform
 	Transform* transform_ = nullptr;
+
+	// Render3D
+	Render3D* render3D_ = nullptr;
+
+	// プレイヤー座標
+	const VECTOR* playerPos_ = nullptr;
 
 private:
 	// ねずみ情報
