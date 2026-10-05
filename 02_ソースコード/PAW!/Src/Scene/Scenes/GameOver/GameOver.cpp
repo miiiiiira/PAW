@@ -14,7 +14,7 @@
 GameOver::GameOver(void)
 {
 	// マウスの表示する
-	//MouseCursor::GetInstance()->SetMouseDraw(true);
+	MouseCursor::GetInstance()->SetMouseDraw(true);
 }
 
 GameOver::~GameOver(void)

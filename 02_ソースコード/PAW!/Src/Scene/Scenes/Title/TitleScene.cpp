@@ -6,7 +6,7 @@
 #include "../../../Application.h"
 #include "../Confirm/Confirm.h"
 #include "../MainMenu/MainMenu.h"
-//#include "../../Common/MouseCursor/MouseCursor.h"
+#include "../../../Input/MouseCursor/MouseCursor.h"
 
 #include "TitleScene.h"
 
@@ -17,7 +17,7 @@ TitleScene::TitleScene(void)
 	isPlaySoundSE_ = false;
 	confirm_ = nullptr;
 	// マウスの表示する
-	//MouseCursor::GetInstance()->SetMouseDraw(true);
+	MouseCursor::GetInstance()->SetMouseDraw(true);
 }
 
 TitleScene::~TitleScene(void)

@@ -6,8 +6,8 @@
 #include "../Application.h"
 
 #include "../Input/InputManager.h"
+#include "../Input/MouseCursor/MouseCursor.h"
 //#include "../Common/FrameRenderer/FrameRenderer.h"
-//#include "../Common/MouseCursor/MouseCursor.h"
 
 SceneManager* SceneManager::instance_ = nullptr;
 
@@ -33,10 +33,10 @@ void SceneManager::Init(void)
 	Fader::GetInstance()->CreateInstance();
 	Fader::GetInstance()->Init();
 
-	//// マウスカーソルクラスを生成
-	//MouseCursor::CreateInstance();
-	//MouseCursor::GetInstance()->Load();
-	//MouseCursor::GetInstance()->Init();
+	// マウスカーソルクラスを生成
+	MouseCursor::CreateInstance();
+	MouseCursor::GetInstance()->Load();
+	MouseCursor::GetInstance()->Init();
 
 	//// フレーム画像のロード
 	//FrameRenderer::Load();
@@ -116,8 +116,8 @@ void SceneManager::Update(void)
 			// 現在のシーンの更新
 			scenes_.back()->Update();
 
-			//// マウスカーソルの座標更新処理
-			//MouseCursor::GetInstance()->Update();
+			// マウスカーソルの座標更新処理
+			MouseCursor::GetInstance()->Update();
 		}
 	}
 
@@ -193,8 +193,8 @@ void SceneManager::Draw(void)
 			scene->Draw();
 		}
 
-		//// マウスカーソルの描画
-		//MouseCursor::GetInstance()->Draw();
+		// マウスカーソルの描画
+		MouseCursor::GetInstance()->Draw();
 	}
 
 	// フェード描画
@@ -212,8 +212,8 @@ void SceneManager::Delete(void)
 	// フェーダー解放
 	Fader::GetInstance()->DeleteInstance();
 
-	//// マウスカーソル解放
-	//MouseCursor::GetInstance()->Destroy();
+	// マウスカーソル解放
+	MouseCursor::GetInstance()->Destroy();
 
 	// ロード画面の削除
 	load_->Release();

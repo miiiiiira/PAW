@@ -6,13 +6,13 @@
 #include "../../../Audio/AudioManager.h"
 #include "../../SceneManager.h"
 #include "../Title/TitleScene.h"
-//#include "../../Common/MouseCursor/MouseCursor.h"
+#include "../../../Input/MouseCursor/MouseCursor.h"
 
 GameClear::GameClear(void)
 {
 	handle_ = -1;
 	// マウスの表示する
-	//MouseCursor::GetInstance()->SetMouseDraw(true);
+	MouseCursor::GetInstance()->SetMouseDraw(true);
 }
 
 GameClear::~GameClear(void)

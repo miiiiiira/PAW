@@ -51,7 +51,7 @@ void MouseCursor::Draw(void)
 	if (!mouseDrawFlg_)return;
 
 	// マウス画像の描画
-	DrawRotaGraphF(mousePos_.x, mousePos_.y, 0.2, 0.0, mouseImg_, true);
+	DrawRotaGraphF(mousePos_.x, mousePos_.y, 1.0, 0.0, mouseImg_, true);
 
 #ifdef _DEBUG
 	// デバッグ表示
@@ -75,9 +75,12 @@ void MouseCursor::SetMouseDraw(bool flg)
 
 	if (mouseDrawFlg_)
 	{
+		// マウス画像座標を初期化
 		mousePos_ = { Application::SCREEN_SIZE_X / 2,Application::SCREEN_SIZE_Y / 2 };
-		SetMousePoint(Application::SCREEN_SIZE_X / 2, Application::SCREEN_SIZE_Y / 2);
 	}
+
+	// マウスカーソルの位置を初期化
+	SetMousePoint(Application::SCREEN_SIZE_X / 2, Application::SCREEN_SIZE_Y / 2);
 }
 
 void MouseCursor::DebugDraw(void)
