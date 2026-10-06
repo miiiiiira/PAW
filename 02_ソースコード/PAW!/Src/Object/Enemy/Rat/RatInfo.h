@@ -70,6 +70,8 @@ struct ratInfo
 {
 	float velocityY_ = 0.0f;	// Œ»İ‚Ì—‰º‘¬“x
 
+	float velocityRot_ = 0.0f;	// Œ»İ‚ÌŠp‘¬“x
+
 	VECTOR moveDir_ = {};	// ˆÚ“®•ûŒü
 
 	float moveSpeed_ = 0;	// ˆÚ“®‘¬“x

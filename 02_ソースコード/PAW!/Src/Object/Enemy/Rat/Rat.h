@@ -93,8 +93,11 @@ private:
 	// 移動処理
 	void Move(void);
 
-	// プレイヤーへの方向を算出 （引数をtrueにするとプレイヤーから離れる方向を算出）
+	// 移動方向を算出 （引数をtrueにするとプレイヤーから離れる方向を算出）
 	void GetDirectionToPlayer(bool isRetreat = false);
+
+	// プレイヤーに向く
+	void GetAngleToPlayer(void);
 
 private:
 	// Transform

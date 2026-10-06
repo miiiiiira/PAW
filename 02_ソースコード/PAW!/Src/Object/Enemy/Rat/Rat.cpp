@@ -1,6 +1,7 @@
 #include "../../Object.h"
 #include "../../Component/Graphics/Render3D.h"
 #include "../../Camera/CameraUtility.h"
+#include "../../../Math/Math.h"
 
 #include "Rat.h"
 
@@ -10,6 +11,9 @@ namespace
 	constexpr float MOVE_SPEED = 5.0f;		// 移動速度
 	constexpr float MIN_DISTANCE = 150.0f;	// プレイヤーとの距離をとる長さ
 	constexpr float MAX_DISTANCE = 300.0f;	// プレイヤーとの距離をつめる長さ
+
+	// 方向設定
+	constexpr float ANGLE_COEFFICIENT = 0.2f;	// 補間の係数
 
 	// 体力設定
 	constexpr int DEFAULT_HP = 5;	// 初期HP
@@ -206,6 +210,9 @@ void Rat::UpdateIdle(Rat& rat)
 	// ねずみからプレイヤーへの方向を算出
 	rat.GetDirectionToPlayer();
 
+	// モデルがプレイヤーに向くようにする
+	rat.GetAngleToPlayer();
+
 	// プレイヤーとの距離を算出
 	VECTOR vec = VSub(*rat.playerPos_, rat.transform_->pos_);
 	float distance = VSize(vec);
@@ -221,6 +228,9 @@ void Rat::UpdateIdle(Rat& rat)
 
 void Rat::UpdateMove(Rat& rat)
 {
+	// モデルがプレイヤーに向くようにする
+	rat.GetAngleToPlayer();
+
 	// プレイヤーとの距離を算出
 	VECTOR vec = VSub(*rat.playerPos_, rat.transform_->pos_);
 	float distance = VSize(vec);
@@ -446,17 +456,17 @@ void Rat::Move(void)
 void Rat::GetDirectionToPlayer(bool isRetreat)
 {
 	// 相手へのベクトルを計算
-	VECTOR vec;
-	vec.x = playerPos_->x - transform_->pos_.x;
-	vec.z = playerPos_->z - transform_->pos_.z;
+	VECTOR vec = VSub(*playerPos_, transform_->pos_);
 
 	// ベクトルの正規化で単位ベクトル(方向)を取得する
 	float length = sqrtf(vec.x * vec.x + vec.z * vec.z);
 
-	if (length == 0.0f)
+	if (length < 0.01f)
 	{
-		// プレイヤーと位置が全く同じだった場合、無理やり移動するように向きの情報を入れる
+		// プレイヤーと位置がほぼ同じだった場合、
+		// 無理やり移動するように向きの情報を入れる
 		info_.moveDir_.x = 1.0f;
+		info_.moveDir_.z = 0.0f;
 		return;
 	}
 
@@ -471,12 +481,24 @@ void Rat::GetDirectionToPlayer(bool isRetreat)
 		info_.moveDir_.x *= -1.0f;
 		info_.moveDir_.z *= -1.0f;
 	}
+}
 
-	// Y軸の回転
-	transform_->angle_.y = atan2f(vec.x, vec.z);
+void Rat::GetAngleToPlayer(void)
+{
+	// 相手へのベクトルを計算
+	VECTOR vec = VSub(*playerPos_, transform_->pos_);
+
+	// あまりにも近ければ処理をおこなわない
+	if (vec.x * vec.x + vec.z * vec.z < 0.0001f) return;
+
+	// 目標の角度を算出
+	float targetAngle = atan2f(vec.x, vec.z);
 
 	// 今回のモデルのY軸向きが逆なので向きを反転させる
-	transform_->angle_.y += 180.0f * (DX_PI_F / 180.0f);
+	targetAngle += DX_PI_F;
+
+	// 角度補間をかける
+	Math::SmoothAngle(transform_->angle_.y, targetAngle, info_.velocityRot_, ANGLE_COEFFICIENT);
 
 	// モデルに向きを設定
 	MV1SetRotationXYZ(render3D_->GetHandle(), transform_->angle_);

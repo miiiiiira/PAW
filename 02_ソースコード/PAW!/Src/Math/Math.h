@@ -78,6 +78,9 @@ namespace Math
 	// 角度の線形補間(常に最短経路)
 	float LerpAngle(float from, float to, float t);
 
+	// ターゲット角度に達したらtrueを返す
+	bool SmoothAngle(float& angle, float targetAngle, float& velocity, float smoothTime);
+
 	// 色の線形補間
 	COLOR_F Lerp(const COLOR_F& start, const COLOR_F& end, float t);
 

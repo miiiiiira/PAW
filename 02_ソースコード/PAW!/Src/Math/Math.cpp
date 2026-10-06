@@ -108,6 +108,34 @@ namespace Math
         return from + diff * t;
     }
 
+    bool SmoothAngle(float& angle, float targetAngle, float& velocity, float smoothTime )
+    {
+        if (smoothTime < 0.0001f) smoothTime = 0.0001f; 
+
+        const float dt = 1.0f / 60.0f; // 60fps固定
+
+        float diff = NormalizeAngle(targetAngle - angle);
+
+        float omega = 2.0f / smoothTime;
+        float x = omega * dt;
+
+        float decay = 1.0f / (1.0f + x + 0.48f * x * x + 0.235f * x * x * x);
+
+        float change = -diff;                           
+        float temp = (velocity + omega * change) * dt;
+        velocity = (velocity - omega * temp) * decay;
+        float output = (change + temp) * decay;         
+
+        angle = NormalizeAngle(targetAngle + output);
+
+        // 到達判定：角度差と速度の両方が小さい
+        const float angleEps = 0.02f;  // 約1.1度
+        const float velEps = 0.02f;  // 1秒あたりのラジアン（かなりゆっくり）
+        float remain = NormalizeAngle(targetAngle - angle);
+
+        return (fabsf(remain) < angleEps) && (fabsf(velocity) < velEps);
+    }
+
     COLOR_F Lerp(const COLOR_F& a, const COLOR_F& b, float t)
     {
         return {
