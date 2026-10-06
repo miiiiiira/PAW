@@ -8,7 +8,8 @@ namespace
 {
 	// 移動設定
 	constexpr float MOVE_SPEED = 5.0f;		// 移動速度
-	constexpr float MIN_DISTANCE = 200.0f;	// プレイヤーとの距離をとる長さ
+	constexpr float MIN_DISTANCE = 150.0f;	// プレイヤーとの距離をとる長さ
+	constexpr float MAX_DISTANCE = 300.0f;	// プレイヤーとの距離をつめる長さ
 
 	// 体力設定
 	constexpr int DEFAULT_HP = 5;	// 初期HP
@@ -202,42 +203,47 @@ void Rat::InitEnd(Rat& rat)
 
 void Rat::UpdateIdle(Rat& rat)
 {
-	// プレイヤーを見る
-	rat.LookPlayer();
+	// ねずみからプレイヤーへの方向を算出
+	rat.GetDirectionToPlayer();
 
 	// プレイヤーとの距離を算出
 	VECTOR vec = VSub(*rat.playerPos_, rat.transform_->pos_);
 	float distance = VSize(vec);
 
 	// プレイヤーと距離が取れたら
-	if (distance < MIN_DISTANCE)
+	if (distance < MIN_DISTANCE
+		|| distance >= MAX_DISTANCE)
 	{
-		// 待機中へ
+		// 移動中へ
 		rat.ChangeState(RAT_STATE_MOVE);
 	}
 }
 
 void Rat::UpdateMove(Rat& rat)
 {
-	// プレイヤーを見る
-	rat.LookPlayer();
-
-	rat.RetreatDir();
-
 	// プレイヤーとの距離を算出
 	VECTOR vec = VSub(*rat.playerPos_, rat.transform_->pos_);
 	float distance = VSize(vec);
 
-	// プレイヤーと距離が取れたら
-	if (distance >= MIN_DISTANCE)
+	if (distance >= MAX_DISTANCE)
 	{
-		// 待機中へ
-		rat.ChangeState(RAT_STATE_IDLE);
+		// ねずみからプレイヤーへの方向を算出
+		rat.GetDirectionToPlayer();
+	}
+	else if (distance < MIN_DISTANCE)
+	{
+		// プレイヤーから離れる方向を算出
+		rat.GetDirectionToPlayer(true);
 	}
 	else
 	{
-		rat.Move();
+		// プレイヤーと距離が取れたら
+		// 待機中へ
+		rat.ChangeState(RAT_STATE_IDLE);
+		return;
 	}
+
+	rat.Move();
 }
 
 void Rat::UpdateAttack(Rat& rat)
@@ -437,24 +443,7 @@ void Rat::Move(void)
 			VScale(info_.moveDir_, info_.moveSpeed_));
 }
 
-void Rat::LookPlayer(void)
-{
-	// 相手へのベクトルを計算(引き算)
-	VECTOR vec;
-	vec.x = playerPos_->x - transform_->pos_.x;
-	vec.z = playerPos_->z - transform_->pos_.z;
-
-	// Y軸の回転
-	transform_->angle_.y = atan2f(vec.x, vec.z);
-
-	// 今回のモデルのY軸向きが逆なので向きを反転させる
-	transform_->angle_.y += 180.0f * (DX_PI_F / 180.0f);
-
-	// モデルに向きを設定
-	MV1SetRotationXYZ(render3D_->GetHandle(), transform_->angle_);
-}
-
-void Rat::RetreatDir(void)
+void Rat::GetDirectionToPlayer(bool isRetreat)
 {
 	// 相手へのベクトルを計算
 	VECTOR vec;
@@ -471,7 +460,24 @@ void Rat::RetreatDir(void)
 		return;
 	}
 
-	// 大きさで割って単位ベクトルにする
-	info_.moveDir_.x = (vec.x / length) * -1.0f;
-	info_.moveDir_.z = (vec.z / length) * -1.0f;
+	// XZ面の方向を算出
+	info_.moveDir_.x = vec.x / length;
+	info_.moveDir_.z = vec.z / length;
+
+	// 後退方向の指示があれば
+	if (isRetreat)
+	{
+		// 反転させる
+		info_.moveDir_.x *= -1.0f;
+		info_.moveDir_.z *= -1.0f;
+	}
+
+	// Y軸の回転
+	transform_->angle_.y = atan2f(vec.x, vec.z);
+
+	// 今回のモデルのY軸向きが逆なので向きを反転させる
+	transform_->angle_.y += 180.0f * (DX_PI_F / 180.0f);
+
+	// モデルに向きを設定
+	MV1SetRotationXYZ(render3D_->GetHandle(), transform_->angle_);
 }
