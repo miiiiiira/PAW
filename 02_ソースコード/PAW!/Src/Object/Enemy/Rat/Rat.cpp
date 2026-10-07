@@ -1,5 +1,6 @@
 #include "../../Object.h"
 #include "../../Component/Graphics/Render3D.h"
+#include "../../Component/Animation/Animation.h"
 #include "../../Camera/CameraUtility.h"
 #include "../../../Math/Math.h"
 
@@ -25,6 +26,9 @@ namespace
 
 	// ダメージ設定
 	constexpr float HIT_REACT_FRICTION = 0.5f;	// ダメージ時のリアクション時の摩擦
+
+	// アニメーション設定
+	constexpr float ANIM_SPEED = 0.6f;
 }
 
 Rat::Rat(void)
@@ -79,11 +83,22 @@ void Rat::Init(void)
 	transform_->pos_ = { 0.0f,0.0f,200.0f };
 	transform_->angle_ = {};
 
-	// 3D描画初期化
-	// モデル設定
+	// 3Dモデル設定
 	render3D_ = owner_->AddComponent<Render3D>();
 	render3D_->SetModel("Data/Model/Enemy/Enemy.mv1");
 	render3D_->Init();
+
+	// アニメーション設定
+	animation_ = owner_->AddComponent<Animation>();
+	animation_->Init();
+	// アニメーション登録
+	for (int i = 0; i < static_cast<int>(RAT_ANIMATION::MAX); i++)
+	{
+		animation_->AddInFbx(
+			static_cast<int>(i),
+			ANIM_SPEED,
+			static_cast<int>(i));
+	}
 
 	// HPの初期化
 	info_.hp_ = DEFAULT_HP;
@@ -177,12 +192,17 @@ void Rat::InitIdle(Rat& rat)
 {
 	// ねずみの移動速度を設定
 	rat.info_.moveSpeed_ = 0.0f;
+
+	// 待機アニメーション再生
+	rat.animation_->Play(static_cast<int>(RAT_ANIMATION::IDLE), true);
 }
 
 void Rat::InitMove(Rat& rat)
 {
 	// ねずみの移動速度を設定
 	rat.info_.moveSpeed_ = MOVE_SPEED;
+	// 待機アニメーション再生
+	rat.animation_->Play(static_cast<int>(RAT_ANIMATION::MOVE), true);
 }
 
 void Rat::InitAttack(Rat& rat)

@@ -7,6 +7,7 @@
 // 前方宣言
 class Transform;
 class Render3D;
+class Animation;
 
 class Rat : public Component
 {
@@ -42,6 +43,7 @@ private:
 	// 状態別更新処理
 	void UpdateState(void);
 
+	// 行動状態
 	// 状態別初期化
 	static void InitIdle(Rat& rat);		// 待機
 	static void InitMove(Rat& rat);		// 移動
@@ -59,6 +61,7 @@ private:
 	// 状態を変更させる
 	void ChangeState(RAT_STATE state);
 
+	// 攻撃状態
 	// 状態別初期化
 	static void InitAttackStart(Rat& rat);		// 攻撃始め
 	static void InitAttacking(Rat& rat);		// 攻撃中
@@ -72,6 +75,7 @@ private:
 	// 攻撃状態を変更させる
 	void ChangeAttackState(RAT_ATTACK_STATE state);
 
+	// 被ダメージ状態
 	// 状態別初期化
 	static void InitHitStart(Rat& rat);		// ダメージ開始
 	static void InitHitStun(Rat& rat);		// ダメージ中
@@ -100,11 +104,10 @@ private:
 	void GetAngleToPlayer(void);
 
 private:
-	// Transform
-	Transform* transform_ = nullptr;
-
-	// Render3D
+	// コンポーネント
+	Transform* transform_ = nullptr;	
 	Render3D* render3D_ = nullptr;
+	Animation* animation_ = nullptr;
 
 	// プレイヤー座標
 	const VECTOR* playerPos_ = nullptr;

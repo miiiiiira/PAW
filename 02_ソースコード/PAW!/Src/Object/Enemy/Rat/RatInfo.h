@@ -80,3 +80,15 @@ struct ratInfo
 
 	int invincibleTime_ = 0;	// –³“GŽžŠÔ
 };
+
+enum class RAT_ANIMATION
+{
+	ATTACK,
+	ATTACK_START,
+	DEAD,
+	IDLE,
+	MOVE,
+	MOVE_CLOSER,
+
+	MAX
+};
