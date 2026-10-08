@@ -13,7 +13,7 @@ public:
 	struct AnimationState
 	{
 		int model = -1;
-		int attackNo = -1;
+		int attachNo = -1;
 		int animIndex = 0;
 		float speed = 0.0f;
 		float totalTime = 0.0f;

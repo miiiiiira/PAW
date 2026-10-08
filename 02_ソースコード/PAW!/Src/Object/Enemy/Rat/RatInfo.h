@@ -12,6 +12,7 @@ enum RAT_STATE
 {
 	RAT_STATE_IDLE,		// 待機中
 	RAT_STATE_MOVE,		// 移動中
+	RAT_STATE_RETREAT,	// 後退中
 	RAT_STATE_ATTACK,	// 攻撃中
 	RAT_STATE_HIT,		// 被ダメージ
 	RAT_STATE_DEAD,		// 死亡

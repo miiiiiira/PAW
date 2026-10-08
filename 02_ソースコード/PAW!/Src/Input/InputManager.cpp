@@ -33,6 +33,7 @@ void InputManager::Init(void)
 	// デバッグ用
 	Add(KEY_INPUT_O);
 	Add(KEY_INPUT_C);
+	Add(KEY_INPUT_N);
 
 	InputManager::MouseInfo info;
 

@@ -4,14 +4,17 @@
 #include "../../Camera/CameraUtility.h"
 #include "../../../Math/Math.h"
 
+#include "../../../Input/InputManager.h"
+
 #include "Rat.h"
 
 namespace
 {
 	// 移動設定
-	constexpr float MOVE_SPEED = 5.0f;		// 移動速度
-	constexpr float MIN_DISTANCE = 150.0f;	// プレイヤーとの距離をとる長さ
-	constexpr float MAX_DISTANCE = 300.0f;	// プレイヤーとの距離をつめる長さ
+	constexpr float MOVE_SPEED = 5.0f;			// 移動速度
+	constexpr float ATTACK_MOVE_SPEED = 12.0f;	// 攻撃時の移動速度
+	constexpr float MIN_DISTANCE = 150.0f;		// プレイヤーとの距離をとる長さ
+	constexpr float MAX_DISTANCE = 300.0f;		// プレイヤーとの距離をつめる長さ
 
 	// 方向設定
 	constexpr float ANGLE_COEFFICIENT = 0.2f;	// 補間の係数
@@ -20,7 +23,7 @@ namespace
 	constexpr int DEFAULT_HP = 5;	// 初期HP
 
 	// 重力設定
-	constexpr float JUMP_POW = 25.0f;	// ジャンプ力
+	constexpr float JUMP_POW = 17.0f;	// ジャンプ力
 	constexpr float GRAVITY = -1.98f;	// 重力加速度
 	constexpr float MAX_FALL = -10.0f;	// 最大落下速度
 
@@ -28,7 +31,10 @@ namespace
 	constexpr float HIT_REACT_FRICTION = 0.5f;	// ダメージ時のリアクション時の摩擦
 
 	// アニメーション設定
-	constexpr float ANIM_SPEED = 0.6f;
+	constexpr float ANIM_SPEED = 0.8f;
+
+	// リミット設定
+	constexpr int INVINCIBLE_TIME = 120;		// 無敵時間
 }
 
 Rat::Rat(void)
@@ -37,6 +43,7 @@ Rat::Rat(void)
 	// 初期化関数
 	stateCtrl_.initStateTable_[RAT_STATE_IDLE] = InitIdle;
 	stateCtrl_.initStateTable_[RAT_STATE_MOVE] = InitMove;
+	stateCtrl_.initStateTable_[RAT_STATE_RETREAT] = InitRetreat;
 	stateCtrl_.initStateTable_[RAT_STATE_ATTACK] = InitAttack;
 	stateCtrl_.initStateTable_[RAT_STATE_HIT] = InitHit;
 	stateCtrl_.initStateTable_[RAT_STATE_DEAD] = InitDead;
@@ -44,6 +51,7 @@ Rat::Rat(void)
 	// 更新関数
 	stateCtrl_.updateStateTable_[RAT_STATE_IDLE] = UpdateIdle;
 	stateCtrl_.updateStateTable_[RAT_STATE_MOVE] = UpdateMove;
+	stateCtrl_.updateStateTable_[RAT_STATE_RETREAT] = UpdateRetreat;
 	stateCtrl_.updateStateTable_[RAT_STATE_ATTACK] = UpdateAttack;
 	stateCtrl_.updateStateTable_[RAT_STATE_HIT] = UpdateHit;
 	stateCtrl_.updateStateTable_[RAT_STATE_DEAD] = UpdateDead;
@@ -153,7 +161,7 @@ void Rat::SetDamage(int damage)
 	else
 	{
 		// 無敵時間を設ける
-		//info_.invincibleTime_ = INVINCIBLE_TIME;
+		info_.invincibleTime_ = INVINCIBLE_TIME;
 
 		// ダメージを受けたステートへ
 		ChangeState(RAT_STATE_HIT);
@@ -205,6 +213,14 @@ void Rat::InitMove(Rat& rat)
 	rat.animation_->Play(static_cast<int>(RAT_ANIMATION::MOVE), true);
 }
 
+void Rat::InitRetreat(Rat& rat)
+{
+	// ねずみの移動速度を設定
+	rat.info_.moveSpeed_ = MOVE_SPEED;
+	// 待機アニメーション再生
+	rat.animation_->Play(static_cast<int>(RAT_ANIMATION::MOVE), true);
+}
+
 void Rat::InitAttack(Rat& rat)
 {
 	// 初期化
@@ -233,16 +249,26 @@ void Rat::UpdateIdle(Rat& rat)
 	// モデルがプレイヤーに向くようにする
 	rat.GetAngleToPlayer();
 
-	// プレイヤーとの距離を算出
-	VECTOR vec = VSub(*rat.playerPos_, rat.transform_->pos_);
-	float distance = VSize(vec);
+	float distance = rat.GetDistanceToPlayer();
 
 	// プレイヤーと距離が取れたら
-	if (distance < MIN_DISTANCE
-		|| distance >= MAX_DISTANCE)
+	if (distance < MIN_DISTANCE)
+	{
+		// 後退中へ
+		rat.ChangeState(RAT_STATE_RETREAT);
+	}
+	else if (distance > MAX_DISTANCE)
 	{
 		// 移動中へ
 		rat.ChangeState(RAT_STATE_MOVE);
+	}
+	else
+	{
+		if (InputManager::GetInstance()->IsTrgDown(KEY_INPUT_N))
+		{
+			// 攻撃中へ
+			rat.ChangeState(RAT_STATE_ATTACK);
+		}
 	}
 }
 
@@ -251,28 +277,38 @@ void Rat::UpdateMove(Rat& rat)
 	// モデルがプレイヤーに向くようにする
 	rat.GetAngleToPlayer();
 
-	// プレイヤーとの距離を算出
-	VECTOR vec = VSub(*rat.playerPos_, rat.transform_->pos_);
-	float distance = VSize(vec);
+	// ねずみからプレイヤーへの方向を算出
+	rat.GetDirectionToPlayer();
 
-	if (distance >= MAX_DISTANCE)
+	// プレイヤーとの距離を詰めれたら
+	if (rat.GetDistanceToPlayer() <= MAX_DISTANCE)
 	{
-		// ねずみからプレイヤーへの方向を算出
-		rat.GetDirectionToPlayer();
-	}
-	else if (distance < MIN_DISTANCE)
-	{
-		// プレイヤーから離れる方向を算出
-		rat.GetDirectionToPlayer(true);
-	}
-	else
-	{
-		// プレイヤーと距離が取れたら
 		// 待機中へ
 		rat.ChangeState(RAT_STATE_IDLE);
 		return;
 	}
 
+	// 移動処理
+	rat.Move();
+}
+
+void Rat::UpdateRetreat(Rat& rat)
+{
+	// モデルがプレイヤーに向くようにする
+	rat.GetAngleToPlayer();
+
+	// プレイヤーから離れる方向を算出
+	rat.GetDirectionToPlayer(true);
+
+	// プレイヤーと距離が取れたら
+	if (rat.GetDistanceToPlayer() >= MIN_DISTANCE)
+	{
+		// 待機中へ
+		rat.ChangeState(RAT_STATE_IDLE);
+		return;
+	}
+
+	// 移動処理
 	rat.Move();
 }
 
@@ -320,14 +356,32 @@ void Rat::ChangeState(RAT_STATE state)
 
 void Rat::InitAttackStart(Rat& rat)
 {
+	// 攻撃始めアニメーション再生
+	rat.animation_->Play(static_cast<int>(RAT_ANIMATION::ATTACK_START), false);
 }
 
 void Rat::InitAttacking(Rat& rat)
 {
+	// ねずみからプレイヤーへの方向を算出
+	rat.GetDirectionToPlayer();
+
+	// モデルがプレイヤーに向くようにする
+	rat.GetAngleToPlayer();
+
+	// 指定された移動速度を設定
+	rat.info_.moveSpeed_ = ATTACK_MOVE_SPEED;
+
+	// 指定されたジャンプ力を設定
+	rat.info_.velocityY_ = JUMP_POW;
+
+	// 攻撃アニメーション再生
+	rat.animation_->Play(static_cast<int>(RAT_ANIMATION::ATTACK), false);
 }
 
 void Rat::InitAttackAfter(Rat& rat)
 {
+	// モデルがプレイヤーに向くようにする
+	rat.GetAngleToPlayer();
 }
 
 void Rat::InitAttackEnd(Rat& rat)
@@ -336,14 +390,28 @@ void Rat::InitAttackEnd(Rat& rat)
 
 void Rat::UpdateAttackStart(Rat& rat)
 {
-	// 攻撃中へ
-	rat.ChangeAttackState(RAT_ATTACKING);
+	// モデルがプレイヤーに向くようにする
+	rat.GetAngleToPlayer();
+
+	if (rat.animation_->IsEnd())
+	{
+		// 攻撃中へ
+		rat.ChangeAttackState(RAT_ATTACKING);
+	}
 }
 
 void Rat::UpdateAttacking(Rat& rat)
 {
-	// 攻撃後の隙状態へ
-	rat.ChangeAttackState(RAT_ATTACK_AFTER);
+	// 移動処理
+	rat.Move();
+
+	// アニメーションが終わっているかつ、床についたら
+	if (rat.animation_->IsEnd()
+		&& rat.transform_->pos_.y <= 0.0f)
+	{
+		// 攻撃後の隙状態へ
+		rat.ChangeAttackState(RAT_ATTACK_AFTER);
+	}
 }
 
 void Rat::UpdateAttackAfter(Rat& rat)
@@ -354,8 +422,8 @@ void Rat::UpdateAttackAfter(Rat& rat)
 
 void Rat::UpdateAttackEnd(Rat& rat)
 {
-	// 待機状態へ
-	rat.ChangeState(RAT_STATE_IDLE);
+	// 後退中へ
+	rat.ChangeState(RAT_STATE_RETREAT);
 }
 
 void Rat::ChangeAttackState(RAT_ATTACK_STATE state)
@@ -518,8 +586,21 @@ void Rat::GetAngleToPlayer(void)
 	targetAngle += DX_PI_F;
 
 	// 角度補間をかける
-	Math::SmoothAngle(transform_->angle_.y, targetAngle, info_.velocityRot_, ANGLE_COEFFICIENT);
+	Math::SmoothAngle(
+		transform_->angle_.y, 
+		targetAngle, 
+		info_.velocityRot_,
+		ANGLE_COEFFICIENT);
+
+	transform_->angle_.x = transform_->angle_.z = 0.0f;
 
 	// モデルに向きを設定
 	MV1SetRotationXYZ(render3D_->GetHandle(), transform_->angle_);
+}
+
+float Rat::GetDistanceToPlayer(void)
+{
+	// プレイヤーとの距離を算出
+	VECTOR vec = VSub(*playerPos_, transform_->pos_);
+	return VSize(vec);
 }

@@ -45,19 +45,21 @@ private:
 
 	// 行動状態
 	// 状態別初期化
-	static void InitIdle(Rat& rat);		// 待機
-	static void InitMove(Rat& rat);		// 移動
-	static void InitAttack(Rat& rat);	// 攻撃
-	static void InitHit(Rat& rat);		// ダメージを受けた
-	static void InitDead(Rat& rat);		// 死亡
-	static void InitEnd(Rat& rat);		// 終了
+	static void InitIdle(Rat& rat);			// 待機
+	static void InitMove(Rat& rat);			// 移動
+	static void InitRetreat(Rat& rat);		// 後退
+	static void InitAttack(Rat& rat);		// 攻撃
+	static void InitHit(Rat& rat);			// ダメージを受けた
+	static void InitDead(Rat& rat);			// 死亡
+	static void InitEnd(Rat& rat);			// 終了
 	// 状態別更新
-	static void UpdateIdle(Rat& rat);	// 待機
-	static void UpdateMove(Rat& rat);	// 移動
-	static void UpdateAttack(Rat& rat);	// 攻撃
-	static void UpdateHit(Rat& rat);	// ダメージを受けた
-	static void UpdateDead(Rat& rat);	// 死亡
-	static void UpdateEnd(Rat& rat);	// 終了
+	static void UpdateIdle(Rat& rat);		// 待機
+	static void UpdateMove(Rat& rat);		// 移動
+	static void UpdateRetreat(Rat& rat);	// 後退
+	static void UpdateAttack(Rat& rat);		// 攻撃
+	static void UpdateHit(Rat& rat);		// ダメージを受けた
+	static void UpdateDead(Rat& rat);		// 死亡
+	static void UpdateEnd(Rat& rat);		// 終了
 	// 状態を変更させる
 	void ChangeState(RAT_STATE state);
 
@@ -102,6 +104,9 @@ private:
 
 	// プレイヤーに向く
 	void GetAngleToPlayer(void);
+
+	// プレイヤーとの距離を算出
+	float GetDistanceToPlayer(void);
 
 private:
 	// コンポーネント

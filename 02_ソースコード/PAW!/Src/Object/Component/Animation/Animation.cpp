@@ -21,7 +21,7 @@ void Animation::Update(void)
 	playAnim_.step += playAnim_.speed;
 
 	// 再生時間が総再生時間を超えていたら
-	if (playAnim_.step > playAnim_.totalTime)
+	if (playAnim_.step >= playAnim_.totalTime)
 	{
 		// ループ再生の場合
 		if (isLoop_)
@@ -34,13 +34,11 @@ void Animation::Update(void)
 		{
 			// 再生時間を総再生時間に設定
 			playAnim_.step = playAnim_.totalTime;
-			// 種類を初期化
-			playType_ = -1;
 		}
 	}
 
 	// アタッチしているアニメーションの再生時間を設定する
-	MV1SetAttachAnimTime(render_->GetHandle(), playAnim_.attackNo, playAnim_.step);
+	MV1SetAttachAnimTime(render_->GetHandle(), playAnim_.attachNo, playAnim_.step);
 }
 
 void Animation::Release(void)
@@ -97,7 +95,7 @@ void Animation::Play(int type, bool loop)
 	// 以前に再生していたアニメーションがあればアタッチ解除する
 	if (playType_ != -1)
 	{
-		MV1DetachAnim(handle, playAnim_.attackNo);
+		MV1DetachAnim(handle, playAnim_.attachNo);
 	}
 
 	// 再生するアニメーション情報を更新し、再生時間を初期化
@@ -109,7 +107,7 @@ void Animation::Play(int type, bool loop)
 	if (playAnim_.model == -1)
 	{
 		// 単一モデル内のアニメーションインデックスからアタッチする場合
-		playAnim_.attackNo =
+		playAnim_.attachNo =
 			MV1AttachAnim(
 				handle,
 				playAnim_.
@@ -118,7 +116,7 @@ void Animation::Play(int type, bool loop)
 	else
 	{
 		// 外部のモデルハンドルからアタッチする場合
-		playAnim_.attackNo =
+		playAnim_.attachNo =
 			MV1AttachAnim(
 				handle,
 				0,
@@ -127,7 +125,7 @@ void Animation::Play(int type, bool loop)
 	}
 
 	// アタッチしたアニメーションの総再生時間を取得
-	playAnim_.totalTime = MV1GetAttachAnimTotalTime(handle, playAnim_.attackNo);
+	playAnim_.totalTime = MV1GetAttachAnimTotalTime(handle, playAnim_.attachNo);
 
 	// ループフラグの更新
 	isLoop_ = loop;
