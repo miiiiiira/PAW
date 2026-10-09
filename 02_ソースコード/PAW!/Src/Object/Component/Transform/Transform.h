@@ -11,4 +11,5 @@ public:
 	VECTOR pos_ = { 0.0f,0.0f,0.0f };
 	VECTOR prevPos_ = { 0.0f,0.0f,0.0f };
 	VECTOR angle_ = { 0.0f,0.0f,0.0f };
+	VECTOR scale_ = { 0.0f,0.0f,0.0f };
 };

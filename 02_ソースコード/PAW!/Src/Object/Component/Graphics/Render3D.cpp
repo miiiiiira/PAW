@@ -90,6 +90,9 @@ void Render3D::SetModel(std::string path)
 	}
 
 	handle_ = MV1LoadModel(path.c_str());
+
+	// ‘å‚«‚³‚ðÝ’è
+	MV1SetScale(handle_, transform_->scale_);
 }
 
 void Render3D::SetModelHandles(std::string path)

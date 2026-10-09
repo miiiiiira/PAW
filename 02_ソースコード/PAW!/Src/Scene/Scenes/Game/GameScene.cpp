@@ -55,7 +55,7 @@ void GameScene::Load(void)
 	// プレイヤーの作成
 	PlayerCreate();
 
-	// ねずみの作成
+	// ネズミの作成
 	RatCreate();
 
 	// 各オブジェクトのロード
@@ -197,9 +197,9 @@ void GameScene::SetUp(void)
 	// カメラユーティリティにカメラのポインタを渡す
 	CameraUtility::SetCameraPoint(camera);
 
-	// ねずみに読み取り専用でプレイヤー座標を渡す
+	// ネズミに読み取り専用でプレイヤー座標を渡す
 	auto rat = objectManger_->FindComponentWithTag<Rat>(TAG_3D::RAT);
-	rat->SetPlayerPos(&player->GetTransform()->pos_);
+	rat->SetPlayerTransform(player->GetTransform());
 }
 
 void GameScene::ChangePauseScene(void)

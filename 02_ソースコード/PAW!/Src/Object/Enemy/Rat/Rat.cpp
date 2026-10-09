@@ -14,7 +14,7 @@ namespace
 	constexpr float MOVE_SPEED = 5.0f;			// 移動速度
 	constexpr float ATTACK_MOVE_SPEED = 12.0f;	// 攻撃時の移動速度
 	constexpr float MIN_DISTANCE = 150.0f;		// プレイヤーとの距離をとる長さ
-	constexpr float MAX_DISTANCE = 300.0f;		// プレイヤーとの距離をつめる長さ
+	constexpr float MAX_DISTANCE = 200.0f;		// プレイヤーとの距離をつめる長さ
 
 	// 方向設定
 	constexpr float ANGLE_COEFFICIENT = 0.2f;	// 補間の係数
@@ -90,11 +90,12 @@ void Rat::Init(void)
 	transform_ = owner_->AddComponent<Transform>();
 	transform_->pos_ = { 0.0f,0.0f,200.0f };
 	transform_->angle_ = {};
+	transform_->scale_ = { 2.0f,2.0f,2.0f };
 
 	// 3Dモデル設定
 	render3D_ = owner_->AddComponent<Render3D>();
-	render3D_->SetModel("Data/Model/Enemy/Enemy.mv1");
 	render3D_->Init();
+	render3D_->SetModel("Data/Model/Enemy/Enemy.mv1");
 
 	// アニメーション設定
 	animation_ = owner_->AddComponent<Animation>();
@@ -111,7 +112,7 @@ void Rat::Init(void)
 	// HPの初期化
 	info_.hp_ = DEFAULT_HP;
 
-	// ねずみの状態初期化
+	// ネズミの状態初期化
 	ChangeState(RAT_STATE_IDLE);
 }
 
@@ -198,7 +199,7 @@ void Rat::UpdateState(void)
 
 void Rat::InitIdle(Rat& rat)
 {
-	// ねずみの移動速度を設定
+	// ネズミの移動速度を設定
 	rat.info_.moveSpeed_ = 0.0f;
 
 	// 待機アニメーション再生
@@ -207,7 +208,7 @@ void Rat::InitIdle(Rat& rat)
 
 void Rat::InitMove(Rat& rat)
 {
-	// ねずみの移動速度を設定
+	// ネズミの移動速度を設定
 	rat.info_.moveSpeed_ = MOVE_SPEED;
 	// 待機アニメーション再生
 	rat.animation_->Play(static_cast<int>(RAT_ANIMATION::MOVE), true);
@@ -215,7 +216,7 @@ void Rat::InitMove(Rat& rat)
 
 void Rat::InitRetreat(Rat& rat)
 {
-	// ねずみの移動速度を設定
+	// ネズミの移動速度を設定
 	rat.info_.moveSpeed_ = MOVE_SPEED;
 	// 待機アニメーション再生
 	rat.animation_->Play(static_cast<int>(RAT_ANIMATION::MOVE), true);
@@ -243,7 +244,7 @@ void Rat::InitEnd(Rat& rat)
 
 void Rat::UpdateIdle(Rat& rat)
 {
-	// ねずみからプレイヤーへの方向を算出
+	// ネズミからプレイヤーへの方向を算出
 	rat.GetDirectionToPlayer();
 
 	// モデルがプレイヤーに向くようにする
@@ -262,6 +263,7 @@ void Rat::UpdateIdle(Rat& rat)
 		// 移動中へ
 		rat.ChangeState(RAT_STATE_MOVE);
 	}
+#ifdef _DEBUG
 	else
 	{
 		if (InputManager::GetInstance()->IsTrgDown(KEY_INPUT_N))
@@ -270,6 +272,7 @@ void Rat::UpdateIdle(Rat& rat)
 			rat.ChangeState(RAT_STATE_ATTACK);
 		}
 	}
+#endif // _DEBUG
 }
 
 void Rat::UpdateMove(Rat& rat)
@@ -277,7 +280,7 @@ void Rat::UpdateMove(Rat& rat)
 	// モデルがプレイヤーに向くようにする
 	rat.GetAngleToPlayer();
 
-	// ねずみからプレイヤーへの方向を算出
+	// ネズミからプレイヤーへの方向を算出
 	rat.GetDirectionToPlayer();
 
 	// プレイヤーとの距離を詰めれたら
@@ -317,7 +320,7 @@ void Rat::UpdateAttack(Rat& rat)
 	// nullチェック
 	if (rat.stateCtrl_.updateAttackTable_[rat.stateCtrl_.attackState_])
 	{
-		// 状態別初期化
+		// 状態別更新
 		rat.stateCtrl_.updateAttackTable_[rat.stateCtrl_.attackState_](rat);
 	}
 }
@@ -327,7 +330,7 @@ void Rat::UpdateHit(Rat& rat)
 	// nullチェック
 	if (rat.stateCtrl_.updateHitTable_[rat.stateCtrl_.hitState_])
 	{
-		// 状態別初期化
+		// 状態別更新
 		rat.stateCtrl_.updateHitTable_[rat.stateCtrl_.hitState_](rat);
 	}
 }
@@ -362,7 +365,7 @@ void Rat::InitAttackStart(Rat& rat)
 
 void Rat::InitAttacking(Rat& rat)
 {
-	// ねずみからプレイヤーへの方向を算出
+	// ネズミからプレイヤーへの方向を算出
 	rat.GetDirectionToPlayer();
 
 	// モデルがプレイヤーに向くようにする
@@ -544,7 +547,7 @@ void Rat::Move(void)
 void Rat::GetDirectionToPlayer(bool isRetreat)
 {
 	// 相手へのベクトルを計算
-	VECTOR vec = VSub(*playerPos_, transform_->pos_);
+	VECTOR vec = VSub(playerTransform_->pos_, transform_->pos_);
 
 	// ベクトルの正規化で単位ベクトル(方向)を取得する
 	float length = sqrtf(vec.x * vec.x + vec.z * vec.z);
@@ -574,7 +577,7 @@ void Rat::GetDirectionToPlayer(bool isRetreat)
 void Rat::GetAngleToPlayer(void)
 {
 	// 相手へのベクトルを計算
-	VECTOR vec = VSub(*playerPos_, transform_->pos_);
+	VECTOR vec = VSub(playerTransform_->pos_, transform_->pos_);
 
 	// あまりにも近ければ処理をおこなわない
 	if (vec.x * vec.x + vec.z * vec.z < 0.0001f) return;
@@ -601,6 +604,6 @@ void Rat::GetAngleToPlayer(void)
 float Rat::GetDistanceToPlayer(void)
 {
 	// プレイヤーとの距離を算出
-	VECTOR vec = VSub(*playerPos_, transform_->pos_);
+	VECTOR vec = VSub(playerTransform_->pos_, transform_->pos_);
 	return VSize(vec);
 }

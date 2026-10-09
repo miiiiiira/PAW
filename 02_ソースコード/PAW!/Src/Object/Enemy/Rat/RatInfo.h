@@ -7,7 +7,7 @@ class Rat; // 前方宣言
 // 状態関数型
 typedef void(*ratStateFunction)(Rat&);
 
-// ねずみの状態
+// ネズミの状態
 enum RAT_STATE
 {
 	RAT_STATE_IDLE,		// 待機中
@@ -21,7 +21,7 @@ enum RAT_STATE
 	RAT_STATE_MAX
 };
 
-// ねずみ攻撃状態
+// ネズミ攻撃状態
 enum RAT_ATTACK_STATE
 {
 	RAT_ATTACK_START,	// 攻撃始め
@@ -32,7 +32,7 @@ enum RAT_ATTACK_STATE
 	RAT_ATTACK_MAX
 };
 
-// ねずみ被ダメージ状態
+// ネズミ被ダメージ状態
 enum RAT_HIT_STATE
 {
 	RAT_HIT_START,	// ダメージ開始

@@ -25,19 +25,23 @@ public:
 	Transform* GetTransform(void) { return transform_; }
 
 	// 状態を取得
-	RAT_STATE GetState(void) { return stateCtrl_.state_; }
+	RAT_STATE GetState(void)const { return stateCtrl_.state_; }
 
 	// 無敵時間を渡す
-	int GetInvincibleTime(void) { return info_.invincibleTime_; }
+	int GetInvincibleTime(void)const { return info_.invincibleTime_; }
 
-	// プレイヤーの座標ポインタを取得
-	void SetPlayerPos(const VECTOR* vec) { playerPos_ = vec; }
+	// プレイヤーのTransformポインタを取得
+	void SetPlayerTransform(const Transform* transform) { playerTransform_ = transform; }
 
 	// ダメージを与える
 	void SetDamage(int damage);
 
 	// 吹っ飛びリアクションをさせる
 	void SetHitReact(VECTOR moveDir, float moveSpeed, float jumpPow);
+
+	// 攻撃中か？　true / 攻撃中, false / 攻撃中じゃない
+	bool IsAttacking(void)const { return stateCtrl_.state_ == RAT_STATE_ATTACK && 
+										stateCtrl_.attackState_ == RAT_ATTACKING; }
 
 private:
 	// 状態別更新処理
@@ -114,14 +118,14 @@ private:
 	Render3D* render3D_ = nullptr;
 	Animation* animation_ = nullptr;
 
-	// プレイヤー座標
-	const VECTOR* playerPos_ = nullptr;
+	// プレイヤーTransform
+	const Transform* playerTransform_ = nullptr;
 
 private:
-	// ねずみ情報
+	// ネズミ情報
 	ratInfo info_;
 
-	// ねずみの状態情報
+	// ネズミの状態情報
 	ratStateCtrl stateCtrl_;
 };
 
