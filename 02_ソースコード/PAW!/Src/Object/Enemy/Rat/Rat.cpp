@@ -12,8 +12,10 @@ namespace
 {
 	// 移動設定
 	constexpr float MOVE_SPEED = 5.0f;			// 移動速度
+	constexpr float MIN_MOVE_SPEED = 3.0f;		// 最低移動速度
 	constexpr float ATTACK_MOVE_SPEED = 12.0f;	// 攻撃時の移動速度
-	constexpr float MIN_DISTANCE = 150.0f;		// プレイヤーとの距離をとる長さ
+	constexpr float APPROACH_MOVE_SPEED = 4.0f;	// ちょっと近づく時の移動速度
+	constexpr float MIN_DISTANCE = 170.0f;		// プレイヤーとの距離をとる長さ
 	constexpr float MAX_DISTANCE = 200.0f;		// プレイヤーとの距離をつめる長さ
 
 	// 方向設定
@@ -34,12 +36,15 @@ namespace
 	constexpr float ANIM_SPEED = 0.8f;
 
 	// リミット設定
-	constexpr int INVINCIBLE_TIME = 120;		// 無敵時間
+	constexpr int INVINCIBLE_TIME = 120;	// 無敵時間
+	constexpr int WAIT_TIME = 120;			// 待機時間
+	constexpr int SWAY_NUM_MAX = 4;			// 揺れの最大回数
+	constexpr int RANDOM_RIMIT = 1000;		// ランダム用の最大係数
 }
 
 Rat::Rat(void)
 {
-	// プレイヤー状態
+	// ネズミ状態
 	// 初期化関数
 	stateCtrl_.initStateTable_[RAT_STATE_IDLE] = InitIdle;
 	stateCtrl_.initStateTable_[RAT_STATE_MOVE] = InitMove;
@@ -57,7 +62,17 @@ Rat::Rat(void)
 	stateCtrl_.updateStateTable_[RAT_STATE_DEAD] = UpdateDead;
 	stateCtrl_.updateStateTable_[RAT_STATE_END] = UpdateEnd;
 
-	// プレイヤー攻撃状態
+	// ネズミ待機状態
+	// 初期化関数
+	stateCtrl_.initIdleTable_[RAT_IDLE_WAIT] = InitIdleWait;
+	stateCtrl_.initIdleTable_[RAT_IDLE_SWAY] = InitIdleSway;
+	stateCtrl_.initIdleTable_[RAT_IDLE_APPROACH] = InitIdleApproach;
+	// 更新関数
+	stateCtrl_.updateIdleTable_[RAT_IDLE_WAIT] = UpdateIdleWait;
+	stateCtrl_.updateIdleTable_[RAT_IDLE_SWAY] = UpdateIdleSway;
+	stateCtrl_.updateIdleTable_[RAT_IDLE_APPROACH] = UpdateIdleApproach;
+
+	// ネズミ攻撃状態
 	// 初期化関数
 	stateCtrl_.initAttackTable_[RAT_ATTACK_START] = InitAttackStart;
 	stateCtrl_.initAttackTable_[RAT_ATTACKING] = InitAttacking;
@@ -69,7 +84,7 @@ Rat::Rat(void)
 	stateCtrl_.updateAttackTable_[RAT_ATTACK_AFTER] = UpdateAttackAfter;
 	stateCtrl_.updateAttackTable_[RAT_ATTACK_END] = UpdateAttackEnd;
 
-	// プレイヤー被ダメージ状態
+	// ネズミ被ダメージ状態
 	// 初期化関数
 	stateCtrl_.initHitTable_[RAT_HIT_START] = InitHitStart;
 	stateCtrl_.initHitTable_[RAT_HIT_STUN] = InitHitStun;
@@ -199,11 +214,8 @@ void Rat::UpdateState(void)
 
 void Rat::InitIdle(Rat& rat)
 {
-	// ネズミの移動速度を設定
-	rat.info_.moveSpeed_ = 0.0f;
-
-	// 待機アニメーション再生
-	rat.animation_->Play(static_cast<int>(RAT_ANIMATION::IDLE), true);
+	// 待機状態を初期化
+	rat.ChangeIdleState(RAT_IDLE_WAIT);
 }
 
 void Rat::InitMove(Rat& rat)
@@ -211,7 +223,7 @@ void Rat::InitMove(Rat& rat)
 	// ネズミの移動速度を設定
 	rat.info_.moveSpeed_ = MOVE_SPEED;
 	// 待機アニメーション再生
-	rat.animation_->Play(static_cast<int>(RAT_ANIMATION::MOVE), true);
+	rat.animation_->Play(static_cast<int>(RAT_ANIMATION::MOVE));
 }
 
 void Rat::InitRetreat(Rat& rat)
@@ -219,7 +231,7 @@ void Rat::InitRetreat(Rat& rat)
 	// ネズミの移動速度を設定
 	rat.info_.moveSpeed_ = MOVE_SPEED;
 	// 待機アニメーション再生
-	rat.animation_->Play(static_cast<int>(RAT_ANIMATION::MOVE), true);
+	rat.animation_->Play(static_cast<int>(RAT_ANIMATION::MOVE));
 }
 
 void Rat::InitAttack(Rat& rat)
@@ -244,44 +256,27 @@ void Rat::InitEnd(Rat& rat)
 
 void Rat::UpdateIdle(Rat& rat)
 {
-	// ネズミからプレイヤーへの方向を算出
-	rat.GetDirectionToPlayer();
-
 	// モデルがプレイヤーに向くようにする
 	rat.GetAngleToPlayer();
 
-	float distance = rat.GetDistanceToPlayer();
+	// nullチェック
+	if (rat.stateCtrl_.updateIdleTable_[rat.stateCtrl_.idleState_])
+	{
+		// 状態別更新
+		rat.stateCtrl_.updateIdleTable_[rat.stateCtrl_.idleState_](rat);
+	}
 
-	// プレイヤーと距離が取れたら
-	if (distance < MIN_DISTANCE)
-	{
-		// 後退中へ
-		rat.ChangeState(RAT_STATE_RETREAT);
-	}
-	else if (distance > MAX_DISTANCE)
-	{
-		// 移動中へ
-		rat.ChangeState(RAT_STATE_MOVE);
-	}
-#ifdef _DEBUG
-	else
-	{
-		if (InputManager::GetInstance()->IsTrgDown(KEY_INPUT_N))
-		{
-			// 攻撃中へ
-			rat.ChangeState(RAT_STATE_ATTACK);
-		}
-	}
-#endif // _DEBUG
+	// 距離に応じて移動状態を更新する
+	rat.UpdateMovementState();
 }
 
 void Rat::UpdateMove(Rat& rat)
 {
-	// モデルがプレイヤーに向くようにする
-	rat.GetAngleToPlayer();
-
 	// ネズミからプレイヤーへの方向を算出
 	rat.GetDirectionToPlayer();
+
+	// モデルがプレイヤーに向くようにする
+	rat.GetAngleToPlayer();
 
 	// プレイヤーとの距離を詰めれたら
 	if (rat.GetDistanceToPlayer() <= MAX_DISTANCE)
@@ -297,11 +292,11 @@ void Rat::UpdateMove(Rat& rat)
 
 void Rat::UpdateRetreat(Rat& rat)
 {
-	// モデルがプレイヤーに向くようにする
-	rat.GetAngleToPlayer();
-
 	// プレイヤーから離れる方向を算出
 	rat.GetDirectionToPlayer(true);
+
+	// モデルがプレイヤーに向くようにする
+	rat.GetAngleToPlayer();
 
 	// プレイヤーと距離が取れたら
 	if (rat.GetDistanceToPlayer() >= MIN_DISTANCE)
@@ -357,6 +352,133 @@ void Rat::ChangeState(RAT_STATE state)
 	}
 }
 
+void Rat::InitIdleWait(Rat& rat)
+{
+	// ネズミの移動速度を設定
+	rat.info_.moveSpeed_ = 0.0f;
+
+	// 待機時間の初期化
+	rat.info_.waitTime_ = 0;
+
+	// 待機アニメーション再生
+	rat.animation_->Play(static_cast<int>(RAT_ANIMATION::IDLE));
+}
+
+void Rat::InitIdleSway(Rat& rat)
+{
+	// 揺れ時間初期化
+	rat.info_.swayTime_ = 0;	
+	// 実際に揺れた回数初期化
+	rat.info_.swayTotalNum_ = 0;
+	// 待機時の揺れ処理用のランダム系の初期化
+	rat.InitSwayRandom();
+	// 移動方向を算出
+	rat.GetDirectionLR(rat.info_.isRightSway_);
+	// 待機アニメーション再生
+	rat.animation_->Play(static_cast<int>(RAT_ANIMATION::MOVE_CLOSER));
+}
+
+void Rat::InitIdleApproach(Rat& rat)
+{
+	// ネズミの移動速度を設定
+	rat.info_.moveSpeed_ = APPROACH_MOVE_SPEED;
+
+	// ちょっと近づく時の距離を算出
+	rat.SetApproachDistance();
+
+	// 近づき中に設定
+	rat.info_.isApproaching_ = true;
+
+	// 待機アニメーション再生
+	rat.animation_->Play(static_cast<int>(RAT_ANIMATION::MOVE));
+}
+
+void Rat::UpdateIdleWait(Rat& rat)
+{
+	rat.info_.waitTime_++;
+
+	if (rat.info_.waitTime_ >= WAIT_TIME)
+	{
+		// 乱数を取得
+		int random = GetRand(RANDOM_RIMIT);
+
+		// 0～1にする
+		random %= 2;
+		// 1～2にする
+		random++;
+
+		// 待機状態の動きを変更
+		//rat.ChangeIdleState(static_cast<RAT_IDLE_STATE>(random));
+		rat.ChangeIdleState(RAT_IDLE_SWAY);
+	}
+}
+
+void Rat::UpdateIdleSway(Rat& rat)
+{
+	rat.Move();
+
+	rat.info_.swayTime_++;
+
+	if (rat.info_.swayTime_ > 60)
+	{
+		rat.info_.swayTime_ = 0;
+		rat.info_.isRightSway_ = !rat.info_.isRightSway_;
+		rat.info_.swayTotalNum_++;
+	}
+
+	if (rat.info_.swayNum_ <= rat.info_.swayTotalNum_)
+	{
+		// 待機中へ
+		rat.ChangeIdleState(RAT_IDLE_WAIT);
+		return;
+	}
+}
+
+void Rat::UpdateIdleApproach(Rat& rat)
+{
+	if (rat.info_.isApproaching_)
+	{
+		// ネズミからプレイヤーへの方向を算出
+		rat.GetDirectionToPlayer();
+	}
+	else
+	{
+		// プレイヤーから離れる方向を算出
+		rat.GetDirectionToPlayer(true);
+	}
+
+	// 移動処理
+	rat.Move();
+
+	// 指定の距離まで近づいたら
+	if (rat.GetDistanceToPlayer() <= rat.info_.approachDistance_)
+	{
+		rat.info_.isApproaching_ = false;
+	}
+
+	// プレイヤーと距離が取れたら
+	if (!rat.info_.isApproaching_ &&
+		rat.GetDistanceToPlayer() >= MIN_DISTANCE)
+	{
+		// 待機中へ
+		rat.ChangeIdleState(RAT_IDLE_WAIT);
+		return;
+	}
+}
+
+void Rat::ChangeIdleState(RAT_IDLE_STATE state)
+{
+	// 指定されたステートへ変更
+	stateCtrl_.idleState_ = state;
+
+	// nullチェック
+	if (stateCtrl_.initIdleTable_[stateCtrl_.idleState_])
+	{
+		// 状態別初期化
+		stateCtrl_.initIdleTable_[stateCtrl_.idleState_](*this);
+	}
+}
+
 void Rat::InitAttackStart(Rat& rat)
 {
 	// 攻撃始めアニメーション再生
@@ -385,6 +507,9 @@ void Rat::InitAttackAfter(Rat& rat)
 {
 	// モデルがプレイヤーに向くようにする
 	rat.GetAngleToPlayer();
+
+	// 攻撃後アニメーション再生
+	rat.animation_->Play(static_cast<int>(RAT_ANIMATION::MOVE_CLOSER), false);
 }
 
 void Rat::InitAttackEnd(Rat& rat)
@@ -419,8 +544,11 @@ void Rat::UpdateAttacking(Rat& rat)
 
 void Rat::UpdateAttackAfter(Rat& rat)
 {
-	// 攻撃終了へ
-	rat.ChangeAttackState(RAT_ATTACK_END);
+	if (rat.animation_->IsEnd())
+	{
+		// 攻撃終了へ
+		rat.ChangeAttackState(RAT_ATTACK_END);
+	}
 }
 
 void Rat::UpdateAttackEnd(Rat& rat)
@@ -544,6 +672,42 @@ void Rat::Move(void)
 			VScale(info_.moveDir_, info_.moveSpeed_));
 }
 
+void Rat::UpdateMovementState(void)
+{
+	// プレイヤーとの距離を調べる
+	float distance = GetDistanceToPlayer();
+
+	// プレイヤーが遠かったら
+	if (distance > MAX_DISTANCE)
+	{
+		// 近づき処理へ
+		ChangeState(RAT_STATE_MOVE);
+		return;
+	}
+#ifdef _DEBUG
+	else
+	{
+		if (InputManager::GetInstance()->IsTrgDown(KEY_INPUT_N))
+		{
+			// 攻撃中へ
+			ChangeState(RAT_STATE_ATTACK);
+			return;
+		}
+	}
+#endif // _DEBUG
+
+	// 待機中のちょっと近づく処理の場合処理を行わない
+	if (stateCtrl_.state_ == RAT_STATE_IDLE && stateCtrl_.idleState_ == RAT_IDLE_APPROACH)return;
+
+	// プレイヤーが近かったら
+	if (distance < MIN_DISTANCE)
+	{
+		// 後退中へ
+		ChangeState(RAT_STATE_RETREAT);
+		return;
+	}
+}
+
 void Rat::GetDirectionToPlayer(bool isRetreat)
 {
 	// 相手へのベクトルを計算
@@ -571,6 +735,35 @@ void Rat::GetDirectionToPlayer(bool isRetreat)
 		// 反転させる
 		info_.moveDir_.x *= -1.0f;
 		info_.moveDir_.z *= -1.0f;
+	}
+}
+
+void Rat::GetDirectionLR(bool isRight)
+{
+	VECTOR dir = Math::VECTOR_ZERO;
+	if (isRight)
+	{
+		dir = VAdd(dir, { 1.0f, 0.0f, 0.0f });
+	}
+	else
+	{
+		dir = VAdd(dir, { -1.0f, 0.0f, 0.0f });
+	}
+
+	if (!Math::EqualsVZero(dir))
+	{
+		// 正規化
+		dir = VNorm(dir);
+
+		// XYZの回転行列
+		// XZ平面移動にする場合は、XZの回転を考慮しないようにする
+		MATRIX mat = MGetIdent();
+
+		// カメラのY軸角度回転行列を出す
+		mat = MMult(mat, MGetRotY(transform_->angle_.y));
+
+		// 回転行列を使用して、ベクトルを回転させる
+		info_.moveDir_ = VTransform(dir, mat);
 	}
 }
 
@@ -606,4 +799,36 @@ float Rat::GetDistanceToPlayer(void)
 	// プレイヤーとの距離を算出
 	VECTOR vec = VSub(playerTransform_->pos_, transform_->pos_);
 	return VSize(vec);
+}
+
+void Rat::InitSwayRandom(void)
+{
+	int speed = GetRand(MOVE_SPEED);
+	// 移動速度は最低値をつけておく
+	if (speed < MIN_MOVE_SPEED)
+	{
+		speed = MIN_MOVE_SPEED;
+	}
+
+	int random = GetRand(RANDOM_RIMIT);
+
+	// 揺れ回数
+	info_.swayNum_ = (random % SWAY_NUM_MAX) + 1;
+
+	// 揺れ方向
+	info_.isRightSway_ = random % 2;
+}
+
+void Rat::SetApproachDistance(void)
+{
+	// プレイヤーと距離を算出
+	float distance = GetDistanceToPlayer();
+
+	// 近づく距離算出
+	int random = GetRand(static_cast<int>(distance / 5));
+	random += static_cast<int>(distance / 5);
+	distance -= random;
+
+	// 決定した距離を設定
+	info_.approachDistance_ = distance;
 }

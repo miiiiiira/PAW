@@ -21,6 +21,16 @@ enum RAT_STATE
 	RAT_STATE_MAX
 };
 
+// ネズミ待機状態
+enum RAT_IDLE_STATE
+{
+	RAT_IDLE_WAIT,		// 待機
+	RAT_IDLE_SWAY,		// 左右に揺れる
+	RAT_IDLE_APPROACH,	// ちょっと近づく
+
+	RAT_IDLE_MAX
+};
+
 // ネズミ攻撃状態
 enum RAT_ATTACK_STATE
 {
@@ -45,21 +55,28 @@ enum RAT_HIT_STATE
 // 状態遷移
 struct ratStateCtrl
 {
-	// プレイヤーの状態
+	// ネズミの状態
 	// ステート
 	RAT_STATE state_;
 	// ステートテーブル
 	ratStateFunction initStateTable_[RAT_STATE_MAX];
 	ratStateFunction updateStateTable_[RAT_STATE_MAX];
 
-	// プレイヤー攻撃状態
+	// ネズミ待機状態
+	// ステート
+	RAT_IDLE_STATE idleState_;
+	// ステートテーブル
+	ratStateFunction initIdleTable_[RAT_IDLE_MAX];
+	ratStateFunction updateIdleTable_[RAT_IDLE_MAX];
+
+	// ネズミ攻撃状態
 	// ステート
 	RAT_ATTACK_STATE attackState_;
 	// ステートテーブル
 	ratStateFunction initAttackTable_[RAT_ATTACK_MAX];
 	ratStateFunction updateAttackTable_[RAT_ATTACK_MAX];
 
-	// プレイヤー被ダメージ状態
+	// ネズミ被ダメージ状態
 	// ステート
 	RAT_HIT_STATE hitState_;
 	// ステートテーブル
@@ -80,6 +97,18 @@ struct ratInfo
 	int hp_;	// 今現在のHP
 
 	int invincibleTime_ = 0;	// 無敵時間
+
+	int waitTime_ = 0;	// 待機時間
+
+	// 待機時の揺れ
+	int swayTime_ = 0;			// 揺れ時間
+	int swayTotalNum_ = 0;		// 実際に揺れた回数
+	int swayNum_ = 0;			// 揺れ回数
+	bool isRightSway_ = true;	// 右へ揺れるか　	true / 右へ揺れる, false / 左へ揺れる
+
+	// 待機時のちょっと近づく
+	float approachDistance_ = 0.0f;	// ちょっと近づく距離
+	bool isApproaching_ = true;		// 近づき中か	　true / 近づく , false/ 遠ざかる
 };
 
 enum class RAT_ANIMATION

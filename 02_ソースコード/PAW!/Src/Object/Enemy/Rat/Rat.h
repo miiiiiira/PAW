@@ -67,6 +67,18 @@ private:
 	// 状態を変更させる
 	void ChangeState(RAT_STATE state);
 
+	// 待機状態
+	// 状態別初期化
+	static void InitIdleWait(Rat& rat);			// 待機
+	static void InitIdleSway(Rat& rat);			// 左右に揺れる
+	static void InitIdleApproach(Rat& rat);		// ちょっと近づく
+	// 状態別更新
+	static void UpdateIdleWait(Rat& rat);		// 待機
+	static void UpdateIdleSway(Rat& rat);		// 左右に揺れる
+	static void UpdateIdleApproach(Rat& rat);	// ちょっと近づく
+	// 待機状態を変更させる
+	void ChangeIdleState(RAT_IDLE_STATE state);
+
 	// 攻撃状態
 	// 状態別初期化
 	static void InitAttackStart(Rat& rat);		// 攻撃始め
@@ -103,14 +115,28 @@ private:
 	// 移動処理
 	void Move(void);
 
-	// 移動方向を算出 （引数をtrueにするとプレイヤーから離れる方向を算出）
+	// 距離に応じて移動状態を更新する
+	void UpdateMovementState(void);
+
+	// 移動方向を算出 
+	// 引数をtrueにするとプレイヤーから離れる方向を算出
 	void GetDirectionToPlayer(bool isRetreat = false);
+
+	// ネズミからの左右を算出
+	// 引数をtrueにすると右方向を算出
+	void GetDirectionLR(bool isRight = true);
 
 	// プレイヤーに向く
 	void GetAngleToPlayer(void);
 
 	// プレイヤーとの距離を算出
 	float GetDistanceToPlayer(void);
+
+	// 待機時の揺れ処理用のランダム系の初期化
+	void InitSwayRandom(void);
+
+	// ちょっと近づく時の距離を算出
+	void SetApproachDistance(void);
 
 private:
 	// コンポーネント
