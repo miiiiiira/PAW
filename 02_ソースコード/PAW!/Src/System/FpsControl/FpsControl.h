@@ -1,7 +1,7 @@
 #pragma once
 
 // フレームレート
-static constexpr float FRAME_RATE(1000 / 60);
+static constexpr float FRAME_RATE(1000.0f / 60.0f);
 
 class FpsControl
 {

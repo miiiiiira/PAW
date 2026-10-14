@@ -267,7 +267,7 @@ void Rat::UpdateIdle(Rat& rat)
 	}
 
 	// 距離に応じて移動状態を更新する
-	rat.UpdateMovementState();
+	//rat.UpdateMovementState();
 }
 
 void Rat::UpdateMove(Rat& rat)
@@ -415,11 +415,13 @@ void Rat::UpdateIdleWait(Rat& rat)
 
 void Rat::UpdateIdleSway(Rat& rat)
 {
+	rat.GetDirectionLR(rat.info_.isRightSway_);
+
 	rat.Move();
 
 	rat.info_.swayTime_++;
 
-	if (rat.info_.swayTime_ > 60)
+	if (rat.info_.swayTime_ > 30)
 	{
 		rat.info_.swayTime_ = 0;
 		rat.info_.isRightSway_ = !rat.info_.isRightSway_;
@@ -741,6 +743,7 @@ void Rat::GetDirectionToPlayer(bool isRetreat)
 void Rat::GetDirectionLR(bool isRight)
 {
 	VECTOR dir = Math::VECTOR_ZERO;
+
 	if (isRight)
 	{
 		dir = VAdd(dir, { 1.0f, 0.0f, 0.0f });
@@ -748,6 +751,12 @@ void Rat::GetDirectionLR(bool isRight)
 	else
 	{
 		dir = VAdd(dir, { -1.0f, 0.0f, 0.0f });
+	}
+
+	// プレイヤーが遠かったら
+	if (GetDistanceToPlayer() > MAX_DISTANCE)
+	{
+		dir = VAdd(dir, { 0.0f, 0.0f, -0.5 });
 	}
 
 	if (!Math::EqualsVZero(dir))
@@ -803,11 +812,11 @@ float Rat::GetDistanceToPlayer(void)
 
 void Rat::InitSwayRandom(void)
 {
-	int speed = GetRand(MOVE_SPEED);
+	info_.moveSpeed_ = GetRand(MOVE_SPEED);
 	// 移動速度は最低値をつけておく
-	if (speed < MIN_MOVE_SPEED)
+	if (info_.moveSpeed_ < MIN_MOVE_SPEED)
 	{
-		speed = MIN_MOVE_SPEED;
+		info_.moveSpeed_ = MIN_MOVE_SPEED;
 	}
 
 	int random = GetRand(RANDOM_RIMIT);
