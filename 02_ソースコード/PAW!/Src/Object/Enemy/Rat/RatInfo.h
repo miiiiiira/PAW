@@ -94,7 +94,7 @@ struct ratInfo
 
 	float moveSpeed_ = 0;	// ˆÚ“®‘¬“x
 
-	int hp_;	// ¡Œ»İ‚ÌHP
+	int hp_ = 0;	// ¡Œ»İ‚ÌHP
 
 	int invincibleTime_ = 0;	// –³“GŠÔ
 

@@ -15,8 +15,12 @@ namespace
 	constexpr float MIN_MOVE_SPEED = 3.0f;		// 最低移動速度
 	constexpr float ATTACK_MOVE_SPEED = 12.0f;	// 攻撃時の移動速度
 	constexpr float APPROACH_MOVE_SPEED = 4.0f;	// ちょっと近づく時の移動速度
-	constexpr float MIN_DISTANCE = 170.0f;		// プレイヤーとの距離をとる長さ
-	constexpr float MAX_DISTANCE = 200.0f;		// プレイヤーとの距離をつめる長さ
+	constexpr float FORWARD_OFFSET = -0.3f;		// 前方向のオフセット
+
+	// プレイヤーとの距離設定
+	constexpr float MIN_DISTANCE = 170.0f;		// プレイヤーとの最小距離
+	constexpr float MAX_DISTANCE = 200.0f;		// プレイヤーとの最大距離
+	constexpr float MID_DISTANCE = (MIN_DISTANCE + MAX_DISTANCE) / 2.0f; // 最小距離と最大距離の中間の距離
 
 	// 方向設定
 	constexpr float ANGLE_COEFFICIENT = 0.2f;	// 補間の係数
@@ -103,7 +107,7 @@ void Rat::Init(void)
 {
 	// 座標の設定
 	transform_ = owner_->AddComponent<Transform>();
-	transform_->pos_ = { 0.0f,0.0f,200.0f };
+	transform_->pos_ = { 0.0f,0.0f,MIN_DISTANCE };
 	transform_->angle_ = {};
 	transform_->scale_ = { 2.0f,2.0f,2.0f };
 
@@ -267,7 +271,7 @@ void Rat::UpdateIdle(Rat& rat)
 	}
 
 	// 距離に応じて移動状態を更新する
-	//rat.UpdateMovementState();
+	rat.UpdateMovementState();
 }
 
 void Rat::UpdateMove(Rat& rat)
@@ -370,6 +374,8 @@ void Rat::InitIdleSway(Rat& rat)
 	rat.info_.swayTime_ = 0;	
 	// 実際に揺れた回数初期化
 	rat.info_.swayTotalNum_ = 0;
+	// 指定されたジャンプ力を設定
+	rat.info_.velocityY_ = JUMP_POW;
 	// 待機時の揺れ処理用のランダム系の初期化
 	rat.InitSwayRandom();
 	// 移動方向を算出
@@ -415,21 +421,32 @@ void Rat::UpdateIdleWait(Rat& rat)
 
 void Rat::UpdateIdleSway(Rat& rat)
 {
+	rat.info_.swayTime_++;
+
+	// 移動方向を算出
 	rat.GetDirectionLR(rat.info_.isRightSway_);
 
-	rat.Move();
-
-	rat.info_.swayTime_++;
+	if (rat.transform_->pos_.y > 0.0f)
+	{
+		// 移動させる
+		rat.Move();
+	}
 
 	if (rat.info_.swayTime_ > 30)
 	{
+		// ジャンプ力を設定
+		rat.info_.velocityY_ = JUMP_POW;
 		rat.info_.swayTime_ = 0;
-		rat.info_.isRightSway_ = !rat.info_.isRightSway_;
 		rat.info_.swayTotalNum_++;
+		rat.info_.isRightSway_ = !rat.info_.isRightSway_;
 	}
 
+	// 指定の回数分飛んでいたら
 	if (rat.info_.swayNum_ <= rat.info_.swayTotalNum_)
 	{
+		// 重力初期化
+		rat.info_.velocityY_ = -0.1f;
+
 		// 待機中へ
 		rat.ChangeIdleState(RAT_IDLE_WAIT);
 		return;
@@ -746,17 +763,20 @@ void Rat::GetDirectionLR(bool isRight)
 
 	if (isRight)
 	{
+		// 右成分
 		dir = VAdd(dir, { 1.0f, 0.0f, 0.0f });
 	}
 	else
 	{
+		// 左成分
 		dir = VAdd(dir, { -1.0f, 0.0f, 0.0f });
 	}
 
-	// プレイヤーが遠かったら
-	if (GetDistanceToPlayer() > MAX_DISTANCE)
+	// 中間の距離より距離がひらいていたら
+	if (GetDistanceToPlayer() >= MID_DISTANCE)
 	{
-		dir = VAdd(dir, { 0.0f, 0.0f, -0.5 });
+		// 少し前に詰める
+		dir = VAdd(dir, { 0.0f, 0.0f, FORWARD_OFFSET });
 	}
 
 	if (!Math::EqualsVZero(dir))
@@ -764,8 +784,6 @@ void Rat::GetDirectionLR(bool isRight)
 		// 正規化
 		dir = VNorm(dir);
 
-		// XYZの回転行列
-		// XZ平面移動にする場合は、XZの回転を考慮しないようにする
 		MATRIX mat = MGetIdent();
 
 		// カメラのY軸角度回転行列を出す
@@ -822,7 +840,7 @@ void Rat::InitSwayRandom(void)
 	int random = GetRand(RANDOM_RIMIT);
 
 	// 揺れ回数
-	info_.swayNum_ = (random % SWAY_NUM_MAX) + 1;
+	info_.swayNum_ = 3;
 
 	// 揺れ方向
 	info_.isRightSway_ = random % 2;
