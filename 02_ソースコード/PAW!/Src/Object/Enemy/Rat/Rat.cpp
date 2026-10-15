@@ -414,8 +414,7 @@ void Rat::UpdateIdleWait(Rat& rat)
 		random++;
 
 		// ‘Ò‹@ó‘Ô‚Ì“®‚«‚ğ•ÏX
-		//rat.ChangeIdleState(static_cast<RAT_IDLE_STATE>(random));
-		rat.ChangeIdleState(RAT_IDLE_SWAY);
+		rat.ChangeIdleState(static_cast<RAT_IDLE_STATE>(random));
 	}
 }
 
