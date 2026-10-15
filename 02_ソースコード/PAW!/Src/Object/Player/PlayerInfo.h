@@ -92,11 +92,26 @@ struct playerInfo
 
 	float moveSpeed_ = 0;	// 移動速度
 
-	int hp_;	// 今現在のHP
+	int hp_ = 0;	// 今現在のHP
 
 	VECTOR avoidPos_ = {};	// 回避先の座標
 
 	int invincibleTime_ = 0;	// 無敵時間
 
 	int hitStopCounter_ = 0;	// ヒットストップ用のカウンター
+};
+
+enum class PLAYER_ANIMATION
+{
+	JUMP,
+	GROOMING,
+	LOAF,
+	PUNCH,
+	RUN,
+	SCRATCH,
+	SITTING_IDLE,
+	STANDING_IDLE,
+	WALK,
+
+	MAX
 };

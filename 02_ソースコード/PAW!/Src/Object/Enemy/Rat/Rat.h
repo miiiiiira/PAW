@@ -106,6 +106,9 @@ private:
 	void ChangeHitState(RAT_HIT_STATE state);
 
 private:
+	// コンポーネント追加
+	void AddComponets(void);
+
 	// 重力
 	void ApplyGravity(void);
 

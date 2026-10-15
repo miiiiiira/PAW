@@ -3,6 +3,8 @@
 #include "../../Input/InputManager.h"
 #include "../../Scene/SceneManager.h"
 #include "../Camera/CameraUtility.h"
+#include "../Component/Graphics/Render3D.h"
+#include "../Component/Animation/Animation.h"
 
 #include "Player.h"
 
@@ -13,7 +15,7 @@ namespace
 	constexpr int INVINCIBLE_TIME = 120;		// 無敵時間
 
 	// 移動設定
-	constexpr float MOVE_SPEED = 10.0f;			// 移動速度
+	constexpr float MOVE_SPEED = 15.0f;			// 移動速度
 	constexpr float AVOID_DISTANCE = 500.0f;	// 回避距離
 	constexpr float COEFFICIENT = 0.2f;			// 線形補間の係数
 	constexpr float AVOID_MIN_DISTANCE = 30.0f;	// 回避時の打ち切り距離
@@ -26,6 +28,9 @@ namespace
 	constexpr float GRAVITY = -1.98f;	// 重力加速度
 	constexpr float MAX_FALL = -15.0f;	// 最大落下速度
 
+	// 方向設定
+	constexpr float ANGLE_COEFFICIENT = 0.2f;	// 補間の係数
+
 	// ダメージ設定
 	constexpr float HIT_REACT_FRICTION = 0.5f;	// ダメージ時のリアクション時の摩擦
 	constexpr int SHAKE_TIME = 20;				// 揺らす時間
@@ -34,6 +39,9 @@ namespace
 	constexpr int  STATUS_DRAW_POS_X = 10;		// ステータス描画を始める座標
 	constexpr int  HP_DRAW_POS_Y = 50;			// HPの描画Y軸
 	constexpr int STATUS_DRAW_POS_OFFSET = 10;	// オフセット
+
+	// アニメーション設定
+	constexpr float ANIM_SPEED = 0.7f;
 }
 
 Player::Player(void)
@@ -98,10 +106,8 @@ void Player::Load(void)
 // 初期化
 void Player::Init(void)
 {
-	// 座標の設定
-	transform_ = owner_->AddComponent<Transform>();
-	transform_->pos_ = {};
-	transform_->angle_ = {};
+	// コンポーネントの追加
+	AddComponets();
 
 	// 移動速度の初期化
 	info_.moveSpeed_ = MOVE_SPEED;
@@ -136,6 +142,9 @@ void Player::Update(void)
 
 	// 死亡座標へ到達しているか
 	IsReachedDeadPos();
+
+	// 角度処理
+	RotAngle();
 }
 
 void Player::Draw2D(void)
@@ -218,12 +227,18 @@ void Player::InitIdle(Player& player)
 {
 	// 移動速度を初期化
 	player.info_.moveSpeed_ = 0.0f;
+
+	// 待機アニメーションを設定
+	player.animation_->Play(static_cast<int>(PLAYER_ANIMATION::STANDING_IDLE));
 }
 
 void Player::InitMove(Player& player)
 {
 	// プレイヤーの移動速度を設定
 	player.info_.moveSpeed_ = MOVE_SPEED;
+
+	// 走りアニメーションを設定
+	player.animation_->Play(static_cast<int>(PLAYER_ANIMATION::RUN));
 }
 
 void Player::InitAttack(Player& player)
@@ -515,6 +530,7 @@ void Player::InitJumpStart(Player& player)
 
 void Player::InitJumping(Player& player)
 {
+	player.animation_->Play(static_cast<int>(PLAYER_ANIMATION::JUMP));
 }
 
 void Player::InitJumpEnd(Player& player)
@@ -606,6 +622,32 @@ void Player::ChangeHitState(PLAYER_HIT_STATE state)
 	{
 		// 状態別初期化
 		stateCtrl_.initHitTable_[stateCtrl_.hitState_](*this);
+	}
+}
+
+void Player::AddComponets(void)
+{
+	// 座標の設定
+	transform_ = owner_->AddComponent<Transform>();
+	transform_->pos_ = {};
+	transform_->angle_ = {};
+	transform_->scale_ = { 4.0f,4.0f,4.0f };
+
+	// 3Dモデル設定
+	render3D_ = owner_->AddComponent<Render3D>();
+	render3D_->Init();
+	render3D_->SetModel("Data/Model/Player/Player.mv1");
+
+	// アニメーション設定
+	animation_ = owner_->AddComponent<Animation>();
+	animation_->Init();
+	// アニメーション登録
+	for (int i = 0; i < static_cast<int>(PLAYER_ANIMATION::MAX); i++)
+	{
+		animation_->AddInFbx(
+			static_cast<int>(i),
+			ANIM_SPEED,
+			static_cast<int>(i));
 	}
 }
 
@@ -729,6 +771,25 @@ void Player::IsReachedDeadPos(void)
 	}
 }
 
+void Player::RotAngle(void)
+{
+	// 方向から角度を算出
+	float targetAngle = atan2f(info_.moveDir_.x, info_.moveDir_.z);
+	// 今回のモデルのY軸向きが逆なので向きを反転させる
+	targetAngle += DX_PI_F;
+
+	// 角度補間をかける
+	transform_->angle_.y = Math::LerpAngle(
+		transform_->angle_.y,
+		targetAngle,
+		ANGLE_COEFFICIENT);
+
+	transform_->angle_.x = transform_->angle_.z = 0.0f;
+
+	// モデルに向きを設定
+	MV1SetRotationXYZ(render3D_->GetHandle(), transform_->angle_);
+}
+
 void Player::DrawHP(void)
 {
 	// プレイヤーのhpの表示 緑
@@ -753,12 +814,12 @@ void Player::DebugDraw2D(void)
 void Player::DebugDraw3D(void)
 {
 	// プレイヤー描画
-	DrawCapsule3D(
-		GetPlayerHeadPos(),
-		transform_->pos_,
-		30.0f,
-		10,
-		0x0000ff,
-		0x0000ff,
-		true);
+	//DrawCapsule3D(
+	//	GetPlayerHeadPos(),
+	//	transform_->pos_,
+	//	30.0f,
+	//	10,
+	//	0x0000ff,
+	//	0x0000ff,
+	//	true);
 }

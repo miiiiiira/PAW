@@ -8,6 +8,8 @@
 
 // 前方宣言
 class Transform;
+class Render3D;
+class Animation;
 
 // プレイヤー制御コンポーネント
 class Player : public Component
@@ -118,6 +120,9 @@ private:
 	static constexpr float HEAD_POS_OFFSET = 100.0f;
 
 private:
+	// コンポーネント追加
+	void AddComponets(void);
+
 	// 重力
 	void ApplyGravity(void);	
 
@@ -139,6 +144,9 @@ private:
 	// 死亡座標へ到達しているか
 	void IsReachedDeadPos(void);	
 
+	// 角度処理
+	void RotAngle(void);
+
 	// HP描画
 	void DrawHP(void);		
 
@@ -147,8 +155,10 @@ private:
 	void DebugDraw3D(void);	
 
 private:
-	// Transform
+	// コンポーネント
 	Transform* transform_ = nullptr;		
+	Render3D* render3D_ = nullptr;
+	Animation* animation_ = nullptr;
 
 private:
 	// プレイヤー情報

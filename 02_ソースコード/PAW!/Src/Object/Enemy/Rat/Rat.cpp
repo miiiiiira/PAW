@@ -105,28 +105,8 @@ void Rat::Load(void)
 
 void Rat::Init(void)
 {
-	// 座標の設定
-	transform_ = owner_->AddComponent<Transform>();
-	transform_->pos_ = { 0.0f,0.0f,MIN_DISTANCE };
-	transform_->angle_ = {};
-	transform_->scale_ = { 2.0f,2.0f,2.0f };
-
-	// 3Dモデル設定
-	render3D_ = owner_->AddComponent<Render3D>();
-	render3D_->Init();
-	render3D_->SetModel("Data/Model/Enemy/Enemy.mv1");
-
-	// アニメーション設定
-	animation_ = owner_->AddComponent<Animation>();
-	animation_->Init();
-	// アニメーション登録
-	for (int i = 0; i < static_cast<int>(RAT_ANIMATION::MAX); i++)
-	{
-		animation_->AddInFbx(
-			static_cast<int>(i),
-			ANIM_SPEED,
-			static_cast<int>(i));
-	}
+	// コンポーネントの追加
+	AddComponets();
 
 	// HPの初期化
 	info_.hp_ = DEFAULT_HP;
@@ -638,6 +618,32 @@ void Rat::ChangeHitState(RAT_HIT_STATE state)
 	{
 		// 状態別初期化
 		stateCtrl_.initHitTable_[stateCtrl_.hitState_](*this);
+	}
+}
+
+void Rat::AddComponets(void)
+{
+	// 座標の設定
+	transform_ = owner_->AddComponent<Transform>();
+	transform_->pos_ = { 0.0f,0.0f,MIN_DISTANCE };
+	transform_->angle_ = {};
+	transform_->scale_ = { 2.0f,2.0f,2.0f };
+
+	// 3Dモデル設定
+	render3D_ = owner_->AddComponent<Render3D>();
+	render3D_->Init();
+	render3D_->SetModel("Data/Model/Enemy/Enemy.mv1");
+
+	// アニメーション設定
+	animation_ = owner_->AddComponent<Animation>();
+	animation_->Init();
+	// アニメーション登録
+	for (int i = 0; i < static_cast<int>(RAT_ANIMATION::MAX); i++)
+	{
+		animation_->AddInFbx(
+			static_cast<int>(i),
+			ANIM_SPEED,
+			static_cast<int>(i));
 	}
 }
 
