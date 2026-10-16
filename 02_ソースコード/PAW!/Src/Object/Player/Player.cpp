@@ -24,7 +24,7 @@ namespace
 	constexpr int DEFAULT_HP = 5;	// 初期HP
 
 	// 重力設定
-	constexpr float JUMP_POW = 25.0f;	// ジャンプ力
+	constexpr float JUMP_POW = 28.0f;	// ジャンプ力
 	constexpr float GRAVITY = -1.98f;	// 重力加速度
 	constexpr float MAX_FALL = -15.0f;	// 最大落下速度
 
@@ -813,13 +813,4 @@ void Player::DebugDraw2D(void)
 
 void Player::DebugDraw3D(void)
 {
-	// プレイヤー描画
-	//DrawCapsule3D(
-	//	GetPlayerHeadPos(),
-	//	transform_->pos_,
-	//	30.0f,
-	//	10,
-	//	0x0000ff,
-	//	0x0000ff,
-	//	true);
 }

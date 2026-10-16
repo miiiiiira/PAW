@@ -17,32 +17,43 @@ void Animation::Update(void)
 	// アニメーションが再生されていなかったら処理を行わない
 	if (playType_ == -1) return;
 
-	// アニメーションを進める
-	playAnim_.step += playAnim_.speed;
+	int handle = render_->GetHandle();
 
-	// 再生時間が総再生時間を超えていたら
-	if (playAnim_.step >= playAnim_.totalTime)
+	// 再生中アニメーションを進める
+	StepAnim(playAnim_, isLoop_);
+	MV1SetAttachAnimTime(handle, playAnim_.attachNo, playAnim_.step);
+
+	// ブレンド中の処理
+	if (isBlending_)
 	{
-		// ループ再生の場合
-		if (isLoop_)
+		// ブレンド元アニメーションも進める
+		StepAnim(prevAnim_, prevLoop_);
+		MV1SetAttachAnimTime(handle, prevAnim_.attachNo, prevAnim_.step);
+
+		// ブレンド率を更新
+		blendCount_ += 1.0f;
+		float rate = blendCount_ / blendFrame_;
+		if (rate > 1.0f) rate = 1.0f;
+
+		MV1SetAttachAnimBlendRate(handle, playAnim_.attachNo, rate);
+		MV1SetAttachAnimBlendRate(handle, prevAnim_.attachNo, 1.0f - rate);
+
+		// ブレンド完了
+		if (rate >= 1.0f)
 		{
-			// 再生時間を初期化
-			playAnim_.step = 0.0f;
-		}
-		// ループ再生ではない場合
-		else
-		{
-			// 再生時間を総再生時間に設定
-			playAnim_.step = playAnim_.totalTime;
+			EndBlend();
 		}
 	}
-
-	// アタッチしているアニメーションの再生時間を設定する
-	MV1SetAttachAnimTime(render_->GetHandle(), playAnim_.attachNo, playAnim_.step);
 }
 
 void Animation::Release(void)
 {
+	// ブレンド元が残っていれば外す
+	if (render_ && isBlending_)
+	{
+		EndBlend();
+	}
+
 	// アニメーションの解放
 	for (auto& pair : animations_)
 	{
@@ -52,7 +63,7 @@ void Animation::Release(void)
 		}
 	}
 
-	// 使い終わったらクリア
+	// 拡張オブジェクトをクリア
 	animations_.clear();
 }
 
@@ -77,7 +88,7 @@ void Animation::AddInFbx(int type, float speed, int animIndex)
 	AddInternal(type, speed, anim);
 }
 
-void Animation::Play(int type, bool loop)
+void Animation::Play(int type, bool loop, float blendFrame)
 {
 	if (!render_)
 	{
@@ -92,10 +103,31 @@ void Animation::Play(int type, bool loop)
 	// モデルハンドルを取得
 	int handle = render_->GetHandle();
 
-	// 以前に再生していたアニメーションがあればアタッチ解除する
+	// ブレンド中に切り替わった場合は、古いブレンド元を外す
+	if (isBlending_)
+	{
+		EndBlend();
+	}
+
+	// 以前に再生していたアニメーションがある場合
+	bool doBlend = false;
 	if (playType_ != -1)
 	{
-		MV1DetachAnim(handle, playAnim_.attachNo);
+		if (blendFrame > 0.0f)
+		{
+			// ブレンド元として保持しておく (Detachしない)
+			prevAnim_ = playAnim_;
+			prevLoop_ = isLoop_;
+			blendFrame_ = blendFrame;
+			blendCount_ = 0.0f;
+			isBlending_ = true;
+			doBlend = true;
+		}
+		else
+		{
+			// ブレンドなしの場合はそのままアタッチを外す
+			MV1DetachAnim(handle, playAnim_.attachNo);
+		}
 	}
 
 	// 再生するアニメーション情報を更新し、再生時間を初期化
@@ -107,25 +139,27 @@ void Animation::Play(int type, bool loop)
 	if (playAnim_.model == -1)
 	{
 		// 単一モデル内のアニメーションインデックスからアタッチする場合
-		playAnim_.attachNo =
-			MV1AttachAnim(
-				handle,
-				playAnim_.
-				animIndex);
+		playAnim_.attachNo = MV1AttachAnim(handle, playAnim_.animIndex);
 	}
 	else
 	{
 		// 外部のモデルハンドルからアタッチする場合
-		playAnim_.attachNo =
-			MV1AttachAnim(
-				handle,
-				0,
-				playAnim_.
-				model);
+		playAnim_.attachNo = MV1AttachAnim(handle, 0, playAnim_.model);
 	}
 
 	// アタッチしたアニメーションの総再生時間を取得
 	playAnim_.totalTime = MV1GetAttachAnimTotalTime(handle, playAnim_.attachNo);
+
+	// ブレンド率の初期設定
+	if (doBlend)
+	{
+		MV1SetAttachAnimBlendRate(handle, playAnim_.attachNo, 0.0f);
+		MV1SetAttachAnimBlendRate(handle, prevAnim_.attachNo, 1.0f);
+	}
+	else
+	{
+		MV1SetAttachAnimBlendRate(handle, playAnim_.attachNo, 1.0f);
+	}
 
 	// ループフラグの更新
 	isLoop_ = loop;
@@ -134,7 +168,7 @@ void Animation::Play(int type, bool loop)
 bool Animation::IsEnd(void) const
 {
 	// ループ再生だったら処理を行わない
-	if(isLoop_)	return false;
+	if (isLoop_) return false;
 
 	// 再生時間が総再生時間を超えていたら
 	return playAnim_.step >= playAnim_.totalTime;
@@ -150,4 +184,38 @@ void Animation::AddInternal(int type, float speed, AnimationState& anim)
 		// アニメーション情報を追加
 		animations_.emplace(type, anim);
 	}
+}
+
+void Animation::StepAnim(AnimationState& anim, bool loop)
+{
+	// アニメーションを進める
+	anim.step += anim.speed;
+
+	// 再生時間が総再生時間を超えていたら
+	if (anim.step >= anim.totalTime)
+	{
+		if (loop)
+		{
+			// ループ再生の場合は再生時間を初期化
+			anim.step = 0.0f;
+		}
+		else
+		{
+			// ループ再生ではない場合は総再生時間に設定
+			anim.step = anim.totalTime;
+		}
+	}
+}
+
+void Animation::EndBlend(void)
+{
+	if (render_)
+	{
+		int handle = render_->GetHandle();
+		MV1DetachAnim(handle, prevAnim_.attachNo);
+		// 再生中アニメーションのブレンド率を1.0に確定
+		MV1SetAttachAnimBlendRate(handle, playAnim_.attachNo, 1.0f);
+	}
+	isBlending_ = false;
+	blendCount_ = 0.0f;
 }
