@@ -44,6 +44,8 @@ public:
 	// ブレンド中ならtrueを返す
 	bool IsBlending(void) const { return isBlending_; }
 
+	// アニメーションの再生時間を返す
+	float GetStep(void) const { return playAnim_.step; }
 private:
 	// Render3D
 	Render3D* render_ = nullptr;

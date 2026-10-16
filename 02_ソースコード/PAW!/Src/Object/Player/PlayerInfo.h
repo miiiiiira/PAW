@@ -99,6 +99,8 @@ struct playerInfo
 	int invincibleTime_ = 0;	// 無敵時間
 
 	int hitStopCounter_ = 0;	// ヒットストップ用のカウンター
+
+	bool isAttackActive_ = false;	// 攻撃判定が有効か
 };
 
 enum class PLAYER_ANIMATION

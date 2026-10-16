@@ -481,6 +481,8 @@ void Player::ChangeState(PLAYER_STATE state)
 
 void Player::InitAttack1(Player& player)
 {
+	// 攻撃アニメーションを再生
+	player.animation_->Play(static_cast<int>(PLAYER_ANIMATION::PUNCH), false);
 }
 
 void Player::InitAttack2(Player& player)
@@ -493,8 +495,21 @@ void Player::InitAttack3(Player& player)
 
 void Player::UpdateAttack1(Player& player)
 {
-	// 待機状態へ
-	player.ChangeState(PLAYER_STATE_IDLE);
+	// アニメーションを再生し終えていたら
+	if (player.animation_->IsEnd())
+	{
+		// 待機状態へ
+		player.ChangeState(PLAYER_STATE_IDLE);
+		return;
+	}
+
+	// 攻撃判定を有効になっていたら処理を行わない
+	if (player.info_.isAttackActive_)return;
+
+	if (player.animation_->GetStep() >= 8.0f && player.animation_->GetStep() < 18.0f)
+	{
+		player.info_.isAttackActive_ = true;
+	}
 }
 
 void Player::UpdateAttack2(Player& player)
