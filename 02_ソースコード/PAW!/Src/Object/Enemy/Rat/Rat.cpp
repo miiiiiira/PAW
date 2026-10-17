@@ -3,6 +3,7 @@
 #include "../../Component/Animation/Animation.h"
 #include "../../Camera/CameraUtility.h"
 #include "../../../Math/Math.h"
+#include "../../../Collision/3DCollider/CapsuleCollider.h"
 
 #include "../../../Input/InputManager.h"
 
@@ -629,6 +630,20 @@ void Rat::AddComponets(void)
 	transform_->angle_ = {};
 	transform_->scale_ = { 2.0f,2.0f,2.0f };
 
+	// 当たり判定の設定(カプセル)
+	capsuleCollder_ = owner_->AddComponent<CapsuleCollider>();
+	capsuleCollder_->Init();
+
+	// カプセルの設定
+	capsuleCollder_->AddCapsule(
+		VGet(0.0f, 150.0f, 0.0f),
+		VGet(0.0f, 30.0f, 0.0f),
+		40.0f);
+
+	// タグの設定
+	capsuleCollder_->SetCollisionTag(CollisionTag::ENEMY);
+	capsuleCollder_->SetInverseMass(1.0f);
+
 	// 3Dモデル設定
 	render3D_ = owner_->AddComponent<Render3D>();
 	render3D_->Init();
@@ -863,4 +878,21 @@ void Rat::SetApproachDistance(void)
 
 	// 決定した距離を設定
 	info_.approachDistance_ = distance;
+}
+
+void Rat::OnCollision(Collider* other)
+{
+	// 衝突したオブジェクトをタグごとに判別
+	switch (other->GetCollisionTag())
+	{
+	case CollisionTag::PLAYER:
+		// プレイヤー本体と接触した
+		break;
+	case CollisionTag::PLAYER_ATTACK:
+		// プレイヤーの攻撃を受けた
+		break;
+
+	default:
+		break;
+	}
 }

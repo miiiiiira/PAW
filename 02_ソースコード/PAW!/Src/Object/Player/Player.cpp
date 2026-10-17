@@ -5,6 +5,7 @@
 #include "../Camera/CameraUtility.h"
 #include "../Component/Graphics/Render3D.h"
 #include "../Component/Animation/Animation.h"
+#include "../../Collision/3DCollider/CapsuleCollider.h"
 
 #include "Player.h"
 
@@ -648,6 +649,20 @@ void Player::AddComponets(void)
 	transform_->angle_ = {};
 	transform_->scale_ = { 4.0f,4.0f,4.0f };
 
+	// 当たり判定の設定(カプセル)
+	capsuleCollder_ = owner_->AddComponent<CapsuleCollider>();
+	capsuleCollder_->Init();
+
+	// カプセルの設定
+	capsuleCollder_->AddCapsule(
+		VGet(0.0f, 150.0f, 0.0f),
+		VGet(0.0f, 30.0f, 0.0f),
+		40.0f);
+
+	// タグの設定
+	capsuleCollder_->SetCollisionTag(CollisionTag::PLAYER_ATTACK);
+	capsuleCollder_->SetInverseMass(1.0f);
+
 	// 3Dモデル設定
 	render3D_ = owner_->AddComponent<Render3D>();
 	render3D_->Init();
@@ -803,6 +818,23 @@ void Player::RotAngle(void)
 
 	// モデルに向きを設定
 	MV1SetRotationXYZ(render3D_->GetHandle(), transform_->angle_);
+}
+
+void Player::OnCollision(Collider* other)
+{
+	// 衝突したオブジェクトをタグごとに判別
+	switch (other->GetCollisionTag())
+	{
+	case CollisionTag::ENEMY:
+		// 敵本体と接触した
+		break;
+	case CollisionTag::ENEMY_ATTACK:
+		// 敵の攻撃を受けた
+		break;
+
+	default:
+		break;
+	}
 }
 
 void Player::DrawHP(void)

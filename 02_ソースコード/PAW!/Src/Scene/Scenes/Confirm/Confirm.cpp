@@ -5,7 +5,7 @@
 #include "../../../Input/InputManager.h"
 #include "../../../Audio/AudioManager.h"
 #include "../../SceneManager.h"
-#include "../../../Collision/Collision.h"
+#include "../../../Collision/CollisionMath.h"
 #include "../MainMenu/MainMenu.h"
 //#include "../../Common/FrameRenderer/FrameRenderer.h"
 

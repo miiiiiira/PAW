@@ -221,4 +221,100 @@ namespace Math
         dot = std::clamp(dot, -1.0, 1.0);
         return acos(dot) * (180.0 / DX_PI);
     }
+
+    float LengthSq(const VECTOR& v)
+    {
+        return VDot(v, v);
+    }
+
+    VECTOR SafeNormalize(const VECTOR& v)
+    {
+        float lenSq = LengthSq(v);
+
+        if (lenSq < 0.000001f)
+        {
+            return VGet(1.0f, 0.0f, 0.0f);
+        }
+
+        return VScale(v, 1.0f / std::sqrt(lenSq));
+    }
+
+    VECTOR ClosestPointOnSegment(const VECTOR& p, const VECTOR& a, const VECTOR& b)
+    {
+        VECTOR ab = VSub(b, a);
+        float lengthSq = LengthSq(ab);
+
+        if (lengthSq < 0.000001f)
+        {
+            return a;
+        }
+
+        float t = VDot(VSub(p, a), ab) / lengthSq;
+        t = max(0.0f, min(1.0f, t));
+
+        return VAdd(a, VScale(ab, t));
+    }
+
+    void ClosestPointsSegmentSegment(const VECTOR& p1, const VECTOR& q1, const VECTOR& p2, const VECTOR& q2, VECTOR& c1, VECTOR& c2)
+    {
+        const float eps = 0.000001f;
+
+        VECTOR d1 = VSub(q1, p1);
+        VECTOR d2 = VSub(q2, p2);
+        VECTOR r = VSub(p1, p2);
+
+        float a = VDot(d1, d1);
+        float e = VDot(d2, d2);
+        float f = VDot(d2, r);
+
+        float s = 0.0f;
+        float t = 0.0f;
+
+        if (a <= eps && e <= eps)
+        {
+            c1 = p1;
+            c2 = p2;
+            return;
+        }
+
+        if (a <= eps)
+        {
+            t = max(0.0f, min(1.0f, f / e));
+        }
+        else
+        {
+            float c = VDot(d1, r);
+
+            if (e <= eps)
+            {
+                s = max(0.0f, min(1.0f, -c / a));
+            }
+            else
+            {
+                float b = VDot(d1, d2);
+                float denom = a * e - b * b;
+
+                if (std::fabs(denom) > eps)
+                {
+                    s = max(0.0f, min(1.0f, (b * f - c * e) / denom));
+                }
+
+                t = (b * s + f) / e;
+
+                if (t < 0.0f)
+                {
+                    t = 0.0f;
+                    s = max(0.0f, min(1.0f, -c / a));
+                }
+                else if (t > 1.0f)
+                {
+                    t = 1.0f;
+                    s = max(0.0f, min(1.0f, (b - c) / a));
+                }
+            }
+        }
+
+        c1 = VAdd(p1, VScale(d1, s));
+        c2 = VAdd(p2, VScale(d2, t));
+    }
 }

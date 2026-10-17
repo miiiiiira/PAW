@@ -8,7 +8,8 @@
 #include "../GameClear/GameClear.h"
 #include "../GameOver/GameOver.h"
 #include "../Pause/Pause.h"
-#include "../../../Collision/Collision.h"
+#include "../../../Collision/CollisionMath.h"
+#include "../../../Collision/CollisionManager.h"
 #include "../../../Input/MouseCursor/MouseCursor.h"
 #include "../../../Math/Math.h"
 #include "../../../Object/ObjectManager.h"
@@ -61,6 +62,9 @@ void GameScene::Load(void)
 	// 各オブジェクトのロード
 	objectManger_->Load();
 
+	// 当たり判定のマネジャー生成
+	CollisionManager::CreateInstance();
+
 	// サウンド読みこみ
 	//AudioManager::GetInstance()->LoadSceneSound(LoadScene::GAME);
 }
@@ -90,8 +94,15 @@ void GameScene::Update(void)
 
 #endif // _DEBUG
 
+
+	// 毎フレーム登録をリセット
+	CollisionManager::GetInstance()->Clear();
+
 	// オブジェクトの更新
 	objectManger_->Update();
+
+	// 全ての登録コライダーを検査
+	CollisionManager::GetInstance()->CheckAll();
 
 	// Effekseerにより再生中のエフェクトを更新する
 	UpdateEffekseer3D();
@@ -135,6 +146,10 @@ void GameScene::Release(void)
 	// グリッド解放
 	grid_->Release();
 	delete grid_;
+
+	// 当たり判定のマネジャー削除
+	CollisionManager::GetInstance()->Clear();
+	CollisionManager::DeleteInstance();
 
 	// オブジェクトマネージャー削除
 	delete objectManger_;

@@ -4,7 +4,7 @@
 #include "../../../Audio/AudioManager.h"
 //#include "../../Common/FrameRenderer/FrameRenderer.h"
 #include "../../SceneManager.h"
-#include "../../../Collision/Collision.h"
+#include "../../../Collision/CollisionMath.h"
 #include "../Game/GameScene.h"
 #include "../Title/TitleScene.h"
 #include "../../../Input/MouseCursor/MouseCursor.h"

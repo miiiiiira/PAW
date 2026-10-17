@@ -15,7 +15,6 @@
     <ClCompile Include="Src\Audio\AudioManager.cpp" />
     <ClCompile Include="Src\Audio\SoundTable.cpp" />
     <ClCompile Include="Src\Scene\Scenes\Loading\Loading.cpp" />
-    <ClCompile Include="Src\Collision\Collision.cpp" />
     <ClCompile Include="Src\Input\MouseCursor\MouseCursor.cpp" />
     <ClCompile Include="Src\Scene\Scenes\Confirm\Confirm.cpp" />
     <ClCompile Include="Src\Scene\Scenes\Game\GameScene.cpp" />
@@ -33,6 +32,11 @@
     <ClCompile Include="Src\Math\MatrixUtility.cpp" />
     <ClCompile Include="Src\Object\Grid\Grid.cpp" />
     <ClCompile Include="Src\Object\Enemy\Rat\Rat.cpp" />
+    <ClCompile Include="Src\Collision\3DCollider\CapsuleCollider.cpp" />
+    <ClCompile Include="Src\Collision\3DCollider\SphereCollider.cpp" />
+    <ClCompile Include="Src\Collision\Collider.cpp" />
+    <ClCompile Include="Src\Collision\CollisionManager.cpp" />
+    <ClCompile Include="Src\Collision\CollisionMath.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Application.h" />
@@ -51,7 +55,6 @@
     <ClInclude Include="Src\Audio\SoundInfo.h" />
     <ClInclude Include="Src\Audio\SoundTable.h" />
     <ClInclude Include="Src\Scene\Scenes\Loading\Loading.h" />
-    <ClInclude Include="Src\Collision\Collision.h" />
     <ClInclude Include="Src\Input\MouseCursor\MouseCursor.h" />
     <ClInclude Include="Src\Scene\Scenes\Confirm\Confirm.h" />
     <ClInclude Include="Src\Scene\Scenes\Game\GameScene.h" />
@@ -76,5 +79,12 @@
     <ClInclude Include="Src\Object\Grid\Grid.h" />
     <ClInclude Include="Src\Object\Enemy\Rat\Rat.h" />
     <ClInclude Include="Src\Object\Enemy\Rat\RatInfo.h" />
+    <ClInclude Include="Src\Collision\3DCollider\AABBCollider.h" />
+    <ClInclude Include="Src\Collision\3DCollider\CapsuleCollider.h" />
+    <ClInclude Include="Src\Collision\3DCollider\SphereCollider.h" />
+    <ClInclude Include="Src\Collision\Collider.h" />
+    <ClInclude Include="Src\Collision\CollisionInfo.h" />
+    <ClInclude Include="Src\Collision\CollisionManager.h" />
+    <ClInclude Include="Src\Collision\CollisionMath.h" />
   </ItemGroup>
 </Project>

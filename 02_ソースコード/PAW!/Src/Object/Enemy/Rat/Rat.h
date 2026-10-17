@@ -8,6 +8,7 @@
 class Transform;
 class Render3D;
 class Animation;
+class CapsuleCollider;
 
 class Rat : public Component
 {
@@ -141,11 +142,15 @@ private:
 	// ちょっと近づく時の距離を算出
 	void SetApproachDistance(void);
 
+	// 衝突判定の検知
+	void OnCollision(Collider* other) override;
+
 private:
 	// コンポーネント
 	Transform* transform_ = nullptr;	
 	Render3D* render3D_ = nullptr;
 	Animation* animation_ = nullptr;
+	CapsuleCollider* capsuleCollder_ = nullptr;
 
 	// プレイヤーTransform
 	const Transform* playerTransform_ = nullptr;

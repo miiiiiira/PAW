@@ -115,4 +115,17 @@ namespace Math
 
 	// 2つのベクトルの間の角度
 	double AngleDeg(const VECTOR& from, const VECTOR& to);
+
+	// ベクトルの長さの二乗
+	float LengthSq(const VECTOR& v);
+
+	// ベクトルの正規化。長さ0ならX方向を返す
+	VECTOR SafeNormalize(const VECTOR& v);
+
+	// 点Pから線分ABへの最近接点を求める
+	VECTOR ClosestPointOnSegment(const VECTOR& p, const VECTOR& a, const VECTOR& b);
+
+	// 2つの線分上の最近接点を求める
+	void ClosestPointsSegmentSegment(const VECTOR& p1, const VECTOR& q1, const VECTOR& p2, const VECTOR& q2, VECTOR& c1, VECTOR& c2);
+
 }

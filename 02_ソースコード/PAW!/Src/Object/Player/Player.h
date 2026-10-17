@@ -10,6 +10,7 @@
 class Transform;
 class Render3D;
 class Animation;
+class CapsuleCollider;
 
 // プレイヤー制御コンポーネント
 class Player : public Component
@@ -147,6 +148,9 @@ private:
 	// 角度処理
 	void RotAngle(void);
 
+	// 衝突判定の検知
+	void OnCollision(Collider* other) override;
+
 	// HP描画
 	void DrawHP(void);		
 
@@ -159,6 +163,7 @@ private:
 	Transform* transform_ = nullptr;		
 	Render3D* render3D_ = nullptr;
 	Animation* animation_ = nullptr;
+	CapsuleCollider* capsuleCollder_ = nullptr;
 
 private:
 	// プレイヤー情報

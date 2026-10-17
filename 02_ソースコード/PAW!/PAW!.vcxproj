@@ -138,11 +138,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Collision\3DCollider\CapsuleCollider.cpp" />
+    <ClCompile Include="Src\Collision\3DCollider\SphereCollider.cpp" />
+    <ClCompile Include="Src\Collision\Collider.cpp" />
+    <ClCompile Include="Src\Collision\CollisionManager.cpp" />
+    <ClCompile Include="Src\Collision\CollisionMath.cpp" />
     <ClCompile Include="Src\Object\Enemy\Rat\Rat.cpp" />
     <ClCompile Include="Src\Application.cpp" />
     <ClCompile Include="Src\Audio\AudioManager.cpp" />
     <ClCompile Include="Src\Audio\SoundTable.cpp" />
-    <ClCompile Include="Src\Collision\Collision.cpp" />
     <ClCompile Include="Src\Input\InputManager.cpp" />
     <ClCompile Include="Src\Input\MouseCursor\MouseCursor.cpp" />
     <ClCompile Include="Src\main.cpp" />
@@ -172,12 +176,18 @@
     <ClCompile Include="Src\System\FpsControl\FpsControl.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Collision\3DCollider\AABBCollider.h" />
+    <ClInclude Include="Src\Collision\3DCollider\CapsuleCollider.h" />
+    <ClInclude Include="Src\Collision\3DCollider\SphereCollider.h" />
+    <ClInclude Include="Src\Collision\Collider.h" />
+    <ClInclude Include="Src\Collision\CollisionInfo.h" />
+    <ClInclude Include="Src\Collision\CollisionManager.h" />
+    <ClInclude Include="Src\Collision\CollisionMath.h" />
     <ClInclude Include="Src\Object\Enemy\Rat\Rat.h" />
     <ClInclude Include="Src\Application.h" />
     <ClInclude Include="Src\Audio\AudioManager.h" />
     <ClInclude Include="Src\Audio\SoundInfo.h" />
     <ClInclude Include="Src\Audio\SoundTable.h" />
-    <ClInclude Include="Src\Collision\Collision.h" />
     <ClInclude Include="Src\Input\InputManager.h" />
     <ClInclude Include="Src\Input\MouseCursor\MouseCursor.h" />
     <ClInclude Include="Src\Math\Easing.h" />
