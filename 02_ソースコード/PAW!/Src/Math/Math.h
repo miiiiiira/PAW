@@ -128,4 +128,6 @@ namespace Math
 	// 2‚Â‚Ìü•ªã‚ÌÅ‹ßÚ“_‚ğ‹‚ß‚é
 	void ClosestPointsSegmentSegment(const VECTOR& p1, const VECTOR& q1, const VECTOR& p2, const VECTOR& q2, VECTOR& c1, VECTOR& c2);
 
+	// 0‚ÅƒNƒ‰ƒ“ƒv‚µ‚È‚ª‚çŒ¸Z
+	float SubtractClampZero(float value, float amount);
 }

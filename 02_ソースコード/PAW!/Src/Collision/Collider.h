@@ -21,7 +21,7 @@ public:
 	virtual bool CheckCollision(Collider* other) = 0;
 
 	// 衝突した場合、方向と重なり量も返す
-	virtual bool GetCollisionInfo(Collider* other, CollisionInfo& info) = 0;
+	CollisionInfo GetCollisionInfo(void) { return collisionInfo_; };
 
 	// 所有オブジェクト取得
 	Object* GetOwner() { return owner_; }
@@ -33,7 +33,7 @@ public:
 	CollisionTag GetCollisionTag(void) { return tag_; }
 
 	// 逆質量。0なら固定、1なら通常の動く物体
-	void SetInverseMass(float value) { inverseMass_ = value < 0.0f ? 0.0f : value; }
+	void SetInverseMass(float value) { inverseMass_ = value; }
 
 	float GetInverseMass() const { return inverseMass_; }
 	
@@ -49,6 +49,9 @@ protected:
 
 	// 当たり判定の分類タグ
 	CollisionTag tag_ = CollisionTag::NONE;
+
+	// 当たり判定の情報
+	CollisionInfo collisionInfo_;
 
 	// 1.0f = 通常の移動可能な物体 
 	// 0.5f = 押し出しの分担を少なくしたい物体 

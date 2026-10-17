@@ -137,6 +137,7 @@ void GameScene::Draw(void)
 #ifdef _DEBUG
 
 	DrawString(0, 0, "Game", 0xffffff);
+	CollisionManager::GetInstance()->DrawDebug();
 
 #endif // _DEBUG
 }

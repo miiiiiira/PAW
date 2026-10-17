@@ -8,6 +8,7 @@
 #include "../../../Input/InputManager.h"
 
 #include "Rat.h"
+#include "../../../Scene/SceneManager.h"
 
 namespace
 {
@@ -27,7 +28,7 @@ namespace
 	constexpr float ANGLE_COEFFICIENT = 0.2f;	// 補間の係数
 
 	// 体力設定
-	constexpr int DEFAULT_HP = 5;	// 初期HP
+	constexpr int DEFAULT_HP = 3;	// 初期HP
 
 	// 重力設定
 	constexpr float JUMP_POW = 17.0f;	// ジャンプ力
@@ -41,7 +42,7 @@ namespace
 	constexpr float ANIM_SPEED = 0.8f;
 
 	// リミット設定
-	constexpr int INVINCIBLE_TIME = 120;	// 無敵時間
+	constexpr int INVINCIBLE_TIME = 60;	// 無敵時間
 	constexpr int WAIT_TIME = 120;			// 待機時間
 	constexpr int SWAY_NUM_MAX = 4;			// 揺れの最大回数
 	constexpr int RANDOM_RIMIT = 1000;		// ランダム用の最大係数
@@ -119,10 +120,7 @@ void Rat::Init(void)
 void Rat::Update(void)
 {
 	// 終了していたら処理を行わない
-	if (stateCtrl_.state_ == RAT_STATE_END)
-	{
-		return;
-	}
+	if (stateCtrl_.state_ == RAT_STATE_END)	return;
 
 	// 状態別更新処理
 	UpdateState();
@@ -142,43 +140,37 @@ void Rat::Draw3D(void)
 {
 }
 
-void Rat::SetDamage(int damage)
+void Rat::SetDamage(void)
 {
 	// 無敵時間があればダメージを与えない
 	if (info_.invincibleTime_ > 0)return;
 
 	// HPにダメージを与える
-	info_.hp_ -= damage;
+	--info_.hp_;
 
 	// HPが0以下になったら
 	if (info_.hp_ <= 0)
 	{
 		// 0初期化しておく
 		info_.hp_ = 0;
-
-		// 死亡ステートへ
-		ChangeState(RAT_STATE_DEAD);
 	}
 	else
 	{
 		// 無敵時間を設ける
 		info_.invincibleTime_ = INVINCIBLE_TIME;
-
-		// ダメージを受けたステートへ
-		ChangeState(RAT_STATE_HIT);
 	}
 }
 
-void Rat::SetHitReact(VECTOR moveDir, float moveSpeed, float jumpPow)
+void Rat::SetHitReact(VECTOR moveDir)
 {
 	// 指定された移動向きを設定
 	info_.moveDir_ = moveDir;
 
 	// 指定された移動速度を設定
-	info_.moveSpeed_ = moveSpeed;
+	info_.moveSpeed_ = 15.0f;
 
 	// 指定されたジャンプ力を設定
-	info_.velocityY_ = jumpPow;
+	info_.velocityY_ = JUMP_POW;
 
 	// ダメージを受けたステートへ
 	ChangeState(RAT_STATE_HIT);
@@ -237,6 +229,8 @@ void Rat::InitDead(Rat& rat)
 
 void Rat::InitEnd(Rat& rat)
 {
+	// ネズミが死んだためゲームクリアへ遷移
+	SceneManager::GetInstance()->TrueGameClear();
 }
 
 void Rat::UpdateIdle(Rat& rat)
@@ -352,7 +346,7 @@ void Rat::InitIdleWait(Rat& rat)
 void Rat::InitIdleSway(Rat& rat)
 {
 	// 揺れ時間初期化
-	rat.info_.swayTime_ = 0;	
+	rat.info_.swayTime_ = 0;
 	// 実際に揺れた回数初期化
 	rat.info_.swayTotalNum_ = 0;
 	// 指定されたジャンプ力を設定
@@ -388,6 +382,13 @@ void Rat::UpdateIdleWait(Rat& rat)
 	{
 		// 乱数を取得
 		int random = GetRand(RANDOM_RIMIT);
+
+		if (random > 500)
+		{
+			// 攻撃中へ
+			rat.ChangeState(RAT_STATE_ATTACK);
+			return;
+		}
 
 		// 0～1にする
 		random %= 2;
@@ -500,6 +501,9 @@ void Rat::InitAttacking(Rat& rat)
 
 	// 攻撃アニメーション再生
 	rat.animation_->Play(static_cast<int>(RAT_ANIMATION::ATTACK), false);
+
+	// カプセルの種類を攻撃状態へ
+	rat.capsuleCollder_->SetCollisionTag(CollisionTag::ENEMY_ATTACK);
 }
 
 void Rat::InitAttackAfter(Rat& rat)
@@ -509,6 +513,9 @@ void Rat::InitAttackAfter(Rat& rat)
 
 	// 攻撃後アニメーション再生
 	rat.animation_->Play(static_cast<int>(RAT_ANIMATION::MOVE_CLOSER), false);
+
+	// カプセルの種類を敵に戻す
+	rat.capsuleCollder_->SetCollisionTag(CollisionTag::ENEMY);
 }
 
 void Rat::InitAttackEnd(Rat& rat)
@@ -591,22 +598,35 @@ void Rat::UpdateHitStun(Rat& rat)
 	// 移動速度が0より大きく移動している場合
 	if (rat.info_.moveSpeed_ > 0.0f)
 	{
-		// 移動速度を減算
-		rat.info_.moveSpeed_ -= HIT_REACT_FRICTION;
+		// だんだん移動量を少なくする
+		rat.info_.moveSpeed_ =
+			Math::SubtractClampZero(rat.info_.moveSpeed_, HIT_REACT_FRICTION);
 
 		// 指定された方向と移動速度を使用し座標に反映
 		rat.Move();
 	}
 	else
 	{
+		// 地面に足が付いていなかったら処理を行わない
+		if (rat.transform_->pos_.y > 0.0f)return;
+
+		// 吹き飛びリアクション終了へ
 		rat.ChangeHitState(RAT_HIT_END);
 	}
 }
 
 void Rat::UpdateHitEnd(Rat& rat)
 {
-	// 待機状態へ
-	rat.ChangeState(RAT_STATE_IDLE);
+	if (rat.info_.hp_ <= 0)
+	{
+		// 死亡状態へ
+		rat.ChangeState(RAT_STATE_DEAD);
+	}
+	else
+	{
+		// 待機状態へ
+		rat.ChangeState(RAT_STATE_IDLE);
+	}
 }
 
 void Rat::ChangeHitState(RAT_HIT_STATE state)
@@ -723,17 +743,6 @@ void Rat::UpdateMovementState(void)
 		ChangeState(RAT_STATE_MOVE);
 		return;
 	}
-#ifdef _DEBUG
-	else
-	{
-		if (InputManager::GetInstance()->IsTrgDown(KEY_INPUT_N))
-		{
-			// 攻撃中へ
-			ChangeState(RAT_STATE_ATTACK);
-			return;
-		}
-	}
-#endif // _DEBUG
 
 	// 待機中のちょっと近づく処理の場合処理を行わない
 	if (stateCtrl_.state_ == RAT_STATE_IDLE && stateCtrl_.idleState_ == RAT_IDLE_APPROACH)return;
@@ -830,8 +839,8 @@ void Rat::GetAngleToPlayer(void)
 
 	// 角度補間をかける
 	Math::SmoothAngle(
-		transform_->angle_.y, 
-		targetAngle, 
+		transform_->angle_.y,
+		targetAngle,
 		info_.velocityRot_,
 		ANGLE_COEFFICIENT);
 
@@ -887,9 +896,24 @@ void Rat::OnCollision(Collider* other)
 	{
 	case CollisionTag::PLAYER:
 		// プレイヤー本体と接触した
+		if (stateCtrl_.attackState_ == RAT_ATTACKING)
+		{
+			// 攻撃後の隙状態へ
+			ChangeAttackState(RAT_ATTACK_AFTER);
+		}
 		break;
+
 	case CollisionTag::PLAYER_ATTACK:
 		// プレイヤーの攻撃を受けた
+		// 死亡処理に入っていたら処理を行わない
+		if (stateCtrl_.state_ == RAT_STATE_DEAD ||
+			stateCtrl_.state_ == RAT_STATE_END)return;
+
+		// ダメージ処理
+		SetDamage();
+
+		// 吹っ飛びリアクションをさせる
+		SetHitReact(other->GetCollisionInfo().normal);
 		break;
 
 	default:

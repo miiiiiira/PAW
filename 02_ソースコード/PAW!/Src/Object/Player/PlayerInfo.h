@@ -28,6 +28,7 @@ enum PLAYER_ATTACK_STATE
 	PLAYER_ATTACK_1,	// 攻撃1
 	PLAYER_ATTACK_2,	// 攻撃2
 	PLAYER_ATTACK_3,	// 攻撃3
+	PLAYER_ATTACK_END,	// 攻撃終了
 
 	PLAYER_ATTACK_MAX
 };
@@ -100,7 +101,7 @@ struct playerInfo
 
 	int hitStopCounter_ = 0;	// ヒットストップ用のカウンター
 
-	bool isAttackActive_ = false;	// 攻撃判定が有効か
+	bool isAttackHit_ = false;	// 攻撃が当たったか		true / 当たった , false / 当たっていない
 };
 
 enum class PLAYER_ANIMATION

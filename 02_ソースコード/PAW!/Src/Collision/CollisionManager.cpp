@@ -51,14 +51,12 @@ void CollisionManager::CheckAll()
 			if (!ShouldCheckCollision(a->GetCollisionTag(), b->GetCollisionTag()))
 				continue;
 
-			// AとBの衝突情報を取得する
-			CollisionInfo info;
-
-			if (!a->GetCollisionInfo(b, info))
+			// 当たり判定をチェック
+			if (!a->CheckCollision(b))
 				continue;
 
 			// 衝突情報を元に、重なったオブジェクトの位置を補正する
-			ResolveCollision(a, b, info);
+			ResolveCollision(a, b, a->GetCollisionInfo());
 
 			// 衝突したことを双方のオブジェクトに通知する
 			a->GetOwner()->SendCollision(b);

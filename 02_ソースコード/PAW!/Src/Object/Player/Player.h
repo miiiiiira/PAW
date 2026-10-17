@@ -11,6 +11,7 @@ class Transform;
 class Render3D;
 class Animation;
 class CapsuleCollider;
+class SphereCollider;
 
 // プレイヤー制御コンポーネント
 class Player : public Component
@@ -52,12 +53,6 @@ public:
 	// 無敵時間を渡す
 	int GetInvincibleTime(void) { return info_.invincibleTime_; }
 	
-	// ダメージを与える
-	void SetDamage(int damage);	
-	
-	// 吹っ飛びリアクションをさせる
-	void SetHitReact(VECTOR moveDir,float moveSpeed,float jumpPow);	
-
 private:
 	// 状態別更新処理
 	void UpdateState(void);	
@@ -87,10 +82,12 @@ private:
 	static void InitAttack1(Player& player);	// 攻撃1
 	static void InitAttack2(Player& player);	// 攻撃2
 	static void InitAttack3(Player& player);	// 攻撃3
+	static void InitAttackEnd(Player& player);	// 攻撃修了
 	// 状態別更新
 	static void UpdateAttack1(Player& player);	// 攻撃1
 	static void UpdateAttack2(Player& player);	// 攻撃2
 	static void UpdateAttack3(Player& player);	// 攻撃3
+	static void UpdateAttackEnd(Player& player);// 攻撃終了
 	// 攻撃状態を変更させる
 	void ChangeAttackState(PLAYER_ATTACK_STATE state);
 
@@ -148,8 +145,19 @@ private:
 	// 角度処理
 	void RotAngle(void);
 
+	// ダメージを与える
+	void SetDamage(int damage);
+
+	// 吹っ飛びリアクションをさせる
+	void SetHitReact(VECTOR moveDir);
+
+	// 攻撃状態を終了させる
+	void EndAttaking(void);
+
 	// 衝突判定の検知
 	void OnCollision(Collider* other) override;
+	// 攻撃判定の検知
+	void AttackOnCollision(void);
 
 	// HP描画
 	void DrawHP(void);		
@@ -164,6 +172,7 @@ private:
 	Render3D* render3D_ = nullptr;
 	Animation* animation_ = nullptr;
 	CapsuleCollider* capsuleCollder_ = nullptr;
+	SphereCollider* sphereCollder_ = nullptr;
 
 private:
 	// プレイヤー情報

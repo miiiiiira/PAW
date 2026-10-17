@@ -3,20 +3,26 @@
 
 #include "../../Object/Object.h"
 #include "../../Math/Math.h"
+#include "../../Math/MatrixUtility.h"
 
 #include <cmath>
 
+VECTOR SphereCollider::GetCenter() const
+{
+    // カメラの回転行列
+    VECTOR vec = { transform_->angle_.x,transform_->angle_.y,0.0f };
+    MATRIX matRot = Matrix::GetMatrixRotateXYZ(vec);
+
+    // 指定の座標にカメラの回転を適用する
+    VECTOR localPosRot = VTransform(centerOffset, matRot);
+
+    return VAdd(transform_->pos_, localPosRot);
+}
 
 bool SphereCollider::CheckCollision(Collider* other)
 {
-    CollisionInfo info;
-    return GetCollisionInfo(other, info);
-}
-
-bool SphereCollider::GetCollisionInfo(Collider* other, CollisionInfo& info)
-{
     // 前期あの判定結果が残らないように初期化する
-    info = CollisionInfo{};
+    collisionInfo_ = CollisionInfo{};
 
     // 判定に必要な情報がなければ処理しない
     if (!transform_ || !other)
@@ -33,7 +39,7 @@ bool SphereCollider::GetCollisionInfo(Collider* other, CollisionInfo& info)
             return false;
 
         VECTOR centerB = sphere->GetCenter();
-        
+
         // 二つの球体の中心間の距離を求める
         VECTOR delta = VSub(centerB, centerA);
         float distanceSq = Math::LengthSq(delta);
@@ -47,19 +53,19 @@ bool SphereCollider::GetCollisionInfo(Collider* other, CollisionInfo& info)
 
         float distance = sqrtf(distanceSq);
 
-        info.hit = true;
+        collisionInfo_.hit = true;
 
         // 自身の中心から相手の中心へ向かう方向を衝突法線とする
         // 二つの中心がほぼ同じ位置にある場合は、仮の方向を設定する。
-        info.normal = distance > 0.0001f ?
+        collisionInfo_.normal = distance > 0.0001f ?
             VScale(delta, 1.0f / distance) :
             VGet(1.0f, 0.0f, 0.0f);
 
         // 球体同士が重なっている深さを求める
-        info.penetration = radiusSum - distance;
+        collisionInfo_.penetration = radiusSum - distance;
 
         // 衝突位置の目安として、重なり部分の中間付近を求める
-        info.point = VAdd(centerA, VScale(info.normal, radius_ - info.penetration * 0.5f));
+        collisionInfo_.point = VAdd(centerA, VScale(collisionInfo_.normal, radius_ - collisionInfo_.penetration * 0.5f));
 
         return true;
     }
@@ -102,23 +108,23 @@ bool SphereCollider::GetCollisionInfo(Collider* other, CollisionInfo& info)
                 continue;
 
             // 衝突した
-            info.hit = true;
+            collisionInfo_.hit = true;
 
             // 球体の中心から最近接点へ向かう方向を衝突法線とする
             // 二点がほぼ同じ位置にある場合は、オブジェクトの位置関係から方向を求める
-            info.normal = distance > 0.0001f ?
+            collisionInfo_.normal = distance > 0.0001f ?
                 VScale(delta, 1.0f / distance) :
                 Math::SafeNormalize(VSub(cap->GetOwner()->GetComponent<Transform>()->pos_, transform_->pos_));
 
-            info.penetration = penetration;
+            collisionInfo_.penetration = penetration;
 
             // 最近接点と球体の中心の中間を衝突位置とする
-            info.point = VScale(VAdd(closest, centerA), 0.5f);
+            collisionInfo_.point = VScale(VAdd(closest, centerA), 0.5f);
 
             bestPenetration = penetration;
         }
 
-        return info.hit;
+        return collisionInfo_.hit;
     }
 
     // 対応していない種類のコライダーとは判定しない

@@ -317,4 +317,10 @@ namespace Math
         c1 = VAdd(p1, VScale(d1, s));
         c2 = VAdd(p2, VScale(d2, t));
     }
+
+    float SubtractClampZero(float value, float amount)
+    {
+        value -= amount;
+        return (value < 0.0f) ? 0.0f : value;
+    }
 }

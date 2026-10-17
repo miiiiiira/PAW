@@ -72,9 +72,6 @@ public:
 	// 相手のコライダーと衝突しているかを判定する
 	bool CheckCollision(Collider* other) override;
 
-	// 相手のコライダーとの衝突を調べ、衝突情報を取得する
-	bool GetCollisionInfo(Collider* other, CollisionInfo& info) override;
-
 #ifdef _DEBUG
 	// カプセルの当たり判定をデバッグ表示する
 	void DebugDraw() const override;

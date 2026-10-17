@@ -8,14 +8,8 @@
 
 bool CapsuleCollider::CheckCollision(Collider* other)
 {
-    CollisionInfo info;
-    return GetCollisionInfo(other, info);
-}
-
-bool CapsuleCollider::GetCollisionInfo(Collider* other, CollisionInfo& info)
-{
     // 前回の判定結果が残らないように初期化する
-    info = CollisionInfo{};
+    collisionInfo_ = CollisionInfo{};
 
     // 判定に必要な情報がなければ処理しない
     if (!transform_ || !other)
@@ -70,24 +64,24 @@ bool CapsuleCollider::GetCollisionInfo(Collider* other, CollisionInfo& info)
                     continue;
 
                 // 衝突している
-                info.hit = true;
+                collisionInfo_.hit = true;
 
                 // pointAからpointBへ向かう方向を衝突法線として扱う
                 // 2点がほぼ同じ位置の場合は、オブジェクトの位置関係から方向を求める
-                info.normal = distance > 0.0001f ? 
+                collisionInfo_.normal = distance > 0.0001f ?
                     VScale(delta, 1.0f / distance) :
                     Math::SafeNormalize(VSub(cap->transform_->pos_, transform_->pos_));
 
-                info.penetration = penetration;
+                collisionInfo_.penetration = penetration;
 
                 // 二点の最近接点の中間を衝突位置とする
-                info.point = VScale(VAdd(pointA, pointB), 0.5f);
+                collisionInfo_.point = VScale(VAdd(pointA, pointB), 0.5f);
 
                 bestPenetration = penetration;
             }
         }
 
-        return info.hit;
+        return collisionInfo_.hit;
     }
 
     // カプセルと球の衝突判定
@@ -125,23 +119,23 @@ bool CapsuleCollider::GetCollisionInfo(Collider* other, CollisionInfo& info)
             if (penetration <= bestPenetration)
                 continue;
 
-            info.hit = true;
+            collisionInfo_.hit = true;
 
             // カプセル側の最近接点から球の中心へ向かう方向を求める
             // 中心と最近接点が重なった場合は、オブジェクトの位置関係を使う
-            info.normal = distance > 0.0001f ?
+            collisionInfo_.normal = distance > 0.0001f ?
                 VScale(delta, 1.0f / distance) :
                 Math::SafeNormalize(VSub(sphere->GetCenter(), transform_->pos_));
 
-            info.penetration = penetration;
+            collisionInfo_.penetration = penetration;
 
             // 最近接点と球の中心の中間を衝突位置とする
-            info.point = VScale(VAdd(closest, center), 0.5f);
+            collisionInfo_.point = VScale(VAdd(closest, center), 0.5f);
 
             bestPenetration = penetration;
         }
 
-        return info.hit;
+        return collisionInfo_.hit;
     }
 
     // 対応していない種類のコライダーとは衝突判定を行わない

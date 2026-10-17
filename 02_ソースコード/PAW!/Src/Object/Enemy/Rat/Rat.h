@@ -34,16 +34,6 @@ public:
 	// プレイヤーのTransformポインタを取得
 	void SetPlayerTransform(const Transform* transform) { playerTransform_ = transform; }
 
-	// ダメージを与える
-	void SetDamage(int damage);
-
-	// 吹っ飛びリアクションをさせる
-	void SetHitReact(VECTOR moveDir, float moveSpeed, float jumpPow);
-
-	// 攻撃中か？　true / 攻撃中, false / 攻撃中じゃない
-	bool IsAttacking(void)const { return stateCtrl_.state_ == RAT_STATE_ATTACK && 
-										stateCtrl_.attackState_ == RAT_ATTACKING; }
-
 private:
 	// 状態別更新処理
 	void UpdateState(void);
@@ -141,6 +131,12 @@ private:
 
 	// ちょっと近づく時の距離を算出
 	void SetApproachDistance(void);
+
+	// ダメージを与える
+	void SetDamage(void);
+
+	// 吹っ飛びリアクションをさせる
+	void SetHitReact(VECTOR moveDir);
 
 	// 衝突判定の検知
 	void OnCollision(Collider* other) override;
