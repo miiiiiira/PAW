@@ -28,9 +28,6 @@ public:
 	// 状態を取得
 	RAT_STATE GetState(void)const { return stateCtrl_.state_; }
 
-	// 無敵時間を渡す
-	int GetInvincibleTime(void)const { return info_.invincibleTime_; }
-
 	// プレイヤーのTransformポインタを取得
 	void SetPlayerTransform(const Transform* transform) { playerTransform_ = transform; }
 

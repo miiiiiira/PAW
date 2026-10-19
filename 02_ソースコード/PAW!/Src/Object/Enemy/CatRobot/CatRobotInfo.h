@@ -51,7 +51,7 @@ enum CAT_ROBOT_HIT_STATE
 };
 
 // 状態遷移
-struct ratStateCtrl
+struct catRobotStateCtrl
 {
 	// 猫ロボット状態
 	// ステート
@@ -82,7 +82,7 @@ struct ratStateCtrl
 	catRobotStateFunction updateHitTable_[CAT_ROBOT_HIT_MAX];
 };
 
-struct ratInfo
+struct catRobotInfo
 {
 	float velocityY_ = 0.0f;	// 現在の落下速度
 

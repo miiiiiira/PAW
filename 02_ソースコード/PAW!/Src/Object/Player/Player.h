@@ -50,9 +50,6 @@ public:
 	// プレイヤー状態を取得
 	PLAYER_STATE GetState(void) { return stateCtrl_.state_; }
 	
-	// 無敵時間を渡す
-	int GetInvincibleTime(void) { return info_.invincibleTime_; }
-	
 private:
 	// 状態別更新処理
 	void UpdateState(void);	
