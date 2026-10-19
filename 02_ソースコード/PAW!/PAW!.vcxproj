@@ -138,6 +138,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Object\Enemy\CatRobot\CatRobot.cpp" />
     <ClCompile Include="Src\Collision\3DCollider\CapsuleCollider.cpp" />
     <ClCompile Include="Src\Collision\3DCollider\SphereCollider.cpp" />
     <ClCompile Include="Src\Collision\Collider.cpp" />
@@ -176,6 +177,7 @@
     <ClCompile Include="Src\System\FpsControl\FpsControl.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Object\Enemy\CatRobot\CatRobot.h" />
     <ClInclude Include="Src\Collision\3DCollider\AABBCollider.h" />
     <ClInclude Include="Src\Collision\3DCollider\CapsuleCollider.h" />
     <ClInclude Include="Src\Collision\3DCollider\SphereCollider.h" />
@@ -183,6 +185,7 @@
     <ClInclude Include="Src\Collision\CollisionInfo.h" />
     <ClInclude Include="Src\Collision\CollisionManager.h" />
     <ClInclude Include="Src\Collision\CollisionMath.h" />
+    <ClInclude Include="Src\Object\Enemy\CatRobot\CatRobotInfo.h" />
     <ClInclude Include="Src\Object\Enemy\Rat\Rat.h" />
     <ClInclude Include="Src\Application.h" />
     <ClInclude Include="Src\Audio\AudioManager.h" />

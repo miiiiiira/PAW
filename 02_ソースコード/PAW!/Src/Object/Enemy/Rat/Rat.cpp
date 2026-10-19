@@ -733,6 +733,9 @@ void Rat::Move(void)
 
 void Rat::UpdateMovementState(void)
 {
+	// ‰¡—h‚ê‚Í‹——£‚É‚æ‚Á‚Ä“®‚­‚Ì‚ğ‚â‚ß‚é
+	if (stateCtrl_.state_ == RAT_STATE_IDLE && stateCtrl_.idleState_ == RAT_IDLE_SWAY)return;
+
 	// ƒvƒŒƒCƒ„[‚Æ‚Ì‹——£‚ğ’²‚×‚é
 	float distance = GetDistanceToPlayer();
 
