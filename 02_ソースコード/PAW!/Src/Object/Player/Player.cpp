@@ -506,6 +506,7 @@ void Player::UpdateDead(Player& player)
 void Player::UpdateEnd(Player& player)
 {
 }
+
 void Player::ChangeState(PLAYER_STATE state)
 {
 	// 指定されたステートへ変更

@@ -69,12 +69,15 @@ void Camera::SetBeforeDraw(void)
 	case Camera::MODE::FIXED:
 		SetBeforeDrawFixedPoint();
 		break;
+
 	case Camera::MODE::FREE:
 		SetBeforeDrawFree();
 		break;
+
 	case Camera::MODE::FOLLOW:
 		SetBeforeDrawFollow();
 		break;
+
 	case Camera::MODE::NONE:
 	default:
 		SetBeforeDrawFree();

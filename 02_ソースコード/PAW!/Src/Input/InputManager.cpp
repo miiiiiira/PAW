@@ -204,12 +204,13 @@ bool InputManager::ChangeDevicePad(void)
 		|| IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::DOWN) || IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::UP)
 		|| IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::LEFT) || IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::RIGHT)
 		|| IsPadLStickTrgDown(JOYPAD_NO::PAD1, JOYPAD_STICK::UP) || IsPadLStickTrgDown(JOYPAD_NO::PAD1, JOYPAD_STICK::DOWN)
-		|| IsPadLStickTrgDown(JOYPAD_NO::PAD1, JOYPAD_STICK::LEFT) || IsPadLStickTrgDown(JOYPAD_NO::PAD1, JOYPAD_STICK::RIGHT);
+		|| IsPadLStickTrgDown(JOYPAD_NO::PAD1, JOYPAD_STICK::LEFT) || IsPadLStickTrgDown(JOYPAD_NO::PAD1, JOYPAD_STICK::RIGHT)
+		|| IsPadRStickNew(JOYPAD_NO::PAD1);
 }
 
 bool InputManager::PushAnyButton(void)
 {
-	return CheckHitKeyAll();
+	return CheckHitKeyAll(DX_CHECKINPUT_KEY);
 }
 
 bool InputManager::DecideButton(void)
@@ -525,6 +526,15 @@ bool InputManager::IsPadLStickTrgDown(JOYPAD_NO no, JOYPAD_STICK stick)
 bool InputManager::IsPadLStickTrgUp(JOYPAD_NO no, JOYPAD_STICK stick)
 {
 	return prevPadLStick_[static_cast<int>(stick)] && !nowPadLStick_[static_cast<int>(stick)];
+}
+
+bool InputManager::IsPadRStickNew(JOYPAD_NO no)
+{
+	const auto& info = padInfos_[static_cast<int>(no)];
+	float x = static_cast<float>(info.AKeyRX);
+	float y = static_cast<float>(info.AKeyRY);
+	// 簡易デッドゾーン(1000が最大なので、0.35倍=350程度)
+	return (x * x + y * y) > (350.0f * 350.0f);
 }
 
 VECTOR InputManager::GetDirectionXZAKey(int aKeyX, int aKeyY)

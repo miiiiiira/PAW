@@ -156,6 +156,9 @@ public:
 	bool IsPadLStickTrgDown(JOYPAD_NO no, JOYPAD_STICK stick);
 	bool IsPadLStickTrgUp(JOYPAD_NO no, JOYPAD_STICK stick);
 
+	// 右スティックの入力
+	bool IsPadRStickNew(JOYPAD_NO no);
+
 	// アナログキーの入力値から方向を取得
 	VECTOR GetDirectionXZAKey(int aKeyX, int aKeyY);
 
