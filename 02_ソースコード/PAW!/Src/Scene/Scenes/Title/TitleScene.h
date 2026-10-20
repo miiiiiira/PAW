@@ -21,19 +21,6 @@ public:
 
 private:
 
-	// ボタンの位置
-	static constexpr int BUTTON_POS_X = 512;
-	static constexpr int BUTTON_POS_Y = 520;
-
-	// ボタンのアルファ値の変化速度
-	static constexpr float ALPHA_SPEED = 5.0f;
-
-	// ボタンのアルファ値の最大値と最小値
-	static constexpr float ALPHA_MAX = 255.0f;
-	static constexpr float ALPHA_MIN = 0.0f;
-
-private:
-
 	std::shared_ptr<Confirm> confirm_;
 
 	int backImg_ = -1;		// 背景画像

@@ -10,6 +10,16 @@
 
 #include "TitleScene.h"
 
+namespace
+{
+	// ボタンのアルファ値の変化速度
+	static constexpr float ALPHA_SPEED = 5.0f;
+
+	// ボタンのアルファ値の最大値と最小値
+	static constexpr float ALPHA_MAX = 255.0f;
+	static constexpr float ALPHA_MIN = 32.0f;
+}
+
 TitleScene::TitleScene(void)
 {
 	alpha_ = ALPHA_MIN;
@@ -32,9 +42,12 @@ void TitleScene::Init(void)
 
 void TitleScene::Load(void)
 {
+	// サウンドをロード
 	//AudioManager::GetInstance()->LoadSceneSound(LoadScene::TITLE);
-	backImg_ = LoadGraph("Data/Image/Common/Title.png");
-	buttonImg_ = LoadGraph("Data/Image/Title/PushAnyButton.png");
+
+	// 画像をロード
+	backImg_ = LoadGraph("Data/Image/Title/TitleBack.png");
+	buttonImg_ = LoadGraph("Data/Image/Title/PushAny.png");
 
 	confirm_ = std::make_shared<Confirm>();
 }
@@ -53,8 +66,10 @@ void TitleScene::Update(void)
 	// 何かのボタンを押されたら
 	if (InputManager::GetInstance()->PushAnyButton())
 	{
-		/*confirm_->ChangeType(Confirm::TYPE::QUIT);
-		SceneManager::GetInstance()->PushScene(confirm_);*/
+		// PushAnyを透過する
+		alpha_ = 0;
+
+		// メインメニューを積む
 		SceneManager::GetInstance()->PushScene(std::make_shared<MainMenu>());
 		return;
 	}
@@ -89,18 +104,11 @@ void TitleScene::Update(void)
 
 void TitleScene::Draw(void)
 {
-	DrawRotaGraph(Application::SCREEN_SIZE_X / 2, Application::SCREEN_SIZE_Y / 2 - 100, 1.0, 0.0, backImg_, true);
+	DrawRotaGraph(Application::SCREEN_SIZE_X / 2, Application::SCREEN_SIZE_Y / 2, 1.0, 0.0, backImg_, true);
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(alpha_));
-	DrawRotaGraph(BUTTON_POS_X, BUTTON_POS_Y, 1.0, 0.0, buttonImg_, true);
+	DrawRotaGraph(Application::SCREEN_SIZE_X / 2, Application::SCREEN_SIZE_Y / 2, 1.0, 0.0, buttonImg_, true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-
-#ifdef _DEBUG
-
-	DrawString(0, 0, "Title", 0xffffff);
-
-#endif // _DEBUG
-
 }
 
 void TitleScene::Release(void)

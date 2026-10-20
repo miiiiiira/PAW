@@ -13,15 +13,19 @@ public:
 	enum class MENU
 	{
 		NONE,
-		PLAY,
-		QUIT,
+		GAME_START,	// ゲーム開始ボタン
+		TITLE,		// タイトルへ戻るボタン
+		EXIT,		// ゲーム終了ボタン
+
+		MAX
 	};
 
 	struct ButtonInfo
 	{
 		MENU type;
-		int graphHandle;
-		int x, y;
+		int graphHandleOff;
+		int graphHandleOn;
+		float x, y;
 		int sizeX, sizeY;
 	};
 
@@ -37,28 +41,12 @@ public:
 
 private:
 
-	static constexpr int TITLE_POS_X = 50;
-	static constexpr int TITLE_POS_Y = 50;
-
-	// 画像サイズ
-	static constexpr int IMAGE_SIZE_X = 200;
-	static constexpr int IMAGE_SIZE_Y = 50;
-
-	// PLAY
-	static constexpr int PLAY_POS_X = 80;
-	static constexpr int PLAY_POS_Y = 250;
-
-	// QUIT
-	static constexpr int QUIT_POS_X = 80;
-	static constexpr int QUIT_POS_Y = 550;
-
-private:
-
 	void ChangeSelect(MENU menu);
 
 	// メニュー選択時の処理
-	void UpdatePlay(void);
-	void UpdateQuit(void);
+	void UpdateGameStart(void);
+	void UpdateTitle(void);
+	void UpdateExit(void);
 
 	void SelectUpgrade(void);	// 選択処理
 
@@ -70,8 +58,9 @@ private:
 
 	std::shared_ptr<Confirm> confirm_;
 
-	int handle_;
-	std::vector<ButtonInfo> menuButtons_;		// メニューボタンの情報を格納する配列
+	// メニューボタンの情報を格納する配列
+	std::vector<ButtonInfo> menuButtons_;
 
-	MENU currentMenu_;					// 現在選択しているメニュー
+	// 現在選択しているメニュー
+	MENU currentMenu_;
 };
