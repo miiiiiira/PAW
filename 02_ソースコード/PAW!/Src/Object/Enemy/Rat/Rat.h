@@ -15,11 +15,8 @@ class Rat : public Component
 public:
 	Rat(void);					// コンストラクタ
 
-	void Load(void) override;	// 読み込み
 	void Init(void) override;	// 初期化
 	void Update(void) override;	// 更新
-	void Draw2D(void) override;	// 2D描画
-	void Draw3D(void) override;	// 3D描画
 
 public:
 	// Transformを返す

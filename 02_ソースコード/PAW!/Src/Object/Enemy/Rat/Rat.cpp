@@ -2,13 +2,13 @@
 #include "../../Component/Graphics/Render3D.h"
 #include "../../Component/Animation/Animation.h"
 #include "../../Camera/CameraUtility.h"
-#include "../../../Math/Math.h"
 #include "../../../Collision/3DCollider/CapsuleCollider.h"
+#include "../../../Math/Math.h"
 
+#include "../../../Scene/SceneManager.h"
 #include "../../../Input/InputManager.h"
 
 #include "Rat.h"
-#include "../../../Scene/SceneManager.h"
 
 namespace
 {
@@ -101,10 +101,6 @@ Rat::Rat(void)
 	stateCtrl_.updateHitTable_[RAT_HIT_END] = UpdateHitEnd;
 }
 
-void Rat::Load(void)
-{
-}
-
 void Rat::Init(void)
 {
 	// コンポーネントの追加
@@ -130,50 +126,6 @@ void Rat::Update(void)
 
 	// 無敵時間を更新
 	UpdateInvincible();
-}
-
-void Rat::Draw2D(void)
-{
-}
-
-void Rat::Draw3D(void)
-{
-}
-
-void Rat::SetDamage(void)
-{
-	// 無敵時間があればダメージを与えない
-	if (info_.invincibleTime_ > 0)return;
-
-	// HPにダメージを与える
-	--info_.hp_;
-
-	// HPが0以下になったら
-	if (info_.hp_ <= 0)
-	{
-		// 0初期化しておく
-		info_.hp_ = 0;
-	}
-	else
-	{
-		// 無敵時間を設ける
-		info_.invincibleTime_ = INVINCIBLE_TIME;
-	}
-}
-
-void Rat::SetHitReact(VECTOR moveDir)
-{
-	// 指定された移動向きを設定
-	info_.moveDir_ = moveDir;
-
-	// 指定された移動速度を設定
-	info_.moveSpeed_ = 15.0f;
-
-	// 指定されたジャンプ力を設定
-	info_.velocityY_ = JUMP_POW;
-
-	// ダメージを受けたステートへ
-	ChangeState(RAT_STATE_HIT);
 }
 
 void Rat::UpdateState(void)
@@ -892,6 +844,39 @@ void Rat::SetApproachDistance(void)
 	info_.approachDistance_ = distance;
 }
 
+void Rat::SetDamage(void)
+{
+	// HPにダメージを与える
+	--info_.hp_;
+
+	// HPが0以下になったら
+	if (info_.hp_ <= 0)
+	{
+		// 0初期化しておく
+		info_.hp_ = 0;
+	}
+	else
+	{
+		// 無敵時間を設ける
+		info_.invincibleTime_ = INVINCIBLE_TIME;
+	}
+}
+
+void Rat::SetHitReact(VECTOR moveDir)
+{
+	// 指定された移動向きを設定
+	info_.moveDir_ = moveDir;
+
+	// 指定された移動速度を設定
+	info_.moveSpeed_ = 15.0f;
+
+	// 指定されたジャンプ力を設定
+	info_.velocityY_ = JUMP_POW;
+
+	// ダメージを受けたステートへ
+	ChangeState(RAT_STATE_HIT);
+}
+
 void Rat::OnCollision(Collider* other)
 {
 	// 衝突したオブジェクトをタグごとに判別
@@ -911,6 +896,9 @@ void Rat::OnCollision(Collider* other)
 		// 死亡処理に入っていたら処理を行わない
 		if (stateCtrl_.state_ == RAT_STATE_DEAD ||
 			stateCtrl_.state_ == RAT_STATE_END)return;
+
+		// 無敵時間があればダメージを与えない
+		if (info_.invincibleTime_ > 0)return;
 
 		// ダメージ処理
 		SetDamage();

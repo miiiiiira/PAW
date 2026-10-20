@@ -12,42 +12,34 @@ enum CAT_ROBOT_STATE
 	CAT_ROBOT_STATE_IDLE,		// 待機中
 	CAT_ROBOT_STATE_MOVE,		// 移動中
 	CAT_ROBOT_STATE_ATTACK,		// 攻撃中
-	CAT_ROBOT_STATE_HIT,		// 被ダメージ
+	CAT_ROBOT_STATE_CHANCE,		// プレイヤーの攻撃チャンス
 	CAT_ROBOT_STATE_DEAD,		// 死亡
 	CAT_ROBOT_STATE_END,		// 終了
 
 	CAT_ROBOT_STATE_MAX
 };
 
-// 猫ロボット待機状態
-enum CAT_ROBOT_IDLE_STATE
-{
-	CAT_ROBOT_IDLE_WAIT,		// 待機
-	CAT_ROBOT_IDLE_SWAY,		// 左右に揺れる
-	CAT_ROBOT_IDLE_APPROACH,	// ちょっと近づく
-	
-	CAT_ROBOT_IDLE_MAX
-};
-
 // 猫ロボット攻撃状態
 enum CAT_ROBOT_ATTACK_STATE
 {
-	CAT_ROBOT_ATTACK_START,		// 攻撃始め
-	CAT_ROBOT_ATTACKING,		// 攻撃中
-	CAT_ROBOT_ATTACK_AFTER,		// 攻撃終了後の隙
+	CAT_ROBOT_ATTACK_SELECT,	// 攻撃選択
+	CAT_ROBOT_ATTACK_1,			// 食材爆撃
+	CAT_ROBOT_ATTACK_2,			// お皿攻撃上下
+	CAT_ROBOT_ATTACK_3,			// お皿攻撃左右
+	CAT_ROBOT_ATTACK_4,			// ナイフ攻撃
 	CAT_ROBOT_ATTACK_END,		// 攻撃終了
 
 	CAT_ROBOT_ATTACK_MAX
 };
 
-// 猫ロボット被ダメージ状態
-enum CAT_ROBOT_HIT_STATE
+// 猫ロボットチャンス状態
+enum CAT_ROBOT_CHANCE_STATE
 {
-	CAT_ROBOT_HIT_START,// ダメージ開始
-	CAT_ROBOT_HIT_STUN,	// ダメージ中
-	CAT_ROBOT_HIT_END,	// 復帰
+	CAT_ROBOT_CHANCE_START,	// 攻撃を受けられる位置まで移動する
+	CAT_ROBOT_CHANCE_STUN,	// スタンして無防備になる(プレイヤーの攻撃チャンス)
+	CAT_ROBOT_CHANCE_END,	// スタンから回復し、通常行動へ戻る
 
-	CAT_ROBOT_HIT_MAX
+	CAT_ROBOT_CHANCE_MAX
 };
 
 // 状態遷移
@@ -60,13 +52,6 @@ struct catRobotStateCtrl
 	catRobotStateFunction initStateTable_[CAT_ROBOT_STATE_MAX];
 	catRobotStateFunction updateStateTable_[CAT_ROBOT_STATE_MAX];
 
-	// 猫ロボット待機状態
-	// ステート
-	CAT_ROBOT_IDLE_STATE idleState_;
-	// ステートテーブル
-	catRobotStateFunction initIdleTable_[CAT_ROBOT_IDLE_MAX];
-	catRobotStateFunction updateIdleTable_[CAT_ROBOT_IDLE_MAX];
-
 	// 猫ロボット攻撃状態
 	// ステート
 	CAT_ROBOT_ATTACK_STATE attackState_;
@@ -76,10 +61,10 @@ struct catRobotStateCtrl
 
 	// 猫ロボット被ダメージ状態
 	// ステート
-	CAT_ROBOT_HIT_STATE hitState_;
+	CAT_ROBOT_CHANCE_STATE chanceState_;
 	// ステートテーブル
-	catRobotStateFunction initHitTable_[CAT_ROBOT_HIT_MAX];
-	catRobotStateFunction updateHitTable_[CAT_ROBOT_HIT_MAX];
+	catRobotStateFunction initChanceTable_[CAT_ROBOT_CHANCE_MAX];
+	catRobotStateFunction updateChanceTable_[CAT_ROBOT_CHANCE_MAX];
 };
 
 struct catRobotInfo
