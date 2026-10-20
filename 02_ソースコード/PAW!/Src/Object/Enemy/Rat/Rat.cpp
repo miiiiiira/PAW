@@ -39,7 +39,12 @@ namespace
 	constexpr float HIT_REACT_FRICTION = 0.5f;	// ダメージ時のリアクション時の摩擦
 
 	// アニメーション設定
-	constexpr float ANIM_SPEED = 0.8f;
+	constexpr float ANIM_SPEED_ATTACK = 0.8f;
+	constexpr float ANIM_SPEED_ATTACK_START = 0.8f;
+	constexpr float ANIM_SPEED_DEAD = 0.4f;
+	constexpr float ANIM_SPEED_IDLE = 0.8f;
+	constexpr float ANIM_SPEED_MOVE = 0.8f;
+	constexpr float ANIM_SPEED_MOVE_CLOSER = 0.8f;
 
 	// リミット設定
 	constexpr int INVINCIBLE_TIME = 60;	// 無敵時間
@@ -177,6 +182,8 @@ void Rat::InitHit(Rat& rat)
 
 void Rat::InitDead(Rat& rat)
 {
+	// 死亡アニメーション再生
+	rat.animation_->Play(static_cast<int>(RAT_ANIMATION::DEAD), false);
 }
 
 void Rat::InitEnd(Rat& rat)
@@ -263,7 +270,12 @@ void Rat::UpdateHit(Rat& rat)
 
 void Rat::UpdateDead(Rat& rat)
 {
-	rat.ChangeState(RAT_STATE_END);
+	// アニメーションが終了していたら
+	if (rat.animation_->IsEnd())
+	{
+		// 完全死亡へ
+		rat.ChangeState(RAT_STATE_END);
+	}
 }
 
 void Rat::UpdateEnd(Rat& rat)
@@ -569,16 +581,8 @@ void Rat::UpdateHitStun(Rat& rat)
 
 void Rat::UpdateHitEnd(Rat& rat)
 {
-	if (rat.info_.hp_ <= 0)
-	{
-		// 死亡状態へ
-		rat.ChangeState(RAT_STATE_DEAD);
-	}
-	else
-	{
-		// 待機状態へ
-		rat.ChangeState(RAT_STATE_IDLE);
-	}
+	// 待機状態へ
+	rat.ChangeState(RAT_STATE_IDLE);
 }
 
 void Rat::ChangeHitState(RAT_HIT_STATE state)
@@ -625,13 +629,30 @@ void Rat::AddComponets(void)
 	animation_ = owner_->AddComponent<Animation>();
 	animation_->Init();
 	// アニメーション登録
-	for (int i = 0; i < static_cast<int>(RAT_ANIMATION::MAX); i++)
-	{
-		animation_->AddInFbx(
-			static_cast<int>(i),
-			ANIM_SPEED,
-			static_cast<int>(i));
-	}
+	animation_->AddInFbx(
+		static_cast<int>(RAT_ANIMATION::ATTACK),
+		ANIM_SPEED_ATTACK,
+		static_cast<int>(RAT_ANIMATION::ATTACK));
+	animation_->AddInFbx(
+		static_cast<int>(RAT_ANIMATION::ATTACK_START),
+		ANIM_SPEED_ATTACK_START,
+		static_cast<int>(RAT_ANIMATION::ATTACK_START));
+	animation_->AddInFbx(
+		static_cast<int>(RAT_ANIMATION::DEAD),
+		ANIM_SPEED_DEAD,
+		static_cast<int>(RAT_ANIMATION::DEAD));
+	animation_->AddInFbx(
+		static_cast<int>(RAT_ANIMATION::IDLE),
+		ANIM_SPEED_IDLE,
+		static_cast<int>(RAT_ANIMATION::IDLE));
+	animation_->AddInFbx(
+		static_cast<int>(RAT_ANIMATION::MOVE),
+		ANIM_SPEED_MOVE,
+		static_cast<int>(RAT_ANIMATION::MOVE));
+	animation_->AddInFbx(
+		static_cast<int>(RAT_ANIMATION::MOVE_CLOSER),
+		ANIM_SPEED_MOVE_CLOSER,
+		static_cast<int>(RAT_ANIMATION::MOVE_CLOSER));
 }
 
 void Rat::ApplyGravity(void)
@@ -854,6 +875,8 @@ void Rat::SetDamage(void)
 	{
 		// 0初期化しておく
 		info_.hp_ = 0;
+
+		ChangeState(RAT_STATE_DEAD);
 	}
 	else
 	{
@@ -864,6 +887,9 @@ void Rat::SetDamage(void)
 
 void Rat::SetHitReact(VECTOR moveDir)
 {
+	// 死亡していたら吹き飛び処理を行わない
+	if (stateCtrl_.state_ == RAT_STATE_DEAD)return;
+
 	// 指定された移動向きを設定
 	info_.moveDir_ = moveDir;
 
