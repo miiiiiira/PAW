@@ -183,7 +183,8 @@ void MainMenu::UpdateExit(void)
 	// 決定ボタンを押されたら
 	if (InputManager::GetInstance()->DecideButton())
 	{
-		Application::GetInstance()->SetEnd(true);
+		// 確認画面を積む
+		SceneManager::GetInstance()->PushScene(std::make_shared<Confirm>());
 	}
 }
 
