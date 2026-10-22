@@ -46,6 +46,10 @@ public:
 
 	// アニメーションの再生時間を返す
 	float GetStep(void) const { return playAnim_.step; }
+
+	// アニメーションの総再生時間を返す
+	float GetTotalAnimTime(void)const { return playAnim_.totalTime; }
+
 private:
 	// Render3D
 	Render3D* render_ = nullptr;

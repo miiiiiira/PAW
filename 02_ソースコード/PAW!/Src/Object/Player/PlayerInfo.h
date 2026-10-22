@@ -89,7 +89,7 @@ struct playerInfo
 {
 	float velocityY_ = 0.0f;	// Œ»Ý‚Ì—Ž‰º‘¬“x
 
-	VECTOR moveDir_ = {};	// ˆÚ“®•ûŒü
+	VECTOR moveDir_ = {0.0f,0.0f,0.0f};	// ˆÚ“®•ûŒü
 
 	float moveSpeed_ = 0;	// ˆÚ“®‘¬“x
 
@@ -106,15 +106,17 @@ struct playerInfo
 
 enum class PLAYER_ANIMATION
 {
-	JUMP,
-	GROOMING,
-	LOAF,
-	PUNCH,
-	RUN,
-	SCRATCH,
-	SITTING_IDLE,
 	STANDING_IDLE,
+	SITTING_IDLE,
 	WALK,
+	RUN,
+	JUMP,
+	PUNCH,
+	PUNCH2,
+	PUNCH3,
+	SCRATCH,
+	LOAF,
+	GROOMING,
 
 	MAX
 };
