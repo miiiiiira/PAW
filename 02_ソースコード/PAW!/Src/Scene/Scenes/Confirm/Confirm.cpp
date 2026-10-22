@@ -11,16 +11,16 @@
 namespace
 {
 	// 画像サイズ（YES, NO）
-	constexpr int IMAGE_SIZE_X = 150;
-	constexpr int IMAGE_SIZE_Y = 70;
+	constexpr int IMAGE_SIZE_X = 199;
+	constexpr int IMAGE_SIZE_Y = 77;
 
 	// YES
-	constexpr int YES_POS_X = (Application::SCREEN_SIZE_X - IMAGE_SIZE_X) / 2 - 150;
-	constexpr int YES_POS_Y = (Application::SCREEN_SIZE_Y - IMAGE_SIZE_Y) / 2 + 150;
+	constexpr int YES_POS_X = (Application::SCREEN_SIZE_X / 2) - IMAGE_SIZE_X;
+	constexpr int YES_POS_Y = (Application::SCREEN_SIZE_Y / 2) + IMAGE_SIZE_Y;
 
 	// NO
-	constexpr int NO_POS_X = (Application::SCREEN_SIZE_X - IMAGE_SIZE_X) / 2 + 150;
-	constexpr int NO_POS_Y = (Application::SCREEN_SIZE_Y - IMAGE_SIZE_Y) / 2 + 150;
+	constexpr int NO_POS_X = (Application::SCREEN_SIZE_X / 2) + IMAGE_SIZE_X;
+	constexpr int NO_POS_Y = (Application::SCREEN_SIZE_Y / 2) + IMAGE_SIZE_Y;
 
 	// 猫画像を変更するタイミング
 	constexpr int CAT_COUNT = 120;
@@ -76,8 +76,8 @@ void Confirm::Load(void)
 	// YES画像
 	selectButtons_.push_back({
 		SELECT::YES,
-		LoadGraph("Confirm/YesOff.png"),
-		LoadGraph("Confirm/YesOn.png"),
+		LoadGraph("Data/Image/Confirm/YesOff.png"),
+		LoadGraph("Data/Image/Confirm/YesOn.png"),
 		YES_POS_X,
 		YES_POS_Y,
 		IMAGE_SIZE_X,
@@ -86,8 +86,8 @@ void Confirm::Load(void)
 	// NO画像
 	selectButtons_.push_back({
 		SELECT::NO,
-		LoadGraph("Confirm/NoOff.png"),
-		LoadGraph("Confirm/NoOn.png"),
+		LoadGraph("Data/Image/Confirm/NoOff.png"),
+		LoadGraph("Data/Image/Confirm/NoOn.png"),
 		NO_POS_X,
 		NO_POS_Y,
 		IMAGE_SIZE_X,
@@ -252,7 +252,9 @@ void Confirm::MouseSelect(void)
 
 	for (const auto& button : selectButtons_)
 	{
-		if (Collision::HitMouseImg2Box({ static_cast<float>(button.x), static_cast<float>(button.y) },
+		if (Collision::HitMouseImg2Box({
+			button.x - static_cast<float>(button.sizeX) / 2,
+			button.y - static_cast<float>(button.sizeY) / 2 },
 			static_cast<float>(button.sizeX), static_cast<float>(button.sizeY)))
 		{
 			nextSelect = button.type;
