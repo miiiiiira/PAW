@@ -15,17 +15,13 @@ namespace
 	// ボタンのアルファ値の変化速度
 	static constexpr float ALPHA_SPEED = 5.0f;
 
-	// ボタンのアルファ値の最大値と最小値
-	static constexpr float ALPHA_MAX = 255.0f;
-	static constexpr float ALPHA_MIN = 32.0f;
+	// ボタンのアルファ値
+	static constexpr float ALPHA_MAX = 255.0f;	// 最大値
+	static constexpr float ALPHA_MIN = 32.0f;	// 最小値
 }
 
 TitleScene::TitleScene(void)
 {
-	alpha_ = ALPHA_MIN;
-	isIncreasing_ = false; 
-	isPlaySoundSE_ = false;
-	confirm_ = nullptr;
 	// マウスの表示する
 	MouseCursor::GetInstance()->SetMouseDraw(true);
 }
@@ -48,8 +44,6 @@ void TitleScene::Load(void)
 	// 画像をロード
 	backImg_ = LoadGraph("Data/Image/Title/TitleBack.png");
 	buttonImg_ = LoadGraph("Data/Image/Title/PushAny.png");
-
-	confirm_ = std::make_shared<Confirm>();
 }
 
 void TitleScene::LoadEnd(void)
@@ -63,51 +57,36 @@ void TitleScene::LoadEnd(void)
 
 void TitleScene::Update(void)
 {
-	// 何かのボタンを押されたら
-	if (InputManager::GetInstance()->PushAnyButton())
-	{
-		// PushAnyを透過する
-		alpha_ = 0;
+	// メニュー画面を積む
+	ChangeMainMenu();
 
-		// メインメニューを積む
-		SceneManager::GetInstance()->PushScene(std::make_shared<MainMenu>());
-		return;
-	}
+	// 確認画面を積む
+	ChangeConfirmScene();
 
-	// ボタンを押されたら動きを止める
-	if (isPlaySoundSE_)return;
-
-	// ボタンのアルファ値を変化させる
-	if (isIncreasing_)
-	{
-		alpha_ += ALPHA_SPEED; // 増加速度
-
-		// 増加が最大になったら減少に切り替える
-		if(alpha_ >= ALPHA_MAX)
-		{
-			alpha_ = ALPHA_MAX;
-			isIncreasing_ = false; 
-		}
-	}
-	else
-	{
-		alpha_ -= ALPHA_SPEED; // 減少速度
-
-		// 減少が最小になったら増加に切り替える
-		if(alpha_ <= ALPHA_MIN)
-		{
-			alpha_ = ALPHA_MIN;
-			isIncreasing_ = true;
-		}
-	}
+	// 条件に合わせてアルファ値を加減算する
+	UpdateAlpha();
 }
 
 void TitleScene::Draw(void)
 {
-	DrawRotaGraph(Application::SCREEN_SIZE_X / 2, Application::SCREEN_SIZE_Y / 2, 1.0, 0.0, backImg_, true);
+	// 背景描画
+	DrawRotaGraph(
+		Application::SCREEN_SIZE_X / 2,
+		Application::SCREEN_SIZE_Y / 2,
+		1.0, 
+		0.0,
+		backImg_,
+		true);
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(alpha_));
-	DrawRotaGraph(Application::SCREEN_SIZE_X / 2, Application::SCREEN_SIZE_Y / 2, 1.0, 0.0, buttonImg_, true);
+	// PushAnyButtonの画像描画
+	DrawRotaGraph(
+		Application::SCREEN_SIZE_X / 2,
+		Application::SCREEN_SIZE_Y / 2,
+		1.0,
+		0.0,
+		buttonImg_, 
+		true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }
 
@@ -119,4 +98,63 @@ void TitleScene::Release(void)
 	// 画像の解放
 	DeleteGraph(backImg_);
 	DeleteGraph(buttonImg_);
+}
+
+bool TitleScene::ChangeMainMenu(void)
+{
+	// 何かのボタンを押されたら
+	if (InputManager::GetInstance()->PushAnyButton())
+	{
+		// PushAnyを透過する
+		alpha_ = 0.0f;
+
+		// メインメニューを積む
+		SceneManager::GetInstance()->PushScene(std::make_shared<MainMenu>());
+		return true;
+	}
+
+	return false;
+}
+
+bool TitleScene::ChangeConfirmScene(void)
+{
+	// ESC押したら
+	if (InputManager::GetInstance()->IsTrgDown(KEY_INPUT_ESCAPE))
+	{
+		// 確認画面を積む
+		SceneManager::GetInstance()->PushScene(std::make_shared<Confirm>());
+		return true;
+	}
+
+	return false;
+}
+
+void TitleScene::UpdateAlpha(void)
+{
+	// ボタンを押されたら動きを止める
+	if (isPlaySoundSE_)return;
+
+	// ボタンのアルファ値を変化させる
+	if (isIncreasing_)
+	{
+		alpha_ += ALPHA_SPEED; 
+
+		// 増加が最大になったら減少に切り替える
+		if (alpha_ >= ALPHA_MAX)
+		{
+			alpha_ = ALPHA_MAX;
+			isIncreasing_ = false;
+		}
+	}
+	else
+	{
+		alpha_ -= ALPHA_SPEED; 
+
+		// 減少が最小になったら増加に切り替える
+		if (alpha_ <= ALPHA_MIN)
+		{
+			alpha_ = ALPHA_MIN;
+			isIncreasing_ = true;
+		}
+	}
 }

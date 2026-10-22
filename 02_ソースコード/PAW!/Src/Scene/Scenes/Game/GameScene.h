@@ -46,7 +46,7 @@ private:
 	void SetUp(void);
 
 	// シーン遷移
-	void ChangePauseScene(void);		// ポーズシーン
-	void ChangeGameClearScene(void);	// ゲームクリア
-	void ChangeGameOverScene(void);		// ゲームオーバー
+	bool ChangePauseScene(void);		// ポーズシーン
+	bool ChangeGameClearScene(void);	// ゲームクリア
+	bool ChangeGameOverScene(void);		// ゲームオーバー
 };

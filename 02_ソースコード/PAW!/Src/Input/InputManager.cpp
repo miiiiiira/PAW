@@ -210,7 +210,17 @@ bool InputManager::ChangeDevicePad(void)
 
 bool InputManager::PushAnyButton(void)
 {
-	return CheckHitKeyAll(DX_CHECKINPUT_KEY);
+	return FindMouse(MOUSE_INPUT_LEFT).keyTrgDown || FindMouse(MOUSE_INPUT_RIGHT).keyTrgDown
+		|| (CheckHitKeyAll(DX_CHECKINPUT_KEY) && !CheckHitKey(KEY_INPUT_ESCAPE))
+		|| IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::A) || IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::B)
+		|| IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::X) || IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::Y)
+		|| IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::L_TRIGGER) || IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::R_TRIGGER)
+		|| IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::LB) || IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::RB)
+		|| IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::DOWN) || IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::UP)
+		|| IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::LEFT) || IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::RIGHT)
+		|| IsPadLStickTrgDown(JOYPAD_NO::PAD1, JOYPAD_STICK::UP) || IsPadLStickTrgDown(JOYPAD_NO::PAD1, JOYPAD_STICK::DOWN)
+		|| IsPadLStickTrgDown(JOYPAD_NO::PAD1, JOYPAD_STICK::LEFT) || IsPadLStickTrgDown(JOYPAD_NO::PAD1, JOYPAD_STICK::RIGHT)
+		|| IsPadRStickNew(JOYPAD_NO::PAD1);
 }
 
 bool InputManager::DecideButton(void)

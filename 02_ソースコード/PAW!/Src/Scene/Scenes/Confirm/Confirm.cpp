@@ -9,9 +9,31 @@
 #include "../MainMenu/MainMenu.h"
 //#include "../../Common/FrameRenderer/FrameRenderer.h"
 
+namespace
+{
+	// 画像サイズ（YES, NO）
+	constexpr int IMAGE_SIZE_X = 150;
+	constexpr int IMAGE_SIZE_Y = 70;
+
+	// YES
+	constexpr int YES_POS_X = (Application::SCREEN_SIZE_X - IMAGE_SIZE_X) / 2 - 150;
+	constexpr int YES_POS_Y = (Application::SCREEN_SIZE_Y - IMAGE_SIZE_Y) / 2 + 150;
+
+	// NO
+	constexpr int NO_POS_X = (Application::SCREEN_SIZE_X - IMAGE_SIZE_X) / 2 + 150;
+	constexpr int NO_POS_Y = (Application::SCREEN_SIZE_Y - IMAGE_SIZE_Y) / 2 + 150;
+
+	// 猫画像を変更するタイミング
+	constexpr int CAT_COUNT = 120;
+	constexpr int CHANGE_CAT_EYE_COUNT = 10;
+}
+
 Confirm::Confirm(void)
 {
-	confirmImg_ = -1;
+	for (int i = 0; i < static_cast<int>(CAT_TYPE::MAX); ++i)
+	{
+		catImg_[i] = -1;
+	}
 }
 
 Confirm::~Confirm(void)
@@ -20,24 +42,6 @@ Confirm::~Confirm(void)
 
 void Confirm::Init(void)
 {
-	ChangeSelect(SELECT::NONE);
-}
-
-void Confirm::Load(void)
-{
-
-	switch (confirmType_)
-	{
-	case TYPE::QUIT:
-		confirmImg_ = LoadGraph("Confirm/ConfirmQuit.png");		// QUITの時の確認画面
-		break;
-	case TYPE::MAIN_MENU:
-		confirmImg_ = LoadGraph("Confirm/ConfirmMainMenu.png");	// MAIN MENUの時の確認画面
-		break;
-	break;
-	}
-
-
 	// 配列をクリアにしてから、画像を追加
 	selectButtons_.clear();
 	// YES画像
@@ -46,6 +50,37 @@ void Confirm::Load(void)
 	// NO画像
 	selectButtons_.push_back({ SELECT::NO,  LoadGraph("Confirm/No.png"),
 							NO_POS_X, NO_POS_Y, IMAGE_SIZE_X, IMAGE_SIZE_Y });
+
+	// 現在の選択肢初期化
+	ChangeSelect(SELECT::NONE);
+
+	// 猫の種類初期化
+	ChangeCat(CAT_TYPE::OPEN_EYES);
+}
+
+void Confirm::Load(void)
+{
+	// 画像のロード
+	switch (SceneManager::GetInstance()->GetNowSceneTag())
+	{
+	case SCENE_TAG::TITLE:
+	case SCENE_TAG::MAINMANU:
+		// ゲーム終了時の確認画面
+		confirmImg_ = LoadGraph("Data/Image/Confirm/ConfirmExit.png");		
+		break;
+
+	default:
+		break;
+	}
+
+	// 猫画像
+	catImg_[static_cast<int>(CAT_TYPE::OPEN_EYES)] = 
+		LoadGraph("Data/Image/Confirm/ConfirmCatOpen.png");
+	catImg_[static_cast<int>(CAT_TYPE::CLOSING_EYES)] = 
+		LoadGraph("Data/Image/Confirm/ConfirmCatClosing.png");
+	catImg_[static_cast<int>(CAT_TYPE::CLOSE_EYE)] = 
+		LoadGraph("Data/Image/Confirm/ConfirmCatClose.png");
+
 }
 
 void Confirm::LoadEnd(void)
@@ -55,20 +90,11 @@ void Confirm::LoadEnd(void)
 
 void Confirm::Update(void)
 {
-#ifdef _DEBUG
-
-	// メニューからタイトルに戻すボタン
-	if (InputManager::GetInstance()->IsTrgDown(KEY_INPUT_SPACE))
-	{
-		UpdateYes();
-		return;
-	}
-
-#endif // _DEBUG
-
+	// 猫更新処理
+	UpdateCat();
 
 	// 選択処理
-	SelectUpgrade();
+	UpdateSelect();
 
 	// マウスを左クリックされなかったら、処理しない
 	if (!InputManager::GetInstance()->DecideButton()) return;
@@ -91,30 +117,22 @@ void Confirm::Update(void)
 
 void Confirm::Draw(void)
 {
-	DrawGraph(CONFIRM_POS_X, CONFIRM_POS_Y, confirmImg_, true);				// 確認の文字を表示
+	// 確認の画面を描画
+	DrawGraph(0, 0, confirmImg_, true);	
 
+	// 猫を描画
+	DrawGraph(0, 0, catImg_[static_cast<int>(currentCat_)], true);
+
+	// ボタン描画
 	for (const auto& button : selectButtons_)
 	{
-		if (button.type == currentSelect_)
-		{
-			/*FrameRenderer::Draw(button.x,
-				button.y,
-				button.sizeX,
-				button.sizeY,
-				FRAME_OFFSET);*/
-		}
 		DrawGraph(button.x, button.y, button.graphHandle, true);
 	}
-
-#ifdef _DEBUG
-
-	DrawString(0, 0, "Confirm", 0xffffff);
-
-#endif // _DEBUG
 }
 
 void Confirm::Release(void)
 {
+	// 画像を解放
 	for (const auto& button : selectButtons_)
 	{
 		DeleteGraph(button.graphHandle);
@@ -124,30 +142,46 @@ void Confirm::Release(void)
 	DeleteGraph(confirmImg_);
 	confirmImg_ = -1;
 
+	for (int i = 0; i < static_cast<int>(CAT_TYPE::MAX); ++i)
+	{
+		DeleteGraph(catImg_[i]);
+		catImg_[i] = -1;
+	}
 }
 
-void Confirm::ChangeType(TYPE type)
+void Confirm::ChangeCat(CAT_TYPE type)
 {
-	confirmType_ = type;
-}
+	currentCat_ = type;
 
-void Confirm::ChangeSelect(SELECT select)
-{
-	currentSelect_ = select;
+	switch (currentCat_)
+	{
+	case Confirm::CAT_TYPE::OPEN_EYES:
+		// 猫カウント初期化
+		changeCatCount = 0;
+		isOpenEye = true;
+		break;
+	case Confirm::CAT_TYPE::CLOSING_EYES:
+		break;
+	case Confirm::CAT_TYPE::CLOSE_EYE:
+		isOpenEye = false;
+		break;
+	case Confirm::CAT_TYPE::MAX:
+		break;
+	default:
+		break;
+	}
 }
 
 void Confirm::UpdateYes(void)
 {
-	switch (confirmType_)
+	// 画像のロード
+	switch (SceneManager::GetInstance()->GetNowSceneTag())
 	{
-	case TYPE::QUIT:
+	case SCENE_TAG::TITLE:
+	case SCENE_TAG::MAINMANU:
 		Application::GetInstance()->SetEnd(true);
 		break;
-	case TYPE::MAIN_MENU:
-		SceneManager::GetInstance()->NextChangeScene(std::make_shared<MainMenu>(),MAINMANU, true);
-		// ゲームを終了したため初期化する
-		SceneManager::GetInstance()->ResetGame();
-		break;
+
 	default:
 		break;
 	}
@@ -159,7 +193,7 @@ void Confirm::UpdateNo(void)
 	SceneManager::GetInstance()->PopScene();
 }
 
-void Confirm::SelectUpgrade(void)
+void Confirm::UpdateSelect(void)
 {
 	// 前回の選択物を入れておく
 	SELECT prevSelect = currentSelect_;
@@ -204,35 +238,81 @@ void Confirm::MouseSelect(void)
 
 void Confirm::PadSelect(void)
 {
-	switch (currentSelect_)
+	// 現在選択しているメニュー
+	int current = static_cast<int>(currentSelect_);
+
+	// 上が押されたら
+	if (InputManager::GetInstance()->SelectRightPad())
 	{
-	case Confirm::SELECT::NONE:
-
-		// NOボタンへ
-		ChangeSelect(SELECT::NO);
-
-		break;
-	case Confirm::SELECT::YES:
-
-		// 右押されたら
-		if (InputManager::GetInstance()->SelectRightPad())
-		{
-			// NOボタンへ
-			ChangeSelect(SELECT::NO);
-		}
-
-		break;
-	case Confirm::SELECT::NO:
-
-		// 左押されたら
-		if (InputManager::GetInstance()->SelectLeftPad())
-		{
-			// YESボタンへ
-			ChangeSelect(SELECT::YES);
-		}
-
-		break;
-	default:
-		break;
+		// メニューを上に移動
+		current--;
 	}
+	// 下が押されたら
+	else if (InputManager::GetInstance()->SelectLeftPad())
+	{
+		// メニューを下に移動
+		current++;
+	}
+
+	// 移動先をキャスト
+	SELECT next = static_cast<SELECT>(current);
+
+	// 下限設定
+	if (next <= SELECT::NONE)
+	{
+		next = SELECT::YES;
+	}
+
+	// 上限設定
+	if (next >= SELECT::MAX)
+	{
+		next = SELECT::YES;
+	}
+
+	// メニューを切り替える
+	ChangeSelect(next);
+}
+
+void Confirm::UpdateCat(void)
+{
+	// カウンターを進める
+	changeCatCount++;
+
+	// 変更タイミングに到達していなければ処理を行わない
+	if (changeCatCount < CAT_COUNT)return;
+
+	// 一定フレームごとに瞬きさせる
+	if ((changeCatCount - CAT_COUNT) % CHANGE_CAT_EYE_COUNT != 0)return;
+
+	// 現在選択しているメニュー
+	int current = static_cast<int>(currentCat_);
+
+	// 目を開けていたら
+	if (isOpenEye)
+	{
+		current++;
+	}
+	// 目を閉じていたら
+	else
+	{
+		current--;
+	}
+
+	// 移動先をキャスト
+	CAT_TYPE next = static_cast<CAT_TYPE>(current);
+
+	// 下限設定
+	if (next <= CAT_TYPE::OPEN_EYES)
+	{
+		next = CAT_TYPE::OPEN_EYES;
+	}
+
+	// 上限設定
+	if (next >= CAT_TYPE::CLOSE_EYE)
+	{
+		next = CAT_TYPE::CLOSE_EYE;
+	}
+
+	// 猫画像を切り替える
+	ChangeCat(next);
 }

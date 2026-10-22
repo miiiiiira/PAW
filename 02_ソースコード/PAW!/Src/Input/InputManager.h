@@ -169,7 +169,7 @@ public:
 	// パッドに切り替え
 	bool ChangeDevicePad(void);
 
-	// 何かしらのキーを押された
+	// 何かしらのボタンを押された（ESCAPE以外）
 	bool PushAnyButton(void);
 
 	// 決定

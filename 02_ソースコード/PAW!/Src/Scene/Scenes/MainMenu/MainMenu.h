@@ -9,7 +9,6 @@ class Confirm;
 class MainMenu : public SceneBase
 {
 public:
-
 	enum class MENU
 	{
 		NONE,
@@ -22,14 +21,15 @@ public:
 
 	struct ButtonInfo
 	{
-		MENU type;
-		int graphHandleOff;
-		int graphHandleOn;
-		float x, y;
-		int sizeX, sizeY;
+		MENU type;			// 選択している種類
+		int graphHandleOff;	// 選択されていない場合の画像ハンドル
+		int graphHandleOn;	// 選択されている場合の画像ハンドル
+		float x, y;			// 座標
+		int sizeX, sizeY;	// 画像サイズ
 	};
 
-	MainMenu(void);				// コンストラクタ
+public:
+	MainMenu(void);					// コンストラクタ
 	~MainMenu(void) override;		// デストラクタ
 
 	void Init(void)		override;	// 初期化
@@ -40,18 +40,17 @@ public:
 	void Release(void)	override;	// 解放
 
 private:
-
+	// 選択中の種類を変更
 	void ChangeSelect(MENU menu);
 
 	// メニュー選択時の処理
-	void UpdateGameStart(void);
-	void UpdateTitle(void);
-	void UpdateExit(void);
+	void UpdateGameStart(void);	// ゲームスタート
+	void UpdateTitle(void);		// タイトル
+	void UpdateExit(void);		// ゲーム終了
 
-	void SelectUpgrade(void);	// 選択処理
-
+	// 選択処理
+	void SelectUpgrade(void);	
 	void MouseSelect(void);		// マウス選択
-
 	void PadSelect(void);		// パッド選択
 
 private:

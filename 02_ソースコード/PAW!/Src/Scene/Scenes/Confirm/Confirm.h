@@ -7,19 +7,24 @@
 class Confirm : public SceneBase
 {
 public:
-
-	enum class TYPE
-	{
-		NONE,
-		QUIT,
-		MAIN_MENU,
-	};
-
+	// 選択中の種類
 	enum class SELECT
 	{
 		NONE,
 		YES,
 		NO,
+
+		MAX
+	};
+
+	// 猫の種類
+	enum class CAT_TYPE
+	{
+		OPEN_EYES,		// 目を開けている
+		CLOSING_EYES,	// 目を閉じている途中
+		CLOSE_EYE,		// 目を閉じている
+
+		MAX
 	};
 
 	struct ButtonInfo
@@ -31,7 +36,6 @@ public:
 	};
 
 public:
-
 	Confirm(void);					// コンストラクタ
 	~Confirm(void) override;		// デストラクタ
 
@@ -42,52 +46,39 @@ public:
 	void Draw(void)		override;	// 描画
 	void Release(void)	override;	// 解放
 
-	void ChangeType(TYPE type);
+private:
+	// 画像ハンドル
+	int confirmImg_ = -1;							// 確認画面
+	int catImg_[static_cast<int>(CAT_TYPE::MAX)];	// 猫
+
+	// 選択肢のボタン
+	std::vector<ButtonInfo> selectButtons_;
+
+	// 現在の選択肢
+	SELECT currentSelect_ = SELECT::NONE;
+
+	// 猫
+	int changeCatCount = 0;					// 変更までのカウント
+	bool isOpenEye = true;					// 目を開けているか
+	CAT_TYPE currentCat_ = CAT_TYPE::MAX;	// 種類
 
 private:
+	// 現在の選択肢設定
+	void ChangeSelect(SELECT select) { currentSelect_ = select; }
 
-	// 確認ウィンドウの位置とサイズ
-	static constexpr int CONFIRM_SIZE_X = 800;
-	static constexpr int CONFIRM_SIZE_Y = 500;
-	static constexpr int CONFIRM_POS_X = (Application::SCREEN_SIZE_X - CONFIRM_SIZE_X) / 2;
-	static constexpr int CONFIRM_POS_Y = (Application::SCREEN_SIZE_Y - CONFIRM_SIZE_Y) / 2;
-
-	// 画像サイズ（YES, NO）
-	static constexpr int IMAGE_SIZE_X = 150;
-	static constexpr int IMAGE_SIZE_Y = 70;
-
-	// YES
-	static constexpr int YES_POS_X = (Application::SCREEN_SIZE_X - IMAGE_SIZE_X) / 2 - 150;
-	static constexpr int YES_POS_Y = (Application::SCREEN_SIZE_Y - IMAGE_SIZE_Y) / 2 + 150;
-
-	// NO
-	static constexpr int NO_POS_X = (Application::SCREEN_SIZE_X - IMAGE_SIZE_X) / 2 + 150;
-	static constexpr int NO_POS_Y = YES_POS_Y;
-
-	// フレームのオフセット
-	static constexpr int FRAME_OFFSET = 10;
-
-private:
-
-	void ChangeSelect(SELECT select);
+	// 猫の種類設定
+	void ChangeCat(CAT_TYPE type);
 
 	// メニュー選択時の処理
-	void UpdateYes(void);
-	void UpdateNo(void);
+	void UpdateYes(void);	// Yes
+	void UpdateNo(void);	// No
 
-	void SelectUpgrade(void);	// 選択処理
-	
+	// 選択処理
+	void UpdateSelect(void);
 	void MouseSelect(void);		// マウス選択
-	
 	void PadSelect(void);		// パッド選択
 
-private:
-	std::vector<ButtonInfo> selectButtons_;	// 選択肢のボタン
-
-	SELECT currentSelect_;				// 現在の選択肢
-
-	TYPE confirmType_;					// どの確認画面化
-
-	int confirmImg_;					// 画像ハンドル
+	// 猫更新処理
+	void UpdateCat(void);
 };
 

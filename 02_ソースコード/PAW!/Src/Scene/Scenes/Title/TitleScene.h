@@ -2,11 +2,8 @@
 #include "../../SceneBase.h"
 #include <memory>
 
-class Confirm;
-
 class TitleScene : public SceneBase
 {
-
 public:
 	
 	TitleScene(void);				// コンストラクタ
@@ -20,14 +17,24 @@ public:
 	void Release(void)	override;	// 解放
 
 private:
+	// 画像ハンドル
+	int backImg_ = -1;		// 背景
+	int buttonImg_ = -1;	// PushAnyButton
 
-	std::shared_ptr<Confirm> confirm_;
+	// アルファ値系
+	float alpha_ = 0.0f;		// 実際の値
+	bool isIncreasing_ = false;	// ボタンのアルファ値が増加しているかどうか
 
-	int backImg_ = -1;		// 背景画像
-	int buttonImg_ = -1;	// PushAnyButton画像
+	// サウンドを鳴らしたか
+	bool isPlaySoundSE_ = false;	
 
-	float alpha_;		// アルファ値
-	bool isIncreasing_;	// ボタンのアルファ値が増加しているかどうか
+private:
+	// メニュー画面
+	bool ChangeMainMenu(void);
 
-	bool isPlaySoundSE_;	// サウンドを鳴らしたか
+	// 確認画面
+	bool ChangeConfirmScene(void);
+
+	// 条件に合わせてアルファ値を加減算する
+	void UpdateAlpha(void);
 };

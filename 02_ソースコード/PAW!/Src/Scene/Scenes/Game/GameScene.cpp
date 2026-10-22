@@ -108,13 +108,13 @@ void GameScene::Update(void)
 	UpdateEffekseer3D();
 
 	// ポーズシーン遷移
-	ChangePauseScene();
+	if (ChangePauseScene())return;
 
 	// ゲームクリア遷移
-	ChangeGameClearScene();
+	if (ChangeGameClearScene())return;
 
 	// ゲームオーバー遷移
-	ChangeGameOverScene();
+	if (ChangeGameOverScene())return;
 }
 
 void GameScene::Draw(void)
@@ -218,7 +218,7 @@ void GameScene::SetUp(void)
 	rat->SetPlayerTransform(player->GetTransform());
 }
 
-void GameScene::ChangePauseScene(void)
+bool GameScene::ChangePauseScene(void)
 {
 	if (InputManager::GetInstance()->PauseButton())
 	{
@@ -226,11 +226,13 @@ void GameScene::ChangePauseScene(void)
 		//AudioManager::GetInstance()->PlaySE(SoundID::SYS_PAUSE_ON);
 		// ポーズモードへ
 		SceneManager::GetInstance()->PushScene(std::make_shared<Pause>());
-		return;
+		return true;
 	}
+
+	return false;
 }
 
-void GameScene::ChangeGameClearScene(void)
+bool GameScene::ChangeGameClearScene(void)
 {
 	if (SceneManager::GetInstance()->GetIsClear())
 	{
@@ -238,16 +240,20 @@ void GameScene::ChangeGameClearScene(void)
 		SceneManager::GetInstance()->ResetGame();
 		// ゲームクリアシーンへ
 		SceneManager::GetInstance()->NextChangeScene(std::make_shared<GameClear>(), CLEAR);
-		return;
+		return true;
 	}
+
+	return false;
 }
 
-void GameScene::ChangeGameOverScene(void)
+bool GameScene::ChangeGameOverScene(void)
 {
 	if (SceneManager::GetInstance()->GetIsOver())
 	{
 		// ゲームオーバーシーンへ
 		SceneManager::GetInstance()->NextChangeScene(std::make_shared<GameOver>(), OVER);
-		return;
+		return true;
 	}
+
+	return false;
 }
