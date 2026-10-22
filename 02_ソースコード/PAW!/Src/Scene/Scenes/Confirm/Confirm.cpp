@@ -1,13 +1,12 @@
 #include <vector>
 
-#include "Confirm.h"
-
 #include "../../../Input/InputManager.h"
 #include "../../../Audio/AudioManager.h"
 #include "../../SceneManager.h"
 #include "../../../Collision/CollisionMath.h"
 #include "../MainMenu/MainMenu.h"
-//#include "../../Common/FrameRenderer/FrameRenderer.h"
+
+#include "Confirm.h"
 
 namespace
 {
@@ -42,15 +41,6 @@ Confirm::~Confirm(void)
 
 void Confirm::Init(void)
 {
-	// 配列をクリアにしてから、画像を追加
-	selectButtons_.clear();
-	// YES画像
-	selectButtons_.push_back({ SELECT::YES, LoadGraph("Confirm/Yes.png"),
-								YES_POS_X, YES_POS_Y, IMAGE_SIZE_X, IMAGE_SIZE_Y });
-	// NO画像
-	selectButtons_.push_back({ SELECT::NO,  LoadGraph("Confirm/No.png"),
-							NO_POS_X, NO_POS_Y, IMAGE_SIZE_X, IMAGE_SIZE_Y });
-
 	// 現在の選択肢初期化
 	ChangeSelect(SELECT::NONE);
 
@@ -66,7 +56,7 @@ void Confirm::Load(void)
 	case SCENE_TAG::TITLE:
 	case SCENE_TAG::MAINMANU:
 		// ゲーム終了時の確認画面
-		confirmImg_ = LoadGraph("Data/Image/Confirm/ConfirmExit.png");		
+		confirmImg_ = LoadGraph("Data/Image/Confirm/ConfirmExit.png");
 		break;
 
 	default:
@@ -74,13 +64,34 @@ void Confirm::Load(void)
 	}
 
 	// 猫画像
-	catImg_[static_cast<int>(CAT_TYPE::OPEN_EYES)] = 
+	catImg_[static_cast<int>(CAT_TYPE::OPEN_EYES)] =
 		LoadGraph("Data/Image/Confirm/ConfirmCatOpen.png");
-	catImg_[static_cast<int>(CAT_TYPE::CLOSING_EYES)] = 
+	catImg_[static_cast<int>(CAT_TYPE::CLOSING_EYES)] =
 		LoadGraph("Data/Image/Confirm/ConfirmCatClosing.png");
-	catImg_[static_cast<int>(CAT_TYPE::CLOSE_EYE)] = 
+	catImg_[static_cast<int>(CAT_TYPE::CLOSE_EYE)] =
 		LoadGraph("Data/Image/Confirm/ConfirmCatClose.png");
 
+	// 配列をクリアにしてから、画像を追加
+	selectButtons_.clear();
+	// YES画像
+	selectButtons_.push_back({
+		SELECT::YES,
+		LoadGraph("Confirm/YesOff.png"),
+		LoadGraph("Confirm/YesOn.png"),
+		YES_POS_X,
+		YES_POS_Y,
+		IMAGE_SIZE_X,
+		IMAGE_SIZE_Y });
+
+	// NO画像
+	selectButtons_.push_back({
+		SELECT::NO,
+		LoadGraph("Confirm/NoOff.png"),
+		LoadGraph("Confirm/NoOn.png"),
+		NO_POS_X,
+		NO_POS_Y,
+		IMAGE_SIZE_X,
+		IMAGE_SIZE_Y });
 }
 
 void Confirm::LoadEnd(void)
@@ -96,8 +107,6 @@ void Confirm::Update(void)
 	// 選択処理
 	UpdateSelect();
 
-	// マウスを左クリックされなかったら、処理しない
-	if (!InputManager::GetInstance()->DecideButton()) return;
 	// どの選択肢も選ばれていない場合は処理しない
 	if (currentSelect_ == SELECT::NONE) return;
 
@@ -118,7 +127,7 @@ void Confirm::Update(void)
 void Confirm::Draw(void)
 {
 	// 確認の画面を描画
-	DrawGraph(0, 0, confirmImg_, true);	
+	DrawGraph(0, 0, confirmImg_, true);
 
 	// 猫を描画
 	DrawGraph(0, 0, catImg_[static_cast<int>(currentCat_)], true);
@@ -126,7 +135,16 @@ void Confirm::Draw(void)
 	// ボタン描画
 	for (const auto& button : selectButtons_)
 	{
-		DrawGraph(button.x, button.y, button.graphHandle, true);
+		// 選択されているボタン
+		if (button.type == currentSelect_)
+		{
+			DrawRotaGraphF(button.x, button.y, 1.0f, 0.0f, button.graphHandleOn, true);
+		}
+		// 選択されていないボタン
+		else
+		{
+			DrawRotaGraphF(button.x, button.y, 1.0f, 0.0f, button.graphHandleOff, true);
+		}
 	}
 }
 
@@ -135,7 +153,8 @@ void Confirm::Release(void)
 	// 画像を解放
 	for (const auto& button : selectButtons_)
 	{
-		DeleteGraph(button.graphHandle);
+		DeleteGraph(button.graphHandleOff);
+		DeleteGraph(button.graphHandleOn);
 	}
 	selectButtons_.clear();
 
@@ -174,23 +193,31 @@ void Confirm::ChangeCat(CAT_TYPE type)
 
 void Confirm::UpdateYes(void)
 {
-	// 画像のロード
-	switch (SceneManager::GetInstance()->GetNowSceneTag())
+	// 決定ボタンを押されたら
+	if (InputManager::GetInstance()->DecideButton())
 	{
-	case SCENE_TAG::TITLE:
-	case SCENE_TAG::MAINMANU:
-		Application::GetInstance()->SetEnd(true);
-		break;
+		// 画像のロード
+		switch (SceneManager::GetInstance()->GetNowSceneTag())
+		{
+		case SCENE_TAG::TITLE:
+		case SCENE_TAG::MAINMANU:
+			Application::GetInstance()->SetEnd(true);
+			break;
 
-	default:
-		break;
+		default:
+			break;
+		}
 	}
 }
 
 void Confirm::UpdateNo(void)
 {
-	// 確認シーンを閉じる
-	SceneManager::GetInstance()->PopScene();
+	// 決定ボタンを押されたら
+	if (InputManager::GetInstance()->DecideButton())
+	{
+		// 確認シーンを閉じる
+		SceneManager::GetInstance()->PopScene();
+	}
 }
 
 void Confirm::UpdateSelect(void)

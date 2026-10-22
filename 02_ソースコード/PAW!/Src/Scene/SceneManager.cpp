@@ -14,8 +14,6 @@ SceneManager* SceneManager::instance_ = nullptr;
 SceneManager::SceneManager(void)
 {
 	scenes_.clear();
-	load_ = nullptr;
-	isGameEnd_ = false;
 }
 
 SceneManager::~SceneManager(void)

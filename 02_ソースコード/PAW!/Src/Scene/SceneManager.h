@@ -67,12 +67,6 @@ public:
 	// 強制的に特定のシーンに飛ぶ。リセットをかけ特定のシーンのみにする。
 	void JumpScene(std::shared_ptr<SceneBase> scene);
 
-	// ゲーム終了
-	void GameEnd(void) { isGameEnd_ = true; }
-
-	// ゲーム終了取得
-	bool GetGameEnd(void) { return isGameEnd_; }
-
 	// ゲームクリアかどうか取得
 	const bool GetIsClear(void) { return isClear_; }
 	// ゲームオーバーかどうか取得
@@ -116,10 +110,7 @@ private:
 	std::shared_ptr<SceneBase> nextScene_;
 
 	// ロード画面
-	Loading* load_;
-
-	// ゲーム終了
-	bool isGameEnd_;
+	Loading* load_= nullptr;
 
 	// ゲームクリア判定用
 	bool isClear_;

@@ -1,17 +1,17 @@
 #include <memory>
 #include <vector>
-
-#include "MainMenu.h"
+#include <DxLib.h>
 
 #include "../../../Input/InputManager.h"
 #include "../../../Audio/AudioManager.h"
-//#include "../../Common/FrameRenderer/FrameRenderer.h"
 #include "../../SceneManager.h"
 #include "../../../Collision/CollisionMath.h"
 #include "../../../Application.h"
 #include "../Confirm/Confirm.h"
 #include "../Game/GameScene.h"
 #include "../Title/TitleScene.h"
+
+#include "MainMenu.h"
 
 namespace
 {
@@ -34,7 +34,6 @@ namespace
 
 MainMenu::MainMenu(void)
 {
-	confirm_ = nullptr;
 }
 
 MainMenu::~MainMenu(void)
@@ -44,8 +43,6 @@ MainMenu::~MainMenu(void)
 void MainMenu::Init(void)
 {
 	ChangeSelect(MENU::NONE);
-
-	confirm_ = std::make_shared<Confirm>();
 
 	//AudioManager::GetInstance()->PlayBGM(SoundID::BGM_MAINMENU);
 }
@@ -58,13 +55,12 @@ void MainMenu::Load(void)
 	menuButtons_.clear();
 
 	// GameStart画像設定
-	menuButtons_.push_back({ 
+	menuButtons_.push_back({
 		MENU::GAME_START,
 		LoadGraph("Data/Image/MainMenu/Button/GameStartOff.png"),
 		LoadGraph("Data/Image/MainMenu/Button/GameStartOn.png"),
 		GAME_START_POS_X, GAME_START_POS_Y,
-		IMAGE_SIZE_X, IMAGE_SIZE_Y 
-		});
+		IMAGE_SIZE_X, IMAGE_SIZE_Y });
 
 	// Title画像設定
 	menuButtons_.push_back({
@@ -72,8 +68,7 @@ void MainMenu::Load(void)
 		LoadGraph("Data/Image/MainMenu/Button/TitleOff.png"),
 		LoadGraph("Data/Image/MainMenu/Button/TitleOn.png"),
 		TITLE_POS_X, TITLE_POS_Y,
-		IMAGE_SIZE_X, IMAGE_SIZE_Y
-		});
+		IMAGE_SIZE_X, IMAGE_SIZE_Y });
 
 	// GameEnd画像設定
 	menuButtons_.push_back({
@@ -81,9 +76,7 @@ void MainMenu::Load(void)
 		LoadGraph("Data/Image/MainMenu/Button/ExitOff.png"),
 		LoadGraph("Data/Image/MainMenu/Button/ExitOn.png"),
 		GAME_END_POS_X, GAME_END_POS_Y,
-		IMAGE_SIZE_X, IMAGE_SIZE_Y
-		});
-
+		IMAGE_SIZE_X, IMAGE_SIZE_Y });
 }
 
 void MainMenu::LoadEnd(void)
@@ -169,30 +162,28 @@ void MainMenu::ChangeSelect(MENU menu)
 
 void MainMenu::UpdateGameStart(void)
 {
-	// 決定ボタンを押が押されたら
+	// 決定ボタンを押されたら
 	if (InputManager::GetInstance()->DecideButton())
 	{
 		SceneManager::GetInstance()->NextChangeScene(std::make_shared<GameScene>(), SCENE_TAG::GAME, true);
-		//SceneManager::GetInstance()->PushScene(confirm_);
 	}
 }
 
 void MainMenu::UpdateTitle(void)
 {
-	// 決定ボタンを押が押されたら
+	// 決定ボタンを押されたら
 	if (InputManager::GetInstance()->DecideButton())
 	{
 		SceneManager::GetInstance()->PopScene();
-		//SceneManager::GetInstance()->PushScene(confirm_);
 	}
 }
 
 void MainMenu::UpdateExit(void)
 {
-	// 決定ボタンを押が押されたら
+	// 決定ボタンを押されたら
 	if (InputManager::GetInstance()->DecideButton())
 	{
-		SceneManager::GetInstance()->GameEnd();
+		Application::GetInstance()->SetEnd(true);
 	}
 }
 
@@ -224,15 +215,15 @@ void MainMenu::SelectUpgrade(void)
 void MainMenu::MouseSelect(void)
 {
 	MENU nextMenu = MENU::NONE;
-	
+
 	// 衝突判定
 	for (const auto& button : menuButtons_)
 	{
 		// ボタンと当たっているか
 		if (Collision::HitMouseImg2Box(
-			{button.x - static_cast<float>(button.sizeX / 2),
+			{ button.x - static_cast<float>(button.sizeX / 2),
 			button.y - static_cast<float>(button.sizeY / 2) },
-			static_cast<float>(button.sizeX), 
+			static_cast<float>(button.sizeX),
 			static_cast<float>(button.sizeY)))
 		{
 			// 当たっている場所をアクティブなボタンに変更

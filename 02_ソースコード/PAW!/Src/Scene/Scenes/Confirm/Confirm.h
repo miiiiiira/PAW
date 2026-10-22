@@ -29,10 +29,11 @@ public:
 
 	struct ButtonInfo
 	{
-		SELECT type;
-		int graphHandle;
-		int x, y;
-		int sizeX, sizeY;
+		SELECT type;		// 選択している種類
+		int graphHandleOff;	// 選択されていない場合の画像ハンドル
+		int graphHandleOn;	// 選択されている場合の画像ハンドル
+		float x, y;			// 座標
+		int sizeX, sizeY;	// 画像サイズ
 	};
 
 public:

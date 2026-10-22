@@ -1,8 +1,6 @@
 #pragma once
 
 #include "../../SceneBase.h"
-#include <DxLib.h>
-
 
 class Confirm;
 
@@ -40,6 +38,13 @@ public:
 	void Release(void)	override;	// 解放
 
 private:
+	// メニューボタンの情報を格納する配列
+	std::vector<ButtonInfo> menuButtons_;
+
+	// 現在選択しているメニュー
+	MENU currentMenu_;
+
+private:
 	// 選択中の種類を変更
 	void ChangeSelect(MENU menu);
 
@@ -52,14 +57,4 @@ private:
 	void SelectUpgrade(void);	
 	void MouseSelect(void);		// マウス選択
 	void PadSelect(void);		// パッド選択
-
-private:
-
-	std::shared_ptr<Confirm> confirm_;
-
-	// メニューボタンの情報を格納する配列
-	std::vector<ButtonInfo> menuButtons_;
-
-	// 現在選択しているメニュー
-	MENU currentMenu_;
 };
