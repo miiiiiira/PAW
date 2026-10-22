@@ -18,7 +18,7 @@ namespace
 
 	// 移動設定
 	constexpr float MOVE_SPEED = 15.0f;			// 移動速度
-	constexpr float ATTACK_MOVE_SPEED = 12.0f;	// 攻撃時の移動速度
+	constexpr float ATTACK_MOVE_SPEED = 10.0f;	// 攻撃時の移動速度
 	constexpr float HIT_MOVE_SPEED = 20.0f;		// 吹っ飛びリアクション時の移動速度
 	constexpr float FRICTION = 0.5f;			// 摩擦
 	constexpr float AVOID_DISTANCE = 500.0f;	// 回避距離
@@ -550,7 +550,7 @@ void Player::UpdateAttack1(Player& player)
 	}
 
 	// アニメーションが攻撃終了フレーム以上になっていたら
-	if (player.animation_->GetStep() >= 18.0f)
+	if (player.animation_->GetStep() >= player.animation_->GetTotalAnimTime())
 	{
 		// カプセルコライダーのタグがNONEになってたら処理を行わない
 		if (player.sphereCollder_->GetCollisionTag() == CollisionTag::NONE)return;
@@ -559,7 +559,7 @@ void Player::UpdateAttack1(Player& player)
 		player.EndAttaking();
 	}
 	// アニメーションが攻撃開始フレーム以上になっているかつ攻撃終了フレームより小さければ
-	else if (player.animation_->GetStep() >= 8.0f && player.animation_->GetStep() < 18.0f)
+	else if (player.animation_->GetStep() >= 8.0f && player.animation_->GetStep() < player.animation_->GetTotalAnimTime())
 	{
 		// カプセルコライダーのタグがNONEではなかったら処理を行わない
 		if (player.sphereCollder_->GetCollisionTag() != CollisionTag::NONE)return;
