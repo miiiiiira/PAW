@@ -17,12 +17,6 @@ class SphereCollider;
 class Player : public Component
 {
 public:
-	// プレイヤーのカプセルオフセット
-	static constexpr VECTOR STANDING_CAP_END_OFFSET = { 0.0f,30.0f,0.0f };		// エンド位置
-	static constexpr VECTOR STANDING_CAP_START_OFFSET = { 0.0f,150.0f,0.0f };	// 立ち状態スタート位置
-	static constexpr VECTOR MOVE_CAP_START_OFFSET = { 0.0f,135.0f,0.0f };		// 移動状態スタート位置
-	static constexpr VECTOR CROUCHING_CAP_START_OFFSET = { 0.0f,60.0f,0.0f };	// しゃがみ状態スタート位置
-
 	// ステージの当たり判定用の法線
 	static constexpr float FLOOR_NORMAL_Y = 0.85f;	// 床
 	static constexpr float WALL_NORMAL_Y = 0.20f;	// 壁
@@ -38,21 +32,17 @@ public:
 	void Init(void) override;	// 初期化
 	void Update(void) override;	// 更新
 	void Draw2D(void) override;	// 2D描画
-	void Draw3D(void) override;	// 3D描画
 
 public:
 	// Transformを返す
 	Transform* GetTransform(void) { return transform_; }
-	
-	// プレイヤーの頭座標を返す
-	VECTOR GetPlayerHeadPos(void) { return { transform_->pos_.x,transform_->pos_.y + HEAD_POS_OFFSET ,transform_->pos_.z }; }
 
 	// プレイヤー状態を取得
 	PLAYER_STATE GetState(void) { return stateCtrl_.state_; }
-	
+
 private:
 	// 状態別更新処理
-	void UpdateState(void);	
+	void UpdateState(void);
 
 	// 状態別初期化
 	static void InitIdle(Player& player);		// 待機
@@ -73,7 +63,7 @@ private:
 	static void UpdateDead(Player& player);		// 死亡
 	static void UpdateEnd(Player& player);		// 終了
 	// 状態を変更させる
-	void ChangeState(PLAYER_STATE state);	
+	void ChangeState(PLAYER_STATE state);
 
 	// 状態別初期化
 	static void InitAttack1(Player& player);	// 攻撃1
@@ -111,33 +101,29 @@ private:
 	void ChangeHitState(PLAYER_HIT_STATE state);
 
 private:
-	// 頭座標
-	static constexpr float HEAD_POS_OFFSET = 100.0f;
-
-private:
 	// コンポーネント追加
 	void AddComponets(void);
 
 	// 重力
-	void ApplyGravity(void);	
+	void ApplyGravity(void);
 
 	// 無敵時間を更新
-	void UpdateInvincible(void);	
+	void UpdateInvincible(void);
 
 	// ヒットストップ更新
-	void UpdateHitStop(void);	
-	
+	void UpdateHitStop(void);
+
 	// ヒットストップカウンタが0じゃない場合に揺らし量を計算
-	void GetShakeOffset(int& offset);	
+	void GetShakeOffset(int& offset);
 
 	// 移動しているかを渡す		true / 移動している, false / 移動していない
-	bool InputMove(void);	
+	bool InputMove(void);
 
 	// 方向×移動速度で移動量を作って、座標に足して移動させる
-	void Move(void);	
+	void Move(void);
 
 	// 死亡座標へ到達しているか
-	void IsReachedDeadPos(void);	
+	void IsReachedDeadPos(void);
 
 	// 角度処理
 	void RotAngle(void);
@@ -148,8 +134,21 @@ private:
 	// 吹っ飛びリアクションをさせる
 	void SetHitReact(VECTOR moveDir);
 
+	// 攻撃が当たった場合の後処理
+	bool OnAttackHit(void);
+
+	// アニメーション進行度に応じて攻撃判定のON/OFF
+	// (攻撃の判定をスタートさせるフレーム)
+	void UpdateAttackState(float StartAttackFramee);
+
+	// 次の攻撃入力を受け付ける
+	void AcceptNextAttackInput(void);
+
 	// 攻撃状態を終了させる
 	void EndAttaking(void);
+
+	// 攻撃開始処理(アニメーション再生とフラグ初期化)
+	void StartAttack(PLAYER_ANIMATION anim);
 
 	// 衝突判定の検知
 	void OnCollision(Collider* other) override;
@@ -157,15 +156,18 @@ private:
 	void AttackOnCollision(void);
 
 	// HP描画
-	void DrawHP(void);		
+	void DrawHP(void);
+
+#ifdef _DEBUG
 
 	// デバッグ用描画
-	void DebugDraw2D(void);	
-	void DebugDraw3D(void);	
+	void DebugDraw2D(void);
+
+#endif // _DEBUG
 
 private:
 	// コンポーネント
-	Transform* transform_ = nullptr;		
+	Transform* transform_ = nullptr;
 	Render3D* render3D_ = nullptr;
 	Animation* animation_ = nullptr;
 	CapsuleCollider* capsuleCollder_ = nullptr;
@@ -173,8 +175,8 @@ private:
 
 private:
 	// プレイヤー情報
-	playerInfo info_;	
+	playerInfo info_;
 
 	// プレイヤーの状態情報
-	playerStateCtrl stateCtrl_;			
+	playerStateCtrl stateCtrl_;
 };

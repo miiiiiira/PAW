@@ -62,6 +62,14 @@ void GameOver::Update(void)
 
 #endif // _DEBUG
 
+	// 何かのボタンを押されたら、タイトルに遷移
+	if (InputManager::GetInstance()->PushAnyButton())
+	{
+		// ゲームシーンへ
+		SceneManager::GetInstance()->NextChangeScene(std::make_shared<TitleScene>(), TITLE);
+		return;
+	}
+
 	// 選択処理
 	SelectUpdate();
 
@@ -97,11 +105,7 @@ void GameOver::Update(void)
 
 void GameOver::Draw(void)
 {
-#ifdef _DEBUG
-
-	DrawString(0, 0, "GameOver", 0xffffff);
-
-#endif // _DEBUG
+	DrawString(Application::SCREEN_SIZE_X / 2, Application::SCREEN_SIZE_Y / 2, "GameOver", 0xffffff);
 }
 
 void GameOver::Release(void)

@@ -100,15 +100,11 @@ void Loading::Draw(void)
 		handles_[static_cast<int>(nowType_)],
 		true);
 
-#ifdef _DEBUG
-
 	DrawString(
 		Application::SCREEN_SIZE_X/2, 
 		Application::SCREEN_SIZE_Y/2, 
 		"loading",
 		0xffffff);
-
-#endif // _DEBUG
 }
 
 void Loading::Release(void)

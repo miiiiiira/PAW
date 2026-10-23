@@ -58,28 +58,28 @@ struct playerStateCtrl
 {
 	// プレイヤーの状態
 	// ステート
-	PLAYER_STATE state_;
+	PLAYER_STATE state_ = PLAYER_STATE_MAX;
 	// ステートテーブル
 	playerStateFunction initStateTable_[PLAYER_STATE_MAX];
 	playerStateFunction updateStateTable_[PLAYER_STATE_MAX];
 
 	// プレイヤー攻撃状態
 	// ステート
-	PLAYER_ATTACK_STATE attackState_;
+	PLAYER_ATTACK_STATE attackState_ = PLAYER_ATTACK_MAX;
 	// ステートテーブル
 	playerStateFunction initAttackTable_[PLAYER_ATTACK_MAX];
 	playerStateFunction updateAttackTable_[PLAYER_ATTACK_MAX];
 
 	// プレイヤージャンプ状態
 	// ステート
-	PLAYER_JUMP_STATE jumpState_;
+	PLAYER_JUMP_STATE jumpState_ = PLAYER_JUMP_MAX;
 	// ステートテーブル
 	playerStateFunction initJumpTable_[PLAYER_JUMP_MAX];
 	playerStateFunction updateJumpTable_[PLAYER_JUMP_MAX];
 
 	// プレイヤー被ダメージ状態
 	// ステート
-	PLAYER_HIT_STATE hitState_;
+	PLAYER_HIT_STATE hitState_ = PLAYER_HIT_MAX;
 	// ステートテーブル
 	playerStateFunction initHitTable_[PLAYER_HIT_MAX];
 	playerStateFunction updateHitTable_[PLAYER_HIT_MAX];
@@ -89,7 +89,7 @@ struct playerInfo
 {
 	float velocityY_ = 0.0f;	// 現在の落下速度
 
-	VECTOR moveDir_ = {0.0f,0.0f,0.0f};	// 移動方向
+	VECTOR moveDir_ = {0.0f,0.0f,0000000.1f};	// 移動方向
 
 	float moveSpeed_ = 0;	// 移動速度
 
@@ -102,6 +102,9 @@ struct playerInfo
 	int hitStopCounter_ = 0;	// ヒットストップ用のカウンター
 
 	bool isAttackHit_ = false;	// 攻撃が当たったか		true / 当たった , false / 当たっていない
+	
+	PLAYER_ATTACK_STATE currentAttack_ = PLAYER_ATTACK_MAX;	// 攻撃中の種類を入れる
+	PLAYER_ATTACK_STATE nextAttack_ = PLAYER_ATTACK_MAX;	// 攻撃予約された種類を入れる
 };
 
 enum class PLAYER_ANIMATION
@@ -112,8 +115,8 @@ enum class PLAYER_ANIMATION
 	RUN,
 	JUMP,
 	PUNCH,
-	PUNCH2,
-	PUNCH3,
+	PUNCH_2,
+	PUNCH_3,
 	SCRATCH,
 	LOAF,
 	GROOMING,

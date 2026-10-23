@@ -113,11 +113,8 @@ void Pause::Draw(void)
 		DrawGraph(button.x, button.y, button.graphHandle, true);		// ƒƒjƒ…[‚Ì•¶š‚ğ•\¦
 	}
 
-#ifdef _DEBUG
 
-	DrawString(0, 0, "Pause", 0xffffff);
-
-#endif // _DEBUG
+	DrawString(Application::SCREEN_SIZE_X / 2, Application::SCREEN_SIZE_Y / 2, "Pause", 0xffffff);
 }
 
 void Pause::Release(void)

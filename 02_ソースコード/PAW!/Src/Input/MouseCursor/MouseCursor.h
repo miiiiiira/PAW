@@ -22,7 +22,7 @@ private:
 
 public:
 	// マウス画像のサイズ
-	static constexpr int MOUSE_IMG_SIZE_WID = 38;	// 横
+	static constexpr int MOUSE_IMG_SIZE_WID = 39;	// 横
 	static constexpr int MOUSE_IMG_SIZE_HIG = 45;	// 縦
 
 public:

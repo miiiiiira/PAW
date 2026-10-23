@@ -49,11 +49,7 @@ void GameClear::Update(void)
 
 void GameClear::Draw(void)
 {
-#ifdef _DEBUG
-
-	DrawString(0, 0, "GameClear", 0xffffff);
-
-#endif // _DEBUG
+	DrawString(Application::SCREEN_SIZE_X / 2, Application::SCREEN_SIZE_Y / 2, "GameClear", 0xffffff);
 }
 
 void GameClear::Release(void)

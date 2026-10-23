@@ -18,7 +18,7 @@ namespace
 
 	// 移動設定
 	constexpr float MOVE_SPEED = 15.0f;			// 移動速度
-	constexpr float ATTACK_MOVE_SPEED = 10.0f;	// 攻撃時の移動速度
+	constexpr float ATTACK_MOVE_SPEED = 12.0f;	// 攻撃時の移動速度
 	constexpr float HIT_MOVE_SPEED = 20.0f;		// 吹っ飛びリアクション時の移動速度
 	constexpr float FRICTION = 0.5f;			// 摩擦
 	constexpr float AVOID_DISTANCE = 500.0f;	// 回避距離
@@ -40,13 +40,26 @@ namespace
 	// ダメージ設定
 	constexpr int SHAKE_TIME = 20;		// 揺らす時間
 
+	// 攻撃設定
+	constexpr float HIT_ATTACK_FRAME = 3.0f;	// 攻撃が当たるアニメーションフレーム
+
 	// 描画設定
 	constexpr int  STATUS_DRAW_POS_X = 10;		// ステータス描画を始める座標
 	constexpr int  HP_DRAW_POS_Y = 50;			// HPの描画Y軸
 	constexpr int STATUS_DRAW_POS_OFFSET = 10;	// オフセット
 
 	// アニメーション設定
-	constexpr float ANIM_SPEED = 0.7f;
+	constexpr float ANIM_SPEED_STANDING_IDLE = 0.7f;
+	constexpr float ANIM_SPEED_SITTING_IDLE = 0.7f;
+	constexpr float ANIM_SPEED_WALK = 0.7f;
+	constexpr float ANIM_SPEED_RUN = 0.7f;
+	constexpr float ANIM_SPEED_JUMP = 0.7f;
+	constexpr float ANIM_SPEED_PUNCH = 0.6f;
+	constexpr float ANIM_SPEED_PUNCH_2 = 0.6f;
+	constexpr float ANIM_SPEED_PUNCH_3 = 0.5f;
+	constexpr float ANIM_SPEED_SCRATCH = 0.7f;
+	constexpr float ANIM_SPEED_LOAF = 0.7f;
+	constexpr float ANIM_SPEED_GROOMING = 0.7f;
 }
 
 Player::Player(void)
@@ -162,64 +175,6 @@ void Player::Draw2D(void)
 #endif // _DEBUG
 }
 
-void Player::Draw3D(void)
-{
-#ifdef _DEBUG
-	DebugDraw3D();
-#endif // _DEBUG
-}
-
-void Player::SetDamage(int damage)
-{
-	// 無敵時間があればダメージを与えない
-	if (info_.invincibleTime_ > 0)return;
-
-	// HPにダメージを与える
-	info_.hp_ -= damage;
-
-	// HPが0以下になったら
-	if (info_.hp_ <= 0)
-	{
-		// 0初期化しておく
-		info_.hp_ = 0;
-	}
-	else
-	{
-		// 無敵時間を設ける
-		info_.invincibleTime_ = INVINCIBLE_TIME;
-
-		// HP描画を揺らす
-		info_.hitStopCounter_ = SHAKE_TIME;
-	}
-}
-
-void Player::SetHitReact(VECTOR moveDir)
-{
-	// 吹っ飛び方向を算出
-	moveDir.x *= -1.0f;
-	moveDir.z *= -1.0f;
-
-	// 指定された移動向きを設定
-	info_.moveDir_ = moveDir;
-
-	// 指定された移動速度を設定
-	info_.moveSpeed_ = HIT_MOVE_SPEED;
-
-	// 指定されたジャンプ力を設定
-	info_.velocityY_ = HIT_JUMP_POW;
-
-	// ダメージを受けたステートへ
-	ChangeState(PLAYER_STATE_HIT);
-}
-
-void Player::EndAttaking(void)
-{
-	// カプセルコライダーのタグをNONEへ
-	sphereCollder_->SetCollisionTag(CollisionTag::NONE);
-	// 攻撃終了状態へ
-	ChangeAttackState(PLAYER_ATTACK_STATE::PLAYER_ATTACK_END);
-}
-
 void Player::UpdateState(void)
 {
 	// Transformがなければ処理しない
@@ -253,9 +208,6 @@ void Player::InitMove(Player& player)
 
 void Player::InitAttack(Player& player)
 {
-	// プレイヤーの移動速度を設定
-	player.info_.moveSpeed_ = ATTACK_MOVE_SPEED;
-
 	// 初期化
 	player.ChangeAttackState(PLAYER_ATTACK_1);
 }
@@ -360,6 +312,7 @@ void Player::UpdateMove(Player& player)
 	{
 		// 待機状態へ
 		player.ChangeState(PLAYER_STATE_IDLE);
+		return;
 	}
 
 	// 攻撃ボタンが押されていたら
@@ -401,7 +354,7 @@ void Player::UpdateAttack(Player& player)
 	// nullチェック
 	if (player.stateCtrl_.updateAttackTable_[player.stateCtrl_.attackState_])
 	{
-		// 状態別初期化
+		// 状態別更新
 		player.stateCtrl_.updateAttackTable_[player.stateCtrl_.attackState_](player);
 	}
 
@@ -478,7 +431,7 @@ void Player::UpdateJump(Player& player)
 	// nullチェック
 	if (player.stateCtrl_.updateJumpTable_[player.stateCtrl_.jumpState_])
 	{
-		// 状態別初期化
+		// 状態別更新
 		player.stateCtrl_.updateJumpTable_[player.stateCtrl_.jumpState_](player);
 	}
 }
@@ -488,7 +441,7 @@ void Player::UpdateHit(Player& player)
 	// nullチェック
 	if (player.stateCtrl_.updateHitTable_[player.stateCtrl_.hitState_])
 	{
-		// 状態別初期化
+		// 状態別更新
 		player.stateCtrl_.updateHitTable_[player.stateCtrl_.hitState_](player);
 	}
 }
@@ -522,18 +475,20 @@ void Player::ChangeState(PLAYER_STATE state)
 
 void Player::InitAttack1(Player& player)
 {
-	// 攻撃アニメーションを再生
-	player.animation_->Play(static_cast<int>(PLAYER_ANIMATION::PUNCH), false);
-
-	player.info_.isAttackHit_ = false;
+	// 攻撃開始処理
+	player.StartAttack(PLAYER_ANIMATION::PUNCH);
 }
 
 void Player::InitAttack2(Player& player)
 {
+	// 攻撃開始処理
+	player.StartAttack(PLAYER_ANIMATION::PUNCH_2);
 }
 
 void Player::InitAttack3(Player& player)
 {
+	// 攻撃開始処理
+	player.StartAttack(PLAYER_ANIMATION::PUNCH_3);
 }
 
 void Player::InitAttackEnd(Player& player)
@@ -542,53 +497,52 @@ void Player::InitAttackEnd(Player& player)
 
 void Player::UpdateAttack1(Player& player)
 {
-	if (player.info_.isAttackHit_)
-	{
-		player.EndAttaking();
-		player.info_.isAttackHit_ = false;
-		return;
-	}
+	// 攻撃が当たった場合の後処理
+	if (player.OnAttackHit())return;
 
-	// アニメーションが攻撃終了フレーム以上になっていたら
-	if (player.animation_->GetStep() >= player.animation_->GetTotalAnimTime())
-	{
-		// カプセルコライダーのタグがNONEになってたら処理を行わない
-		if (player.sphereCollder_->GetCollisionTag() == CollisionTag::NONE)return;
-
-		// 攻撃状態を終了
-		player.EndAttaking();
-	}
-	// アニメーションが攻撃開始フレーム以上になっているかつ攻撃終了フレームより小さければ
-	else if (player.animation_->GetStep() >= 8.0f && player.animation_->GetStep() < player.animation_->GetTotalAnimTime())
-	{
-		// カプセルコライダーのタグがNONEではなかったら処理を行わない
-		if (player.sphereCollder_->GetCollisionTag() != CollisionTag::NONE)return;
-
-		// カプセルコライダーのタグをプレイヤー攻撃へ
-		player.sphereCollder_->SetCollisionTag(CollisionTag::PLAYER_ATTACK);
-	}
+	// アニメーション進行度に応じて攻撃判定のON/OFF	次の攻撃予約を管理する
+	player.UpdateAttackState(HIT_ATTACK_FRAME);
 }
 
 void Player::UpdateAttack2(Player& player)
 {
-	// 待機状態へ
-	player.ChangeState(PLAYER_STATE_IDLE);
+	// 攻撃が当たった場合の後処理
+	if (player.OnAttackHit())return;
+
+	// アニメーション進行度に応じて攻撃判定のON/OFF	次の攻撃予約を管理する
+	player.UpdateAttackState(HIT_ATTACK_FRAME);
 }
 
 void Player::UpdateAttack3(Player& player)
 {
-	// 待機状態へ
-	player.ChangeState(PLAYER_STATE_IDLE);
+	// 攻撃が当たった場合の後処理
+	if (player.OnAttackHit())return;
+
+	// アニメーション進行度に応じて攻撃判定のON/OFF
+	player.UpdateAttackState(HIT_ATTACK_FRAME);
 }
 
 void Player::UpdateAttackEnd(Player& player)
 {
-	// アニメーションを再生し終えていたら
-	if (player.animation_->IsEnd())
+	// 次の攻撃入力を受け付ける
+	player.AcceptNextAttackInput();
+
+	// アニメーションを再生し終えていなかったら処理を行わない
+	if (!player.animation_->IsEnd())return;
+
+	// 次の攻撃が予約されていなかったら
+	if (player.info_.nextAttack_ == PLAYER_ATTACK_MAX ||
+		player.info_.nextAttack_ == PLAYER_ATTACK_END ||
+		player.info_.currentAttack_ == player.info_.nextAttack_)
 	{
 		// 待機状態へ
 		player.ChangeState(PLAYER_STATE_IDLE);
-		return;
+	}
+	// 次の攻撃が予約されていたら
+	else
+	{
+		// 予約している攻撃の種類へ
+		player.ChangeAttackState(player.info_.nextAttack_);
 	}
 }
 
@@ -664,6 +618,7 @@ void Player::InitHitStun(Player& player)
 
 void Player::InitHitEnd(Player& player)
 {
+	// プレイヤーの移動向きを元に戻す
 	player.info_.moveDir_.x *= -1.0f;
 	player.info_.moveDir_.z *= -1.0f;
 }
@@ -747,7 +702,7 @@ void Player::AddComponets(void)
 	sphereCollder_->Init();
 	// 球の設定
 	sphereCollder_->SetCenterOffset(VGet(0.0f, 70.0f, -120.0f));
-	sphereCollder_->SetRadius(70.0f);
+	sphereCollder_->SetRadius(120.0f);
 	// タグの設定
 	sphereCollder_->SetCollisionTag(CollisionTag::NONE);
 	sphereCollder_->SetInverseMass(-1.0f);
@@ -761,13 +716,50 @@ void Player::AddComponets(void)
 	animation_ = owner_->AddComponent<Animation>();
 	animation_->Init();
 	// アニメーション登録
-	for (int i = 0; i < static_cast<int>(PLAYER_ANIMATION::MAX); i++)
-	{
-		animation_->AddInFbx(
-			static_cast<int>(i),
-			ANIM_SPEED,
-			static_cast<int>(i));
-	}
+	animation_->AddInFbx(
+		static_cast<int>(PLAYER_ANIMATION::STANDING_IDLE),
+		ANIM_SPEED_STANDING_IDLE,
+		static_cast<int>(PLAYER_ANIMATION::STANDING_IDLE));
+	animation_->AddInFbx(
+		static_cast<int>(PLAYER_ANIMATION::SITTING_IDLE),
+		ANIM_SPEED_SITTING_IDLE,
+		static_cast<int>(PLAYER_ANIMATION::SITTING_IDLE));
+	animation_->AddInFbx(
+		static_cast<int>(PLAYER_ANIMATION::WALK),
+		ANIM_SPEED_WALK,
+		static_cast<int>(PLAYER_ANIMATION::WALK));
+	animation_->AddInFbx(
+		static_cast<int>(PLAYER_ANIMATION::RUN),
+		ANIM_SPEED_RUN,
+		static_cast<int>(PLAYER_ANIMATION::RUN));
+	animation_->AddInFbx(
+		static_cast<int>(PLAYER_ANIMATION::JUMP),
+		ANIM_SPEED_JUMP,
+		static_cast<int>(PLAYER_ANIMATION::JUMP));
+	animation_->AddInFbx(
+		static_cast<int>(PLAYER_ANIMATION::PUNCH),
+		ANIM_SPEED_PUNCH,
+		static_cast<int>(PLAYER_ANIMATION::PUNCH));
+	animation_->AddInFbx(
+		static_cast<int>(PLAYER_ANIMATION::PUNCH_2),
+		ANIM_SPEED_PUNCH_2,
+		static_cast<int>(PLAYER_ANIMATION::PUNCH_2));
+	animation_->AddInFbx(
+		static_cast<int>(PLAYER_ANIMATION::PUNCH_3),
+		ANIM_SPEED_PUNCH_3,
+		static_cast<int>(PLAYER_ANIMATION::PUNCH_3));
+	animation_->AddInFbx(
+		static_cast<int>(PLAYER_ANIMATION::SCRATCH),
+		ANIM_SPEED_SCRATCH,
+		static_cast<int>(PLAYER_ANIMATION::SCRATCH));
+	animation_->AddInFbx(
+		static_cast<int>(PLAYER_ANIMATION::LOAF),
+		ANIM_SPEED_LOAF,
+		static_cast<int>(PLAYER_ANIMATION::LOAF));
+	animation_->AddInFbx(
+		static_cast<int>(PLAYER_ANIMATION::GROOMING),
+		ANIM_SPEED_GROOMING,
+		static_cast<int>(PLAYER_ANIMATION::GROOMING));
 }
 
 void Player::ApplyGravity(void)
@@ -825,11 +817,11 @@ void Player::GetShakeOffset(int& offset)
 		// 振動先をカウンターから計算する----------
 		// 0 or 1
 		offset = (info_.hitStopCounter_ / 5) % 2;
-		// 0 or 2　中心を作る
+		// 0 or 2 中心を作る
 		offset *= 2;
-		// -1 or 1　0を中心にする
+		// -1 or 1 0を中心にする
 		offset -= 1;
-		// -3 or 3　振れ幅を付ける
+		// -5 or 5 振れ幅を付ける
 		offset *= 5;
 		// ----------------------------------------
 	}
@@ -882,11 +874,31 @@ void Player::Move(void)
 
 void Player::IsReachedDeadPos(void)
 {
-	// 一定の座標いったら
-	if (transform_->pos_.y < DAMAGE_POS_Y)
+	// 死亡処理中は行わない
+	if (stateCtrl_.state_ == PLAYER_STATE_DEAD ||
+		stateCtrl_.state_ == PLAYER_STATE_END) return;
+
+	if (transform_->pos_.y >= DAMAGE_POS_Y) return;
+
+	// ダメージを受ける
+	SetDamage(1);
+
+	// 座標を初期化
+	transform_->pos_ = {};
+
+	// 重力も初期化
+	info_.velocityY_ = 0;
+
+	// HPが0なら
+	if (info_.hp_ <= 0)
 	{
-		info_.hp_--;
-		return;
+		// 死亡状態へ
+		ChangeState(PLAYER_STATE_DEAD);
+	}
+	else
+	{
+		// 待機状態へ
+		ChangeState(PLAYER_STATE_IDLE);
 	}
 }
 
@@ -907,6 +919,136 @@ void Player::RotAngle(void)
 
 	// モデルに向きを設定
 	MV1SetRotationXYZ(render3D_->GetHandle(), transform_->angle_);
+}
+
+void Player::SetDamage(int damage)
+{
+	// 無敵時間があればダメージを与えない
+	if (info_.invincibleTime_ > 0)return;
+
+	// HPにダメージを与える
+	info_.hp_ -= damage;
+
+	// HPが0以下になったら
+	if (info_.hp_ <= 0)
+	{
+		// 0初期化しておく
+		info_.hp_ = 0;
+	}
+	else
+	{
+		// 無敵時間を設ける
+		info_.invincibleTime_ = INVINCIBLE_TIME;
+
+		// HP描画を揺らす
+		info_.hitStopCounter_ = SHAKE_TIME;
+	}
+}
+
+void Player::SetHitReact(VECTOR moveDir)
+{
+	// 吹っ飛び方向を算出のため反転
+	moveDir.x *= -1.0f;
+	moveDir.z *= -1.0f;
+
+	// 指定された移動向きを設定
+	info_.moveDir_ = moveDir;
+
+	// 指定された移動速度を設定
+	info_.moveSpeed_ = HIT_MOVE_SPEED;
+
+	// 指定されたジャンプ力を設定
+	info_.velocityY_ = HIT_JUMP_POW;
+
+	// ダメージを受けたステートへ
+	ChangeState(PLAYER_STATE_HIT);
+}
+
+bool Player::OnAttackHit(void)
+{
+	// 攻撃が当たっていたら
+	if (info_.isAttackHit_)
+	{
+		EndAttaking();
+		// 攻撃フラグを折る
+		info_.isAttackHit_ = false;
+		return true;
+	}
+
+	return false;
+}
+
+void Player::UpdateAttackState(float StartAttackFrame)
+{
+	// アニメーションが攻撃終了フレーム以上になっていたら
+	if (animation_->GetStep() >= animation_->GetTotalAnimTime())
+	{
+		// カプセルコライダーのタグがNONEになってたら処理を行わない
+		if (sphereCollder_->GetCollisionTag() == CollisionTag::NONE)return;
+
+		// 攻撃状態を終了
+		EndAttaking();
+	}
+	// アニメーションが攻撃開始フレーム以上になっているかつ攻撃終了フレームより小さければ
+	else if (animation_->GetStep() >= StartAttackFrame && animation_->GetStep() < animation_->GetTotalAnimTime())
+	{
+		// 次の攻撃入力を受け付ける
+		AcceptNextAttackInput();
+
+		// カプセルコライダーのタグがNONEではなかったら処理を行わない
+		if (sphereCollder_->GetCollisionTag() != CollisionTag::NONE)return;
+
+		// カプセルコライダーのタグをプレイヤー攻撃へ
+		sphereCollder_->SetCollisionTag(CollisionTag::PLAYER_ATTACK);
+	}
+}
+
+void Player::AcceptNextAttackInput(void)
+{
+	// 攻撃ボタンが押されたかつ、次の攻撃が予約されていなかったら
+	if (InputManager::GetInstance()->AttackButton() && info_.currentAttack_ == info_.nextAttack_)
+	{
+		// 現在の攻撃から次の攻撃を算出
+		int attack = static_cast<int>(info_.nextAttack_);
+
+		attack++;
+
+		// 上限
+		if (attack >= static_cast<int>(PLAYER_ATTACK_END))
+		{
+			attack = static_cast<int>(PLAYER_ATTACK_END);
+		}
+
+		// 次の攻撃を予約する
+		info_.nextAttack_ = static_cast<PLAYER_ATTACK_STATE>(attack);
+	}
+}
+
+void Player::EndAttaking(void)
+{
+	// カプセルコライダーのタグをNONEへ
+	sphereCollder_->SetCollisionTag(CollisionTag::NONE);
+
+	// 攻撃終了状態へ
+	ChangeAttackState(PLAYER_ATTACK_STATE::PLAYER_ATTACK_END);
+}
+
+void Player::StartAttack(PLAYER_ANIMATION anim)
+{
+	// 移動先の向きを,
+	InputMove();
+
+	// プレイヤーの移動速度を設定
+	info_.moveSpeed_ = ATTACK_MOVE_SPEED;
+
+	// 攻撃アニメーションを再生
+	animation_->Play(static_cast<int>(anim), false);
+
+	// 攻撃が当たったかフラグ初期化
+	info_.isAttackHit_ = false;
+
+	// 攻撃予約フラグ
+	info_.currentAttack_ = info_.nextAttack_ = stateCtrl_.attackState_;
 }
 
 void Player::OnCollision(Collider* other)
@@ -968,6 +1110,7 @@ void Player::DrawHP(void)
 		info_.hp_);
 }
 
+#ifdef _DEBUG
 void Player::DebugDraw2D(void)
 {
 	// プレイヤー座標表示
@@ -977,7 +1120,4 @@ void Player::DebugDraw2D(void)
 		"プレイヤー座標 : %.f,%.f,%.f",
 		transform_->pos_.x, transform_->pos_.y, transform_->pos_.z);
 }
-
-void Player::DebugDraw3D(void)
-{
-}
+#endif // _DEBUG

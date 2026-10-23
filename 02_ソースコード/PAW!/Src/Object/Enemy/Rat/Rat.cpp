@@ -40,14 +40,14 @@ namespace
 
 	// アニメーション設定
 	constexpr float ANIM_SPEED_ATTACK = 0.8f;
-	constexpr float ANIM_SPEED_ATTACK_START = 0.8f;
+	constexpr float ANIM_SPEED_ATTACK_START = 0.2f;
 	constexpr float ANIM_SPEED_DEAD = 0.4f;
 	constexpr float ANIM_SPEED_IDLE = 0.8f;
 	constexpr float ANIM_SPEED_MOVE = 0.8f;
 	constexpr float ANIM_SPEED_MOVE_CLOSER = 0.8f;
 
 	// リミット設定
-	constexpr int INVINCIBLE_TIME = 60;	// 無敵時間
+	constexpr int INVINCIBLE_TIME = 10;		// 無敵時間
 	constexpr int WAIT_TIME = 120;			// 待機時間
 	constexpr int SWAY_NUM_MAX = 4;			// 揺れの最大回数
 	constexpr int RANDOM_RIMIT = 1000;		// ランダム用の最大係数
@@ -894,10 +894,10 @@ void Rat::SetHitReact(VECTOR moveDir)
 	info_.moveDir_ = moveDir;
 
 	// 指定された移動速度を設定
-	info_.moveSpeed_ = 15.0f;
+	info_.moveSpeed_ = 7.0f;
 
 	// 指定されたジャンプ力を設定
-	info_.velocityY_ = JUMP_POW;
+	info_.velocityY_ = 10.0f;
 
 	// ダメージを受けたステートへ
 	ChangeState(RAT_STATE_HIT);

@@ -294,13 +294,14 @@ bool InputManager::JumpButton(void)
 bool InputManager::AttackButton(void)
 {
 	return  FindMouse(MOUSE_INPUT_LEFT).keyTrgDown ||
-		IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::Y);
+		IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::X);
 }
 
 bool InputManager::AvoidButton(void)
 {
 	return  IsTrgDown(KEY_INPUT_LSHIFT) ||
-		IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::B);
+		IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::L_TRIGGER) ||
+		IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::R_TRIGGER);
 }
 
 InputManager::InputManager(void)
