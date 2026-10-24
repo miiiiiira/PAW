@@ -8,6 +8,25 @@
 class ObjectManager
 {
 public:
+	// シングルトン（生成・取得・削除）
+	static void CreateInstance(void) { if (instance_ == nullptr) { instance_ = new ObjectManager(); } }
+	static ObjectManager* GetInstance(void) { return instance_; }
+	static void DeleteInstance(void) { if (instance_ != nullptr) { delete instance_; instance_ = nullptr; } }
+
+private:
+	// 静的インスタンス
+	static ObjectManager* instance_;
+
+	ObjectManager();		// コンストラクタ
+	~ObjectManager() {};	// デストラクタ
+
+	// コピー・ムーブ操作を禁止
+	ObjectManager(const ObjectManager&) = delete;
+	ObjectManager& operator=(const ObjectManager&) = delete;
+	ObjectManager(ObjectManager&&) = delete;
+	ObjectManager& operator=(ObjectManager&&) = delete;
+
+public:
 
 	// オブジェクトの生成
 	Object* CreateObject(void);

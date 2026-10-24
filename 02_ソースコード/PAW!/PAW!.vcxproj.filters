@@ -38,6 +38,7 @@
     <ClCompile Include="Src\Collision\CollisionManager.cpp" />
     <ClCompile Include="Src\Collision\CollisionMath.cpp" />
     <ClCompile Include="Src\Object\Enemy\CatRobot\CatRobot.cpp" />
+    <ClCompile Include="Src\Object\Enemy\EnemyManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Application.h" />
@@ -89,5 +90,6 @@
     <ClInclude Include="Src\Collision\CollisionMath.h" />
     <ClInclude Include="Src\Object\Enemy\CatRobot\CatRobot.h" />
     <ClInclude Include="Src\Object\Enemy\CatRobot\CatRobotInfo.h" />
+    <ClInclude Include="Src\Object\Enemy\EnemyManager.h" />
   </ItemGroup>
 </Project>

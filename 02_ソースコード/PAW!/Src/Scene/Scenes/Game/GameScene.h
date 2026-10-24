@@ -26,9 +26,6 @@ public:
 
 private:
 
-	// オブジェクトマネージャー
-	ObjectManager* objectManger_ = nullptr;
-
 	// グリッド線
 	Grid* grid_  = nullptr;
 

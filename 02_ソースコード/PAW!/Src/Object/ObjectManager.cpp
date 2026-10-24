@@ -2,6 +2,12 @@
 #include "Component/Component.h"
 #include <algorithm>
 
+ObjectManager* ObjectManager::instance_ = nullptr;
+
+ObjectManager::ObjectManager(void)
+{
+}
+
 // Objectê∂ê¨
 Object* ObjectManager::CreateObject(void)
 {
