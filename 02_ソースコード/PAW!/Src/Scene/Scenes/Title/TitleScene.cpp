@@ -57,14 +57,14 @@ void TitleScene::LoadEnd(void)
 
 void TitleScene::Update(void)
 {
+	// 条件に合わせてアルファ値を加減算する
+	UpdateAlpha();
+
 	// メニュー画面を積む
 	ChangeMainMenu();
 
 	// 確認画面を積む
 	ChangeConfirmScene();
-
-	// 条件に合わせてアルファ値を加減算する
-	UpdateAlpha();
 }
 
 void TitleScene::Draw(void)
