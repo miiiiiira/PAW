@@ -295,6 +295,24 @@ void Rat::ChangeState(RAT_STATE state)
 	}
 }
 
+bool Rat::IsCanAttack(void)
+{
+	bool isDistance = false;
+
+	// プレイヤーとの距離を調べる
+	float distance = GetDistanceToPlayer();
+
+	// プレイヤーとの距離がちょうどよかったら
+	if (distance < MAX_DISTANCE &&
+		distance > MIN_DISTANCE)
+	{
+		isDistance = true;
+	}
+
+	// 待機中かつプレイヤーとの距離がちょうどよかったらtrueを返す
+	return stateCtrl_.state_ == RAT_STATE_IDLE && isDistance;
+}
+
 void Rat::InitIdleWait(Rat& rat)
 {
 	// ネズミの移動速度を設定
@@ -346,13 +364,6 @@ void Rat::UpdateIdleWait(Rat& rat)
 	{
 		// 乱数を取得
 		int random = GetRand(RANDOM_RIMIT);
-
-		if (random > 500)
-		{
-			// 攻撃中へ
-			rat.ChangeState(RAT_STATE_ATTACK);
-			return;
-		}
 
 		// 0～1にする
 		random %= 2;
@@ -602,7 +613,6 @@ void Rat::AddComponets(void)
 {
 	// 座標の設定
 	transform_ = owner_->AddComponent<Transform>();
-	transform_->pos_ = { 0.0f,0.0f,MIN_DISTANCE };
 	transform_->angle_ = {};
 	transform_->scale_ = { 2.0f,2.0f,2.0f };
 
@@ -835,7 +845,7 @@ float Rat::GetDistanceToPlayer(void)
 
 void Rat::InitSwayRandom(void)
 {
-	info_.moveSpeed_ = GetRand(MOVE_SPEED);
+	info_.moveSpeed_ = static_cast<float>(GetRand(static_cast<int>(MOVE_SPEED)));
 	// 移動速度は最低値をつけておく
 	if (info_.moveSpeed_ < MIN_MOVE_SPEED)
 	{

@@ -19,7 +19,7 @@ namespace
 	// 移動設定
 	constexpr float MOVE_SPEED = 15.0f;			// 移動速度
 	constexpr float ATTACK_MOVE_SPEED = 12.0f;	// 攻撃時の移動速度
-	constexpr float HIT_MOVE_SPEED = 20.0f;		// 吹っ飛びリアクション時の移動速度
+	constexpr float HIT_MOVE_SPEED = 15.0f;		// 吹っ飛びリアクション時の移動速度
 	constexpr float FRICTION = 0.5f;			// 摩擦
 	constexpr float AVOID_DISTANCE = 500.0f;	// 回避距離
 	constexpr float COEFFICIENT = 0.2f;			// 線形補間の係数

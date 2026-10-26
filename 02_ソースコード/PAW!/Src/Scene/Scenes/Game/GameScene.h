@@ -9,11 +9,11 @@
 
 class ObjectManager;
 class Grid;
+class EnemyCommander;
 
 class GameScene : public SceneBase
 {
 public:
-
 	GameScene(void);				// コンストラクタ
 	~GameScene(void) override;		// デストラクタ
 
@@ -25,12 +25,13 @@ public:
 	void Release(void)	override;	// 解放
 
 private:
-
 	// グリッド線
 	Grid* grid_  = nullptr;
 
-private:
+	// 敵司令官
+	EnemyCommander* enemyCommander_ = nullptr;
 
+private:
 	// オブジェクト作成
 	// カメラの作成
 	void CameraCreate(void);	

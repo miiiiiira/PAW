@@ -22,11 +22,16 @@ public:
 	// Transformを返す
 	Transform* GetTransform(void) { return transform_; }
 
-	// 状態を取得
-	RAT_STATE GetState(void)const { return stateCtrl_.state_; }
-
 	// プレイヤーのTransformポインタを取得
 	void SetPlayerTransform(const Transform* transform) { playerTransform_ = transform; }
+
+	// 状態を取得
+	RAT_STATE GetState(void)const { return stateCtrl_.state_; }
+	// 状態を変更させる
+	void ChangeState(RAT_STATE state);
+
+	// 攻撃できる状態か
+	bool IsCanAttack(void);
 
 private:
 	// 状態別更新処理
@@ -49,8 +54,7 @@ private:
 	static void UpdateHit(Rat& rat);		// ダメージを受けた
 	static void UpdateDead(Rat& rat);		// 死亡
 	static void UpdateEnd(Rat& rat);		// 終了
-	// 状態を変更させる
-	void ChangeState(RAT_STATE state);
+
 
 	// 待機状態
 	// 状態別初期化
@@ -137,7 +141,7 @@ private:
 
 private:
 	// コンポーネント
-	Transform* transform_ = nullptr;	
+	Transform* transform_ = nullptr;
 	Render3D* render3D_ = nullptr;
 	Animation* animation_ = nullptr;
 	CapsuleCollider* capsuleCollder_ = nullptr;

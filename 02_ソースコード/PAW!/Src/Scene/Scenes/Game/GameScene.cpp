@@ -18,6 +18,7 @@
 #include "../../../Object/Enemy/Rat/Rat.h"
 #include "../../../Object/Camera/Camera.h"
 #include "../../../Object/Camera/CameraUtility.h"
+#include "../../../Object/Enemy/EnemyCommander.h"
 #include "../../../Object/Grid/Grid.h"
 
 #include "GameScene.h"
@@ -41,6 +42,9 @@ void GameScene::Init(void)
 	grid_ = new Grid();
 	grid_->Init();
 
+	// 敵司令官の初期化
+	enemyCommander_->Init();
+
 	// BGM再生
 	//AudioManager::GetInstance()->PlayBGM(SoundID::BGM_GAME_1);
 }
@@ -57,13 +61,19 @@ void GameScene::Load(void)
 	PlayerCreate();
 
 	// ネズミの作成
-	RatCreate();
+	for (int i = 0; i < 4; ++i)
+	{
+		RatCreate();
+	}
 
 	// 各オブジェクトのロード
 	ObjectManager::GetInstance()->Load();
 
 	// 当たり判定のマネジャー生成
 	CollisionManager::CreateInstance();
+
+	// 敵司令官の生成
+	enemyCommander_ = new EnemyCommander();
 
 	// サウンド読みこみ
 	//AudioManager::GetInstance()->LoadSceneSound(LoadScene::GAME);
@@ -91,9 +101,10 @@ void GameScene::Update(void)
 		// ゲームオーバーにする
 		SceneManager::GetInstance()->TrueGameOver();
 	}
-
 #endif // _DEBUG
 
+	// 敵司令官の更新
+	enemyCommander_->Update();
 
 	// 毎フレーム登録をリセット
 	CollisionManager::GetInstance()->Clear();
@@ -144,6 +155,11 @@ void GameScene::Draw(void)
 
 void GameScene::Release(void)
 {
+	// 敵司令官の解放
+	enemyCommander_->Release();
+	delete enemyCommander_;
+	enemyCommander_ = nullptr;
+
 	// グリッド解放
 	grid_->Release();
 	delete grid_;
@@ -194,13 +210,13 @@ void GameScene::RatCreate(void)
 	// タグを付与
 	rat->SetTagAndPriority(TAG_3D::RAT);
 
-	// プレイヤー機能セット
+	// ネズミ機能セット
 	rat->AddComponent<Rat>();
 }
 
 void GameScene::SetUp(void)
 {
-	 // プレイヤーを取得
+	// プレイヤーを取得
 	auto player = ObjectManager::GetInstance()->FindComponentWithTag<Player>(TAG_3D::PLAYER);
 
 	// カメラの取得
@@ -214,8 +230,11 @@ void GameScene::SetUp(void)
 	CameraUtility::SetCameraPoint(camera);
 
 	// ネズミに読み取り専用でプレイヤー座標を渡す
-	auto rat = ObjectManager::GetInstance()->FindComponentWithTag<Rat>(TAG_3D::RAT);
-	rat->SetPlayerTransform(player->GetTransform());
+	auto rats = ObjectManager::GetInstance()->FindComponentWithTagAll<Rat>(TAG_3D::RAT);
+	for (const auto& rat : rats)
+	{
+		rat->SetPlayerTransform(player->GetTransform());
+	}
 }
 
 bool GameScene::ChangePauseScene(void)

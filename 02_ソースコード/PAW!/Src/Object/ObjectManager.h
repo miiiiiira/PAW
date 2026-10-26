@@ -43,6 +43,10 @@ public:
 	template<class T>
 	T* FindComponentWithTag(TAG_3D tag);
 
+	// 指定のクラス、タグにヒットするポインタをすべて渡す
+	template<class T>
+	std::vector<T*>FindComponentWithTagAll(TAG_3D tag);
+
 private:
 
 	// 管理しているObject
@@ -61,4 +65,20 @@ inline T* ObjectManager::FindComponentWithTag(TAG_3D tag)
 	}
 
 	return nullptr;
+}
+
+template<class T>
+inline std::vector <T*> ObjectManager::FindComponentWithTagAll(TAG_3D tag)
+{
+	std::vector<T*> result;
+
+	for (auto& obj : objects_)
+	{
+		if (obj->GetTag() != tag) continue;
+
+		T* comp = obj->GetComponent<T>();
+		if (comp) result.push_back(comp);
+	}
+
+	return result;
 }
