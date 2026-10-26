@@ -36,14 +36,16 @@ GameScene::~GameScene(void)
 void GameScene::Init(void)
 {
 	// オブジェクトマネージャー初期化
-	ObjectManager::GetInstance()->Init();
+	objectManager_->Init();
 
 	// グリッド初期化
 	grid_ = new Grid();
 	grid_->Init();
 
 	// 敵司令官の初期化
-	enemyCommander_->Init();
+	// ネズミの参照を渡す
+	auto rats = objectManager_->FindComponentWithTagAll<Rat>(TAG_3D::RAT);
+	enemyCommander_->Init(rats);
 
 	// BGM再生
 	//AudioManager::GetInstance()->PlayBGM(SoundID::BGM_GAME_1);
@@ -52,7 +54,7 @@ void GameScene::Init(void)
 void GameScene::Load(void)
 {
 	// オブジェクトマネージャーの生成
-	ObjectManager::CreateInstance();
+	objectManager_ = new ObjectManager();
 
 	// カメラの作成
 	CameraCreate();
@@ -67,7 +69,7 @@ void GameScene::Load(void)
 	}
 
 	// 各オブジェクトのロード
-	ObjectManager::GetInstance()->Load();
+	objectManager_->Load();
 
 	// 当たり判定のマネジャー生成
 	CollisionManager::CreateInstance();
@@ -110,7 +112,7 @@ void GameScene::Update(void)
 	CollisionManager::GetInstance()->Clear();
 
 	// オブジェクトの更新
-	ObjectManager::GetInstance()->Update();
+	objectManager_->Update();
 
 	// 全ての登録コライダーを検査
 	CollisionManager::GetInstance()->CheckAll();
@@ -131,19 +133,19 @@ void GameScene::Update(void)
 void GameScene::Draw(void)
 {
 	// オブジェクトの描画前
-	ObjectManager::GetInstance()->PreDraw();
+	objectManager_->PreDraw();
 
 	// グリッド描画
 	grid_->Draw();
 
 	// オブジェクトの3D描画
-	ObjectManager::GetInstance()->Draw3D();
+	objectManager_->Draw3D();
 
 	// Effekseerにより再生中のエフェクトを描画する
 	DrawEffekseer3D();
 
 	// オブジェクトの2D描画
-	ObjectManager::GetInstance()->Draw2D();
+	objectManager_->Draw2D();
 
 #ifdef _DEBUG
 
@@ -169,7 +171,8 @@ void GameScene::Release(void)
 	CollisionManager::DeleteInstance();
 
 	// オブジェクトマネージャー削除
-	ObjectManager::DeleteInstance();
+	delete objectManager_;
+	objectManager_ = nullptr;
 
 	// 音の解放
 	//AudioManager::GetInstance()->DeleteSceneSound(LoadScene::GAME);
@@ -178,7 +181,7 @@ void GameScene::Release(void)
 void GameScene::CameraCreate(void)
 {
 	// カメラ生成
-	auto cameraObj = ObjectManager::GetInstance()->CreateObject();
+	auto cameraObj = objectManager_->CreateObject();
 
 	// タグの付与
 	cameraObj->SetTagAndPriority(TAG_3D::CAMERA);
@@ -193,7 +196,7 @@ void GameScene::CameraCreate(void)
 void GameScene::PlayerCreate(void)
 {
 	// プレイヤー生成
-	auto player = ObjectManager::GetInstance()->CreateObject();
+	auto player = objectManager_->CreateObject();
 
 	// タグを付与
 	player->SetTagAndPriority(TAG_3D::PLAYER,TAG_2D::PLAYER);
@@ -205,7 +208,7 @@ void GameScene::PlayerCreate(void)
 void GameScene::RatCreate(void)
 {
 	// プレイヤー生成
-	auto rat = ObjectManager::GetInstance()->CreateObject();
+	auto rat = objectManager_->CreateObject();
 
 	// タグを付与
 	rat->SetTagAndPriority(TAG_3D::RAT);
@@ -217,10 +220,10 @@ void GameScene::RatCreate(void)
 void GameScene::SetUp(void)
 {
 	// プレイヤーを取得
-	auto player = ObjectManager::GetInstance()->FindComponentWithTag<Player>(TAG_3D::PLAYER);
+	auto player = objectManager_->FindComponentWithTag<Player>(TAG_3D::PLAYER);
 
 	// カメラの取得
-	auto camera = ObjectManager::GetInstance()->FindComponentWithTag<Camera>(TAG_3D::CAMERA);
+	auto camera = objectManager_->FindComponentWithTag<Camera>(TAG_3D::CAMERA);
 
 	// プレイヤーの情報をカメラに設定
 	camera->SetTarget(player->GetTransform());
@@ -230,7 +233,7 @@ void GameScene::SetUp(void)
 	CameraUtility::SetCameraPoint(camera);
 
 	// ネズミに読み取り専用でプレイヤー座標を渡す
-	auto rats = ObjectManager::GetInstance()->FindComponentWithTagAll<Rat>(TAG_3D::RAT);
+	auto rats = objectManager_->FindComponentWithTagAll<Rat>(TAG_3D::RAT);
 	for (const auto& rat : rats)
 	{
 		rat->SetPlayerTransform(player->GetTransform());

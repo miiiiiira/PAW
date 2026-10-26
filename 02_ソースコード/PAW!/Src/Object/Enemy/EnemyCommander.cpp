@@ -7,9 +7,9 @@ EnemyCommander::EnemyCommander(void)
 {
 }
 
-void EnemyCommander::Init(void)
+void EnemyCommander::Init(std::vector<Rat*> rats)
 {
-	rats_ = ObjectManager::GetInstance()->FindComponentWithTagAll<Rat>(TAG_3D::RAT);
+	rats_ = rats;
 
 	float i = -1.0f;
 	// ƒlƒYƒ~‚ÌUŒ‚ˆ—

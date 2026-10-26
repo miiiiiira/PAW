@@ -25,6 +25,9 @@ public:
 	void Release(void)	override;	// 解放
 
 private:
+	// オブジェクトマネージャー
+	ObjectManager* objectManager_ = nullptr;
+
 	// グリッド線
 	Grid* grid_  = nullptr;
 

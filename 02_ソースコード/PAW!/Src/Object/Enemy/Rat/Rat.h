@@ -55,7 +55,6 @@ private:
 	static void UpdateDead(Rat& rat);		// €–S
 	static void UpdateEnd(Rat& rat);		// I—¹
 
-
 	// ‘Ò‹@ó‘Ô
 	// ó‘Ô•Ê‰Šú‰»
 	static void InitIdleWait(Rat& rat);			// ‘Ò‹@

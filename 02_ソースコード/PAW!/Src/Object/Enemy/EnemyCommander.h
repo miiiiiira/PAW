@@ -10,7 +10,7 @@ class EnemyCommander
 public:
 	EnemyCommander(void);
 
-	void Init(void);	// ‰Šú‰»
+	void Init(std::vector<Rat*> rats);	// ‰Šú‰»
 	void Update(void);	// XV
 	void Release(void);	// ‰ğ•ú
 
