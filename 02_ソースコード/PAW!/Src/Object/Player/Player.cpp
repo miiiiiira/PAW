@@ -42,8 +42,8 @@ namespace
 
 	// 攻撃設定
 	constexpr float HIT_ATTACK_FRAME = 3.0f;	// 攻撃が当たるアニメーションフレーム
-	constexpr float ASSIST_RANGE = 200.0f;		// プレイヤー周辺の円半径
-	constexpr float ASSIST_ANGLE = 90.0f;		// 補正可能角度
+	constexpr float ASSIST_RANGE = 300.0f;		// プレイヤー周辺の円半径
+	constexpr float ASSIST_ANGLE = 120.0f;		// 補正可能角度
 
 	// 描画設定
 	constexpr int  STATUS_DRAW_POS_X = 10;		// ステータス描画を始める座標
@@ -174,6 +174,14 @@ void Player::Draw2D(void)
 #ifdef _DEBUG
 	// デバッグ表示
 	DebugDraw2D();
+#endif // _DEBUG
+}
+
+void Player::Draw3D(void)
+{
+#ifdef _DEBUG
+	// デバッグ描画
+	DebugDraw3D();
 #endif // _DEBUG
 }
 
@@ -1271,5 +1279,17 @@ void Player::DebugDraw2D(void)
 		0xff0000,
 		"プレイヤー座標 : %.f,%.f,%.f",
 		transform_->pos_.x, transform_->pos_.y, transform_->pos_.z);
+}
+void Player::DebugDraw3D(void)
+{
+	// 攻撃補正範囲の描画
+	DrawSphere3D(
+		transform_->pos_, 
+		ASSIST_RANGE, 
+		16, 
+		0x0000ff, 
+		0x0000ff, 
+		false
+	);
 }
 #endif // _DEBUG
