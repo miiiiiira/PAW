@@ -33,6 +33,7 @@ public:
 	void Init(void) override;	// 初期化
 	void Update(void) override;	// 更新
 	void Draw2D(void) override;	// 2D描画
+	void Draw3D(void) override;	// 3D描画
 
 public:
 	// Transformを返す
@@ -154,6 +155,7 @@ private:
 #ifdef _DEBUG
 	// デバッグ用描画
 	void DebugDraw2D(void);
+	void DebugDraw3D(void);
 #endif // _DEBUG
 
 private:

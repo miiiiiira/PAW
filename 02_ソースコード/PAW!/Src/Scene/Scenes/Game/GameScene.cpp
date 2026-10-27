@@ -63,7 +63,7 @@ void GameScene::Load(void)
 	PlayerCreate();
 
 	// ƒlƒYƒ~‚Ìì¬
-	for (int i = 0; i < 4; ++i)
+	for (int i = 0; i < 1; ++i)
 	{
 		RatCreate();
 	}
@@ -237,6 +237,7 @@ void GameScene::SetUp(void)
 	for (const auto& rat : rats)
 	{
 		rat->SetPlayerTransform(player->GetTransform());
+		player->SetRatPoint(rat->GetTransform());
 	}
 }
 
