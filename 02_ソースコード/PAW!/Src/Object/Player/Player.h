@@ -12,6 +12,7 @@ class Render3D;
 class Animation;
 class CapsuleCollider;
 class SphereCollider;
+class Rat;
 
 // プレイヤー制御コンポーネント
 class Player : public Component
@@ -39,6 +40,9 @@ public:
 
 	// プレイヤー状態を取得
 	PLAYER_STATE GetState(void) { return stateCtrl_.state_; }
+
+	// 敵ネズミのポインタをもらう
+	void SetRatPoint(const Transform* ratTransform) { ratsTransform_.emplace_back(ratTransform); }
 
 private:
 	// 状態別更新処理
@@ -110,59 +114,46 @@ private:
 	// 無敵時間を更新
 	void UpdateInvincible(void);
 
-	// ヒットストップ更新
-	void UpdateHitStop(void);
+	// ヒットストップ系
+	void UpdateHitStop(void);			// 更新
+	void GetShakeOffset(int& offset);	// 揺らし量を計算
 
-	// ヒットストップカウンタが0じゃない場合に揺らし量を計算
-	void GetShakeOffset(int& offset);
-
-	// 移動しているかを渡す		true / 移動している, false / 移動していない
-	bool InputMove(void);
-
-	// 方向×移動速度で移動量を作って、座標に足して移動させる
-	void Move(void);
-
-	// 死亡座標へ到達しているか
-	void IsReachedDeadPos(void);
+	// 移動系
+	bool InputMove(void);			// 移動しているか	true / 移動している, false / 移動していない
+	void Move(void);				// 移動処理
+	void IsReachedDeadPos(void);	// 死亡座標へ到達しているか
 
 	// 角度処理
 	void RotAngle(void);
 
-	// ダメージを与える
-	void SetDamage(int damage);
+	// ダメージ系
+	void SetDamage(int damage);			// ダメージを与える
+	void SetHitReact(VECTOR moveDir);	// 吹っ飛びリアクションをさせる
 
-	// 吹っ飛びリアクションをさせる
-	void SetHitReact(VECTOR moveDir);
+	// 攻撃系
+	void AcceptNextAttackInput(void);					// 次の攻撃入力を受け付ける
+	void StartAttack(PLAYER_ANIMATION anim);			// 攻撃開始処理(アニメーション再生とフラグ初期化)
+	void UpdateAttackState(float StartAttackFramee);	// アニメーション進行度に応じて攻撃判定のON/OFF	(攻撃の判定をスタートさせるフレーム)
+	bool OnAttackHit(void);								// 攻撃が当たった場合の後処理
+	void EndAttaking(void);								// 攻撃状態を終了させる
+	
+	// 攻撃補正系
+	bool IsInAssistRange(const Transform* ratTransform);		// プレイヤー周辺の円内にいるか
+	bool IsWithinAssistAngle(const Transform* ratTransform);	// 角度判定内か
+	void SelectNearestTarget(void);								// 距離が近い対象を選ぶ
+	void FaceTarget(void);										// 選んだ敵の方へ向く
+	void ApplyAttackAssist(void);								// 攻撃補正処理
 
-	// 攻撃が当たった場合の後処理
-	bool OnAttackHit(void);
+	// 衝突判定系
+	void OnCollision(Collider* other) override;	// 衝突判定の検知
+	void AttackOnCollision(void);				// 攻撃判定の検知
 
-	// アニメーション進行度に応じて攻撃判定のON/OFF
-	// (攻撃の判定をスタートさせるフレーム)
-	void UpdateAttackState(float StartAttackFramee);
-
-	// 次の攻撃入力を受け付ける
-	void AcceptNextAttackInput(void);
-
-	// 攻撃状態を終了させる
-	void EndAttaking(void);
-
-	// 攻撃開始処理(アニメーション再生とフラグ初期化)
-	void StartAttack(PLAYER_ANIMATION anim);
-
-	// 衝突判定の検知
-	void OnCollision(Collider* other) override;
-	// 攻撃判定の検知
-	void AttackOnCollision(void);
-
-	// HP描画
-	void DrawHP(void);
+	// 描画系
+	void DrawHP(void);	// HP描画
 
 #ifdef _DEBUG
-
 	// デバッグ用描画
 	void DebugDraw2D(void);
-
 #endif // _DEBUG
 
 private:
@@ -172,6 +163,9 @@ private:
 	Animation* animation_ = nullptr;
 	CapsuleCollider* capsuleCollder_ = nullptr;
 	SphereCollider* sphereCollder_ = nullptr;
+
+	// ネズミのTransformポインタ
+	std::vector<const Transform*>ratsTransform_;
 
 private:
 	// プレイヤー情報

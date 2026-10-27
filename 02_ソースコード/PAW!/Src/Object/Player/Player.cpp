@@ -42,6 +42,8 @@ namespace
 
 	// 攻撃設定
 	constexpr float HIT_ATTACK_FRAME = 3.0f;	// 攻撃が当たるアニメーションフレーム
+	constexpr float ASSIST_RANGE = 200.0f;		// プレイヤー周辺の円半径
+	constexpr float ASSIST_ANGLE = 90.0f;		// 補正可能角度
 
 	// 描画設定
 	constexpr int  STATUS_DRAW_POS_X = 10;		// ステータス描画を始める座標
@@ -475,18 +477,27 @@ void Player::ChangeState(PLAYER_STATE state)
 
 void Player::InitAttack1(Player& player)
 {
+	// 攻撃角度補正
+	player.ApplyAttackAssist();
+
 	// 攻撃開始処理
 	player.StartAttack(PLAYER_ANIMATION::PUNCH);
 }
 
 void Player::InitAttack2(Player& player)
 {
+	// 攻撃角度補正
+	player.ApplyAttackAssist();
+
 	// 攻撃開始処理
 	player.StartAttack(PLAYER_ANIMATION::PUNCH_2);
 }
 
 void Player::InitAttack3(Player& player)
 {
+	// 攻撃角度補正
+	player.ApplyAttackAssist();
+
 	// 攻撃開始処理
 	player.StartAttack(PLAYER_ANIMATION::PUNCH_3);
 }
@@ -500,6 +511,9 @@ void Player::UpdateAttack1(Player& player)
 	// 攻撃が当たった場合の後処理
 	if (player.OnAttackHit())return;
 
+	// 選んだ敵の方へ向く
+	player.FaceTarget();
+
 	// アニメーション進行度に応じて攻撃判定のON/OFF	次の攻撃予約を管理する
 	player.UpdateAttackState(HIT_ATTACK_FRAME);
 }
@@ -509,6 +523,9 @@ void Player::UpdateAttack2(Player& player)
 	// 攻撃が当たった場合の後処理
 	if (player.OnAttackHit())return;
 
+	// 選んだ敵の方へ向く
+	player.FaceTarget();
+
 	// アニメーション進行度に応じて攻撃判定のON/OFF	次の攻撃予約を管理する
 	player.UpdateAttackState(HIT_ATTACK_FRAME);
 }
@@ -517,6 +534,9 @@ void Player::UpdateAttack3(Player& player)
 {
 	// 攻撃が当たった場合の後処理
 	if (player.OnAttackHit())return;
+
+	// 選んだ敵の方へ向く
+	player.FaceTarget();
 
 	// アニメーション進行度に応じて攻撃判定のON/OFF
 	player.UpdateAttackState(HIT_ATTACK_FRAME);
@@ -619,8 +639,8 @@ void Player::InitHitStun(Player& player)
 void Player::InitHitEnd(Player& player)
 {
 	// プレイヤーの移動向きを元に戻す
-	player.info_.moveDir_.x *= -1.0f;
-	player.info_.moveDir_.z *= -1.0f;
+	player.info_.moveDir_.x = player.info_.prevMoveDir_.x;
+	player.info_.moveDir_.z = player.info_.prevMoveDir_.z;
 }
 
 void Player::UpdateHitStart(Player& player)
@@ -702,7 +722,7 @@ void Player::AddComponets(void)
 	sphereCollder_->Init();
 	// 球の設定
 	sphereCollder_->SetCenterOffset(VGet(0.0f, 70.0f, -120.0f));
-	sphereCollder_->SetRadius(120.0f);
+	sphereCollder_->SetRadius(70.0f);
 	// タグの設定
 	sphereCollder_->SetCollisionTag(CollisionTag::NONE);
 	sphereCollder_->SetInverseMass(-1.0f);
@@ -951,6 +971,8 @@ void Player::SetHitReact(VECTOR moveDir)
 	moveDir.x *= -1.0f;
 	moveDir.z *= -1.0f;
 
+	// 前回向きを保持しておく
+	info_.prevMoveDir_ = info_.moveDir_;
 	// 指定された移動向きを設定
 	info_.moveDir_ = moveDir;
 
@@ -964,18 +986,43 @@ void Player::SetHitReact(VECTOR moveDir)
 	ChangeState(PLAYER_STATE_HIT);
 }
 
-bool Player::OnAttackHit(void)
+void Player::AcceptNextAttackInput(void)
 {
-	// 攻撃が当たっていたら
-	if (info_.isAttackHit_)
+	// 攻撃ボタンが押されたかつ、次の攻撃が予約されていなかったら
+	if (InputManager::GetInstance()->AttackButton() && info_.currentAttack_ == info_.nextAttack_)
 	{
-		EndAttaking();
-		// 攻撃フラグを折る
-		info_.isAttackHit_ = false;
-		return true;
-	}
+		// 現在の攻撃から次の攻撃を算出
+		int attack = static_cast<int>(info_.nextAttack_);
 
-	return false;
+		attack++;
+
+		// 上限
+		if (attack >= static_cast<int>(PLAYER_ATTACK_END))
+		{
+			attack = static_cast<int>(PLAYER_ATTACK_END);
+		}
+
+		// 次の攻撃を予約する
+		info_.nextAttack_ = static_cast<PLAYER_ATTACK_STATE>(attack);
+	}
+}
+
+void Player::StartAttack(PLAYER_ANIMATION anim)
+{
+	// 移動先の向きを,
+	InputMove();
+
+	// プレイヤーの移動速度を設定
+	info_.moveSpeed_ = ATTACK_MOVE_SPEED;
+
+	// 攻撃アニメーションを再生
+	animation_->Play(static_cast<int>(anim), false);
+
+	// 攻撃が当たったかフラグ初期化
+	info_.isAttackHit_ = false;
+
+	// 攻撃予約フラグ
+	info_.currentAttack_ = info_.nextAttack_ = stateCtrl_.attackState_;
 }
 
 void Player::UpdateAttackState(float StartAttackFrame)
@@ -1003,25 +1050,18 @@ void Player::UpdateAttackState(float StartAttackFrame)
 	}
 }
 
-void Player::AcceptNextAttackInput(void)
+bool Player::OnAttackHit(void)
 {
-	// 攻撃ボタンが押されたかつ、次の攻撃が予約されていなかったら
-	if (InputManager::GetInstance()->AttackButton() && info_.currentAttack_ == info_.nextAttack_)
+	// 攻撃が当たっていたら
+	if (info_.isAttackHit_)
 	{
-		// 現在の攻撃から次の攻撃を算出
-		int attack = static_cast<int>(info_.nextAttack_);
-
-		attack++;
-
-		// 上限
-		if (attack >= static_cast<int>(PLAYER_ATTACK_END))
-		{
-			attack = static_cast<int>(PLAYER_ATTACK_END);
-		}
-
-		// 次の攻撃を予約する
-		info_.nextAttack_ = static_cast<PLAYER_ATTACK_STATE>(attack);
+		EndAttaking();
+		// 攻撃フラグを折る
+		info_.isAttackHit_ = false;
+		return true;
 	}
+
+	return false;
 }
 
 void Player::EndAttaking(void)
@@ -1033,22 +1073,134 @@ void Player::EndAttaking(void)
 	ChangeAttackState(PLAYER_ATTACK_STATE::PLAYER_ATTACK_END);
 }
 
-void Player::StartAttack(PLAYER_ANIMATION anim)
+bool Player::IsInAssistRange(const Transform* ratTransform)
 {
-	// 移動先の向きを,
-	InputMove();
+	VECTOR vec = VSub(ratTransform->pos_, transform_->pos_);
+	float distanceXZ = vec.x * vec.x + vec.z * vec.z;
+	float rad = ASSIST_RANGE * ASSIST_RANGE;
 
-	// プレイヤーの移動速度を設定
-	info_.moveSpeed_ = ATTACK_MOVE_SPEED;
+	return distanceXZ <= rad;
+}
 
-	// 攻撃アニメーションを再生
-	animation_->Play(static_cast<int>(anim), false);
+bool Player::IsWithinAssistAngle(const Transform* ratTransform)
+{
+	VECTOR vec = VSub(ratTransform->pos_, transform_->pos_);
 
-	// 攻撃が当たったかフラグ初期化
-	info_.isAttackHit_ = false;
+	// XZ上の距離を算出
+	float distance = std::sqrt(vec.x * vec.x + vec.z * vec.z);
 
-	// 攻撃予約フラグ
-	info_.currentAttack_ = info_.nextAttack_ = stateCtrl_.attackState_;
+	// 基準となる向き（XZのみ）
+	float dirX = info_.moveDir_.x;
+	float dirZ = info_.moveDir_.z;
+	float dirLen = std::sqrt(dirX * dirX + dirZ * dirZ);
+
+	if (dirLen < 0.0001f)
+	{
+		// 入力がないときはモデルの向きを使う
+		// ※モデルのY軸向きが逆なので符号を反転している
+		dirX = -std::sin(transform_->angle_.y);
+		dirZ = -std::cos(transform_->angle_.y);
+		dirLen = 1.0f;
+	}
+
+	dirX /= dirLen;
+	dirZ /= dirLen;
+
+	const float cosTheta =
+		(vec.x * dirX + vec.z * dirZ) / distance;
+
+	return cosTheta >= std::cos((ASSIST_ANGLE * DX_PI_F / 180.0f) * 0.5f);
+}
+
+void Player::SelectNearestTarget(void)
+{
+	// 最短距離
+	float minDistance = FLT_MAX;
+	// 候補の中から一番近いものを選ぶ
+	for (const auto& transform : info_.attackAssistCandidates_)
+	{
+		// 自分から敵へのベクトルを求める
+		VECTOR vec = VSub(transform->pos_, transform_->pos_);
+		// 距離を求める
+		float distance = vec.x * vec.x + vec.z * vec.z;
+
+		// 一番距離が近いものを選ぶ
+		if (distance < minDistance)
+		{
+			// 近かったら最短距離と決定対象を更新
+			minDistance = distance;
+			info_.finalCandidateTransform_ = transform;
+		}
+	}
+}
+
+void Player::FaceTarget(void)
+{
+	// 中身がなかったら処理を行わない
+	if (info_.finalCandidateTransform_ == nullptr) return;
+
+	// 相手へのベクトルを計算
+	VECTOR vec = VSub(info_.finalCandidateTransform_->pos_, transform_->pos_);
+
+	// ベクトルの正規化で単位ベクトル(方向)を取得する
+	float length = sqrtf(vec.x * vec.x + vec.z * vec.z);
+
+	if (length < 0.0001f)
+	{
+		// プレイヤーと位置がほぼ同じだった場合、
+		// 無理やり移動するように向きの情報を入れる
+		info_.moveDir_.x = 1.0f;
+		info_.moveDir_.z = 0.0f;
+		return;
+	}
+
+	// XZ面の方向を算出
+	info_.moveDir_.x = vec.x / length;
+	info_.moveDir_.z = vec.z / length;
+
+	// 目標の角度を算出
+	float targetAngle = atan2f(vec.x, vec.z);
+
+	// 今回のモデルのY軸向きが逆なので向きを反転させる
+	targetAngle += DX_PI_F;
+
+	// 角度補間をかける
+	Math::SmoothAngle(
+		transform_->angle_.y,
+		targetAngle,
+		info_.velocityRot_,
+		ANGLE_COEFFICIENT);
+
+	transform_->angle_.x = transform_->angle_.z = 0.0f;
+
+	// モデルに向きを設定
+	MV1SetRotationXYZ(render3D_->GetHandle(), transform_->angle_);
+}
+
+void Player::ApplyAttackAssist(void)
+{
+	// 前回のものを引き継がないよう初期化
+	info_.velocityRot_ = 0.0f;					// 角速度
+	info_.attackAssistCandidates_.clear();		// 補正対象
+	info_.finalCandidateTransform_ = nullptr;	// 決定対象
+
+	for (const auto& transform : ratsTransform_)
+	{
+		// プレイヤー周辺の円内にいなければ次の処理へ
+		if (!IsInAssistRange(transform))continue;
+
+		// 角度判定内に入ってなければ次の処理へ
+		if (!IsWithinAssistAngle(transform))continue;
+
+		// 補正対象に追加
+		info_.attackAssistCandidates_.emplace_back(transform);
+	}
+
+	// 中身がなければ処理終了
+	if (info_.attackAssistCandidates_.empty())return;
+
+	// 距離が近い対象を選ぶ
+	SelectNearestTarget();
 }
 
 void Player::OnCollision(Collider* other)

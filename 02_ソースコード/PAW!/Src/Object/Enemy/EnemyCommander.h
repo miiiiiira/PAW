@@ -11,8 +11,8 @@ public:
 	EnemyCommander(void);
 
 	void Init(std::vector<Rat*> rats);	// 初期化
-	void Update(void);	// 更新
-	void Release(void);	// 解放
+	void Update(void);					// 更新
+	void Release(void);					// 解放
 
 private:
 	// ネズミのポインタ

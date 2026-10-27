@@ -89,7 +89,10 @@ struct playerInfo
 {
 	float velocityY_ = 0.0f;	// 現在の落下速度
 
+	float velocityRot_ = 0.0f;	// 現在の角速度
+
 	VECTOR moveDir_ = {0.0f,0.0f,0000000.1f};	// 移動方向
+	VECTOR prevMoveDir_ = {};					// 前の移動方向
 
 	float moveSpeed_ = 0;	// 移動速度
 
@@ -105,6 +108,10 @@ struct playerInfo
 	
 	PLAYER_ATTACK_STATE currentAttack_ = PLAYER_ATTACK_MAX;	// 攻撃中の種類を入れる
 	PLAYER_ATTACK_STATE nextAttack_ = PLAYER_ATTACK_MAX;	// 攻撃予約された種類を入れる
+
+	std::vector<const Transform*> attackAssistCandidates_;	// 補正対象の候補
+	const Transform* finalCandidateTransform_;				// 補正対象の最終候補
+
 };
 
 enum class PLAYER_ANIMATION
