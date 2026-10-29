@@ -42,6 +42,8 @@ private:
 	void PlayerCreate(void);	
 	// ネズミの作成
 	void RatCreate(void);	
+	// 猫ロボットの作成
+	void CatRobotCreate(void);	
 
 	// 参照系
 	void SetUp(void);

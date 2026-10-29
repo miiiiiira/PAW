@@ -4,6 +4,7 @@
 #include "../../Camera/CameraUtility.h"
 #include "../../../Collision/3DCollider/CapsuleCollider.h"
 #include "../../../Math/Math.h"
+#include "Attack/Attack1.h"
 
 #include "CatRobot.h"
 
@@ -14,10 +15,14 @@ namespace
 
 	// 重力設定
 	constexpr float GRAVITY = -1.98f;	// 重力加速度
-	constexpr float MAX_FALL = -10.0f;	// 最大落下速度
+	constexpr float MAX_FALL = -20.0f;	// 最大落下速度
 
 	// リミット設定
 	constexpr int INVINCIBLE_TIME = 60;	// 無敵時間
+
+	// 攻撃1の（食材攻撃）
+	constexpr float ATTACK1_POS_Y = 1000.0f;	// Y座標
+	constexpr int ATTACK1_NUM = 10;				// 最大個数
 }
 
 CatRobot::CatRobot(void)
@@ -115,6 +120,8 @@ void CatRobot::InitMove(CatRobot& catRobot)
 
 void CatRobot::InitAttack(CatRobot& catRobot)
 {
+	// 攻撃種類選択へ
+	catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_SELECT);
 }
 
 void CatRobot::InitChance(CatRobot& catRobot)
@@ -184,6 +191,8 @@ void CatRobot::InitAttackSelect(CatRobot& catRobot)
 
 void CatRobot::InitAttack1(CatRobot& catRobot)
 {
+	// 攻撃1の座標決め
+	catRobot.ResetAttack1Pos();
 }
 
 void CatRobot::InitAttack2(CatRobot& catRobot)
@@ -204,10 +213,32 @@ void CatRobot::InitAttackEnd(CatRobot& catRobot)
 
 void CatRobot::UpdateAttackSelect(CatRobot& catRobot)
 {
+	// 攻撃１へ
+	catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_1);
 }
 
 void CatRobot::UpdateAttack1(CatRobot& catRobot)
 {
+	bool isAllEnd = true;
+
+	// 攻撃数分回す
+	for (const auto& attack : catRobot.attack1_)
+	{
+		// 終了していなかったら
+		if (attack->GetState() != ATTACK1_STATE_END)
+		{
+			// フラグを折る
+			isAllEnd = false;
+			break;
+		}
+	}
+
+	// すべて下へ落ち切っていたら
+	if (isAllEnd)
+	{
+		// 攻撃終了へ
+		catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_END);
+	}
 }
 
 void CatRobot::UpdateAttack2(CatRobot& catRobot)
@@ -224,6 +255,8 @@ void CatRobot::UpdateAttack4(CatRobot& catRobot)
 
 void CatRobot::UpdateAttackEnd(CatRobot& catRobot)
 {
+	// 待機状態へ
+	catRobot.ChangeState(CAT_ROBOT_STATE_IDLE);
 }
 
 void CatRobot::ChangeAttackState(CAT_ROBOT_ATTACK_STATE state)
@@ -280,9 +313,9 @@ void CatRobot::AddComponets(void)
 {
 	// 座標の設定
 	transform_ = owner_->AddComponent<Transform>();
-	transform_->pos_ = { 0.0f,0.0f,500.0f };
+	transform_->pos_ = { 0.0f,500.0f,2000.0f };
 	transform_->angle_ = {};
-	transform_->scale_ = { 2.0f,2.0f,2.0f };
+	transform_->scale_ = {};
 
 	// 当たり判定の設定(カプセル)
 	capsuleCollder_ = owner_->AddComponent<CapsuleCollider>();
@@ -290,18 +323,34 @@ void CatRobot::AddComponets(void)
 
 	// カプセルの設定
 	capsuleCollder_->AddCapsule(
-		VGet(0.0f, 150.0f, 0.0f),
+		VGet(0.0f, 800.0f, 0.0f),
 		VGet(0.0f, 30.0f, 0.0f),
-		40.0f);
+		350.0f);
 
 	// タグの設定
-	capsuleCollder_->SetCollisionTag(CollisionTag::ENEMY);
-	capsuleCollder_->SetInverseMass(1.0f);
+	capsuleCollder_->SetCollisionTag(CollisionTag::BOSS);
+	capsuleCollder_->SetInverseMass(0.0f);
 
 	// 3Dモデル設定
 	render3D_ = owner_->AddComponent<Render3D>();
 	render3D_->Init();
 	render3D_->SetModel("Data/Model/Enemy/CatRobot.mv1");
+
+	// アニメーション設定
+	animation_ = owner_->AddComponent<Animation>();
+	animation_->Init();
+	// アニメーション登録
+	animation_->AddInFbx(
+		static_cast<int>(CAT_ROBOT_ANIMATION::STANDING_IDLE),
+		10,
+		static_cast<int>(CAT_ROBOT_ANIMATION::STANDING_IDLE));
+
+	// 攻撃1(食材攻撃)個数分回す
+	for (int i = 0; i < ATTACK1_NUM; i++)
+	{
+		Attack1* attack = attack1_.emplace_back(owner_->AddComponent<Attack1>());
+		attack->Init();
+	}
 }
 
 void CatRobot::ApplyGravity(void)
@@ -380,6 +429,22 @@ void CatRobot::GetDirectionToPlayer(bool isRetreat)
 		// 反転させる
 		info_.moveDir_.x *= -1.0f;
 		info_.moveDir_.z *= -1.0f;
+	}
+}
+
+void CatRobot::ResetAttack1Pos(void)
+{
+	// 一つだけ、プレイヤーの頭上に設定
+	attack1_.front()->
+		StartAttack({ playerTransform_->pos_.x,ATTACK1_POS_Y,playerTransform_->pos_.z });
+
+	// 攻撃数分回す
+	for (int i = 1; i < attack1_.size(); i++)
+	{
+		float randX = static_cast<float>(GetRand(1000.0f));
+		float randZ = static_cast<float>(GetRand(1000.0f));
+
+		attack1_[i]->StartAttack({ randX,ATTACK1_POS_Y,randZ });
 	}
 }
 

@@ -7,7 +7,7 @@ enum class TAG_3D
 	STAGE,
 	PLAYER,
 	RAT,
-	ROBOT,
+	CAT_ROBOT,
 	CROSSHAIR,
 	CAMERA,
 };

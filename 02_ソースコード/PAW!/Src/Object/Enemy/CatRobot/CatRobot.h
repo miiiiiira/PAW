@@ -9,6 +9,8 @@ class Transform;
 class Render3D;
 class Animation;
 class CapsuleCollider;
+class SphereCollider;
+class Attack1;
 
 class CatRobot : public Component
 {
@@ -24,6 +26,9 @@ public:
 
 	// 状態を取得
 	CAT_ROBOT_STATE GetState(void)const { return stateCtrl_.state_; }
+
+	// 状態を変更させる
+	void ChangeState(CAT_ROBOT_STATE state);
 
 	// プレイヤーのTransformポインタを取得
 	void SetPlayerTransform(const Transform* transform) { playerTransform_ = transform; }
@@ -47,8 +52,6 @@ private:
 	static void UpdateChance(CatRobot& catRobot);	// プレイヤーの攻撃チャンス
 	static void UpdateDead(CatRobot& catRobot);		// 死亡
 	static void UpdateEnd(CatRobot& catRobot);		// 終了
-	// 状態を変更させる
-	void ChangeState(CAT_ROBOT_STATE state);
 
 	// 攻撃状態
 	// 状態別初期化
@@ -97,6 +100,9 @@ private:
 	// 引数をtrueにするとプレイヤーから離れる方向を算出
 	void GetDirectionToPlayer(bool isRetreat = false);
 
+	// 攻撃1の座標決め
+	void ResetAttack1Pos(void);
+
 	// ダメージを与える
 	void SetDamage(void);
 
@@ -106,9 +112,12 @@ private:
 private:
 	// コンポーネント
 	Transform* transform_ = nullptr;
+	CapsuleCollider* capsuleCollder_ = nullptr;
 	Render3D* render3D_ = nullptr;
 	Animation* animation_ = nullptr;
-	CapsuleCollider* capsuleCollder_ = nullptr;
+
+	// 攻撃コンポーネント
+	std::vector<Attack1*> attack1_;
 
 	// プレイヤーTransform
 	const Transform* playerTransform_ = nullptr;

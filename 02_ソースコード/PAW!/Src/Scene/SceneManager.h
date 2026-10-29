@@ -36,11 +36,6 @@ private:
 	SceneManager(SceneManager&&) = delete;
 	SceneManager& operator=(SceneManager&&) = delete;
 
-	// 下記をコンパイルエラーさせるため 上記を追加
-	// SceneManager copy = *SceneManager::GetInstance();
-	// SceneManager copied(*SceneManager::GetInstance());
-	// SceneManager moved = std::move(*SceneManager::GetInstance());
-
 public:
 
 	// 環境光のカラー値、アルファ値
@@ -113,9 +108,9 @@ private:
 	Loading* load_= nullptr;
 
 	// ゲームクリア判定用
-	bool isClear_;
+	bool isClear_ = false;
 	// ゲームオーバー判定用
-	bool isOver_;
+	bool isOver_ = false;
 
 	// 現在のシーンのタグを保持
 	SCENE_TAG nowSceneTag_;

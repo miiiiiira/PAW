@@ -5,9 +5,6 @@
 #include "../../../Collision/3DCollider/CapsuleCollider.h"
 #include "../../../Math/Math.h"
 
-#include "../../../Scene/SceneManager.h"
-#include "../../../Input/InputManager.h"
-
 #include "Rat.h"
 
 namespace
@@ -188,8 +185,6 @@ void Rat::InitDead(Rat& rat)
 
 void Rat::InitEnd(Rat& rat)
 {
-	// ネズミが死んだためゲームクリアへ遷移
-	SceneManager::GetInstance()->TrueGameClear();
 }
 
 void Rat::UpdateIdle(Rat& rat)

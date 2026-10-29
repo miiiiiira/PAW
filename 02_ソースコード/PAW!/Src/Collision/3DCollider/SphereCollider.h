@@ -16,6 +16,12 @@ public:
     // 球体の中心位置をワールド座標で取得する
     VECTOR GetCenter() const;
    
+    // Transformを渡す
+    void SetTransform(Transform* transform)
+    {
+        transform_ = transform;
+    }
+   
     // 球体の半径を取得する
     float GetRadius() const
     {

@@ -16,6 +16,7 @@
 #include "../../../Object/Tag.h"
 #include "../../../Object/Player/Player.h"
 #include "../../../Object/Enemy/Rat/Rat.h"
+#include "../../../Object/Enemy/CatRobot/CatRobot.h"
 #include "../../../Object/Camera/Camera.h"
 #include "../../../Object/Camera/CameraUtility.h"
 #include "../../../Object/Enemy/EnemyCommander.h"
@@ -45,7 +46,8 @@ void GameScene::Init(void)
 	// 敵司令官の初期化
 	// ネズミの参照を渡す
 	auto rats = objectManager_->FindComponentWithTagAll<Rat>(TAG_3D::RAT);
-	enemyCommander_->Init(rats);
+	auto catRobot = objectManager_->FindComponentWithTag<CatRobot>(TAG_3D::CAT_ROBOT);
+	enemyCommander_->Init(rats,catRobot);
 
 	// BGM再生
 	//AudioManager::GetInstance()->PlayBGM(SoundID::BGM_GAME_1);
@@ -67,6 +69,9 @@ void GameScene::Load(void)
 	{
 		RatCreate();
 	}
+
+	// 猫ロボットの作成
+	CatRobotCreate();
 
 	// 各オブジェクトのロード
 	objectManager_->Load();
@@ -207,7 +212,7 @@ void GameScene::PlayerCreate(void)
 
 void GameScene::RatCreate(void)
 {
-	// プレイヤー生成
+	// ネズミ生成
 	auto rat = objectManager_->CreateObject();
 
 	// タグを付与
@@ -217,28 +222,47 @@ void GameScene::RatCreate(void)
 	rat->AddComponent<Rat>();
 }
 
+void GameScene::CatRobotCreate(void)
+{
+	// 猫ロボット生成
+	auto catRobot = objectManager_->CreateObject();
+
+	// タグを付与
+	catRobot->SetTagAndPriority(TAG_3D::CAT_ROBOT);
+
+	// 猫ロボット機能セット
+	catRobot->AddComponent<CatRobot>();
+}
+
 void GameScene::SetUp(void)
 {
-	// プレイヤーを取得
+	// ポインタを取得
+	// プレイヤー
 	auto player = objectManager_->FindComponentWithTag<Player>(TAG_3D::PLAYER);
-
-	// カメラの取得
+	// カメラ
 	auto camera = objectManager_->FindComponentWithTag<Camera>(TAG_3D::CAMERA);
+	// ネズミ
+	auto rats = objectManager_->FindComponentWithTagAll<Rat>(TAG_3D::RAT);
+	// 猫ロボット
+	auto catRobot = objectManager_->FindComponentWithTag<CatRobot>(TAG_3D::CAT_ROBOT);
 
-	// プレイヤーの情報をカメラに設定
+	// プレイヤーのTransformをカメラに設定
 	camera->SetTarget(player->GetTransform());
-	camera->SetPlayer(player);
 
 	// カメラユーティリティにカメラのポインタを渡す
 	CameraUtility::SetCameraPoint(camera);
 
-	// ネズミに読み取り専用でプレイヤー座標を渡す
-	auto rats = objectManager_->FindComponentWithTagAll<Rat>(TAG_3D::RAT);
 	for (const auto& rat : rats)
 	{
-		rat->SetPlayerTransform(player->GetTransform());
+		// プレイヤーにネズミTransformを渡す
 		player->SetRatPoint(rat->GetTransform());
+
+		// ネズミにプレイヤーTransformを渡す
+		rat->SetPlayerTransform(player->GetTransform());
 	}
+
+	// 猫ロボットにプレイヤーTransformを渡す
+	catRobot->SetPlayerTransform(player->GetTransform());
 }
 
 bool GameScene::ChangePauseScene(void)

@@ -4,9 +4,7 @@
 #include "../../Math/Math.h"
 #include "../../Math/Easing.h"
 #include "../../Input/InputManager.h"
-#include "../../Scene/SceneManager.h"
 #include "../../Application.h"
-#include "../Player/Player.h"
 
 #include "Camera.h"
 

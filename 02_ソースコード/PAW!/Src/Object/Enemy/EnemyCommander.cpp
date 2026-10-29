@@ -1,4 +1,5 @@
 #include "../ObjectManager.h"
+#include "CatRobot/CatRobot.h"
 #include "Rat/Rat.h"
 
 #include "EnemyCommander.h"
@@ -7,9 +8,11 @@ EnemyCommander::EnemyCommander(void)
 {
 }
 
-void EnemyCommander::Init(std::vector<Rat*> rats)
+void EnemyCommander::Init(std::vector<Rat*> rats, CatRobot* catRobot)
 {
 	rats_ = rats;
+
+	catRobot_ = catRobot;
 
 	float i = -1.0f;
 	// ƒlƒYƒ~‚ÌUŒ‚ˆ—
@@ -56,7 +59,15 @@ void EnemyCommander::RatControl(void)
 		{
 			// UŒ‚ˆ—‚Ö
 			rat->ChangeState(RAT_STATE_ATTACK);
+
 			i++;
 		}
+	}
+
+	// ”Lƒƒ{ƒbƒg‚ª‘Ò‹@ó‘Ô‚¾‚Á‚½‚ç
+	if (catRobot_->GetState() == CAT_ROBOT_STATE_IDLE)
+	{
+		// UŒ‚ó‘Ô‚Ö
+		catRobot_->ChangeState(CAT_ROBOT_STATE_ATTACK);
 	}
 }

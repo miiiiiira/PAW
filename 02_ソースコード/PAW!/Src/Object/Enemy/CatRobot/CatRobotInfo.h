@@ -83,3 +83,20 @@ struct catRobotInfo
 
 	int waitTime_ = 0;	// ‘Ò‹@ŽžŠÔ
 };
+
+enum class CAT_ROBOT_ANIMATION
+{
+	STANDING_IDLE,
+	SITTING_IDLE,
+	WALK,
+	RUN,
+	JUMP,
+	PUNCH,
+	PUNCH_2,
+	PUNCH_3,
+	SCRATCH,
+	LOAF,
+	GROOMING,
+
+	MAX
+};

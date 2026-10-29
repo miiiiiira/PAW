@@ -7,7 +7,6 @@
 
 #include "../Input/InputManager.h"
 #include "../Input/MouseCursor/MouseCursor.h"
-//#include "../Common/FrameRenderer/FrameRenderer.h"
 
 SceneManager* SceneManager::instance_ = nullptr;
 
@@ -35,9 +34,6 @@ void SceneManager::Init(void)
 	MouseCursor::CreateInstance();
 	MouseCursor::GetInstance()->Load();
 	MouseCursor::GetInstance()->Init();
-
-	//// フレーム画像のロード
-	//FrameRenderer::Load();
 
 	// 3D情報の初期化
 	Init3D();
@@ -70,11 +66,9 @@ void SceneManager::Init3D(void)
 
 	// ライトの設定
 	SetUseLighting(true);
+	SetLightEnable(true);
 
-	// 標準ライトをディレクショナルライトにする
-	ChangeLightTypeDir(VGet( 0.5f,0.0f, 0.0f ));
-
-	SetLightDifColor(GetColorF(0.0f, 0.0f, 0.0f, 1.0f));
+	SetLightDifColor(GetColorF(1.0f, 1.0f, 1.0f, 1.0f));
 	
 	// フォグ設定
 	SetFogEnable(true);

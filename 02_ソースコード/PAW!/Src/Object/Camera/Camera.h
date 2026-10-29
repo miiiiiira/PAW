@@ -6,7 +6,6 @@
 #include "../Component/Transform/Transform.h"
 
 class Transform;
-class Player;
 
 class Camera : public Component
 {
@@ -44,9 +43,6 @@ public:
 
 	// 追従対象
 	void SetTarget(Transform* targetTransform) { targetTransform_ = targetTransform; }
-
-	// プレイヤーの情報をもらう　※プレイヤーの場合
-	void SetPlayer(Player* player) { player_ = player; }
 
 	// Transformを返す
 	Transform* GetTransform(void) { return transform_; }
@@ -88,9 +84,6 @@ private:
 
 	// 追従対象Transform
 	Transform* targetTransform_ = nullptr;
-
-	// プレイヤー
-	Player* player_ = nullptr;
 
 private:
 

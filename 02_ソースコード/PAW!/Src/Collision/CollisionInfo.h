@@ -8,6 +8,7 @@ enum class CollisionTag
 	NONE,			// 未分類
 	PLAYER,			// プレイヤー本体
 	ENEMY,			// 敵本体
+	BOSS,			// BOSS本体
 	PLAYER_ATTACK,	// プレイヤーの攻撃
 	ENEMY_ATTACK,	// 敵の攻撃
 	STAGE,			// 地形
