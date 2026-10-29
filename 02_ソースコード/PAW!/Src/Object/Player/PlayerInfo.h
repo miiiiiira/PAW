@@ -7,6 +7,8 @@ class Player; // 前方宣言
 // 状態関数型
 typedef void(*playerStateFunction)(Player&);
 
+static constexpr int HP_UI_DIV = 6;
+
 // プレイヤーの状態
 enum PLAYER_STATE
 {
@@ -112,6 +114,12 @@ struct playerInfo
 	std::vector<const Transform*> attackAssistCandidates_;	// 補正対象の候補
 	const Transform* finalCandidateTransform_;				// 補正対象の最終候補
 
+};
+
+struct playerUiInfo
+{
+	// 画像ハンドル
+	int hpImage_[HP_UI_DIV];	// HP
 };
 
 enum class PLAYER_ANIMATION

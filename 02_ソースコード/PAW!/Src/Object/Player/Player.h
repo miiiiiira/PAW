@@ -28,6 +28,7 @@ public:
 
 public:
 	Player(void);				// コンストラクタ
+	~Player(void);				// デストラクタ
 
 	void Load(void) override;	// 読み込み
 	void Init(void) override;	// 初期化
@@ -172,6 +173,9 @@ private:
 private:
 	// プレイヤー情報
 	playerInfo info_;
+
+	// 画像ハンドル
+	playerUiInfo uiInfo_;
 
 	// プレイヤーの状態情報
 	playerStateCtrl stateCtrl_;

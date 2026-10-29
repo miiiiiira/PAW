@@ -45,11 +45,6 @@ namespace
 	constexpr float ASSIST_RANGE = 300.0f;		// プレイヤー周辺の円半径
 	constexpr float ASSIST_ANGLE = 120.0f;		// 補正可能角度
 
-	// 描画設定
-	constexpr int  STATUS_DRAW_POS_X = 10;		// ステータス描画を始める座標
-	constexpr int  HP_DRAW_POS_Y = 50;			// HPの描画Y軸
-	constexpr int STATUS_DRAW_POS_OFFSET = 10;	// オフセット
-
 	// アニメーション設定
 	constexpr float ANIM_SPEED_STANDING_IDLE = 0.7f;
 	constexpr float ANIM_SPEED_SITTING_IDLE = 0.7f;
@@ -62,6 +57,17 @@ namespace
 	constexpr float ANIM_SPEED_SCRATCH = 0.7f;
 	constexpr float ANIM_SPEED_LOAF = 0.7f;
 	constexpr float ANIM_SPEED_GROOMING = 0.7f;
+
+	// 描画設定
+	constexpr int  STATUS_DRAW_POS_X = 10;		// ステータス描画を始める座標
+	constexpr int  HP_DRAW_POS_Y = 50;			// HPの描画Y軸
+	constexpr int STATUS_DRAW_POS_OFFSET = 10;	// オフセット
+
+	// HP
+	constexpr int HP_UI_SIZE_X = 1024;
+	constexpr int HP_UI_SIZE_Y = 256;
+	constexpr int HP_UI_DEAW_SIZE_X = HP_UI_SIZE_X / 2;
+	constexpr int HP_UI_DEAW_SIZE_Y = HP_UI_SIZE_Y / 2;
 }
 
 Player::Player(void)
@@ -121,8 +127,26 @@ Player::Player(void)
 	stateCtrl_.updateHitTable_[PLAYER_HIT_END] = UpdateHitEnd;
 }
 
+Player::~Player(void)
+{
+	// 画像読み込み
+	for (int i = 0; i < HP_UI_DIV; i++)
+	{
+		DeleteGraph(uiInfo_.hpImage_[i]);
+	}
+}
+
 void Player::Load(void)
 {
+	// HP画像読み込み
+	LoadDivGraph(
+		"Data/Image/Game/HP.png",
+		HP_UI_DIV,
+		1,
+		HP_UI_DIV,
+		HP_UI_SIZE_X,
+		HP_UI_SIZE_Y,
+		uiInfo_.hpImage_);
 }
 
 // 初期化
@@ -951,9 +975,6 @@ void Player::RotAngle(void)
 
 void Player::SetDamage(int damage)
 {
-	// 無敵時間があればダメージを与えない
-	if (info_.invincibleTime_ > 0)return;
-
 	// HPにダメージを与える
 	info_.hp_ -= damage;
 
@@ -1227,6 +1248,9 @@ void Player::OnCollision(Collider* other)
 		if (stateCtrl_.state_ == PLAYER_STATE_DEAD ||
 			stateCtrl_.state_ == PLAYER_STATE_END)return;
 
+		// 無敵時間があれば処理を行わない
+		if (info_.invincibleTime_ > 0)return;
+
 		// ダメージ処理
 		SetDamage(1);
 
@@ -1261,13 +1285,14 @@ void Player::AttackOnCollision(void)
 
 void Player::DrawHP(void)
 {
-	// プレイヤーのhpの表示 緑
-	DrawFormatString(
-		STATUS_DRAW_POS_X,
-		HP_DRAW_POS_Y - STATUS_DRAW_POS_OFFSET,
-		0x00fa9a,
-		"%d",
-		info_.hp_);
+	// HP描画
+	DrawRotaGraph(
+		HP_UI_DEAW_SIZE_X / 2,
+		HP_UI_DEAW_SIZE_Y / 2,
+		0.5,
+		0.0,
+		uiInfo_.hpImage_[info_.hp_],
+		true);
 }
 
 #ifdef _DEBUG
@@ -1284,11 +1309,11 @@ void Player::DebugDraw3D(void)
 {
 	// 攻撃補正範囲の描画
 	DrawSphere3D(
-		transform_->pos_, 
-		ASSIST_RANGE, 
-		16, 
-		0x0000ff, 
-		0x0000ff, 
+		transform_->pos_,
+		ASSIST_RANGE,
+		16,
+		0x0000ff,
+		0x0000ff,
 		false
 	);
 }
