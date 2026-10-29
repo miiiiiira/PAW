@@ -59,15 +59,14 @@ void EnemyCommander::RatControl(void)
 		{
 			// UŒ‚ˆ—‚Ö
 			rat->ChangeState(RAT_STATE_ATTACK);
-
 			i++;
 		}
 	}
 
 	// ”Lƒƒ{ƒbƒg‚ª‘Ò‹@ó‘Ô‚¾‚Á‚½‚ç
-	if (catRobot_->GetState() == CAT_ROBOT_STATE_IDLE)
-	{
-		// UŒ‚ó‘Ô‚Ö
-		catRobot_->ChangeState(CAT_ROBOT_STATE_ATTACK);
-	}
+	//if (catRobot_->GetState() == CAT_ROBOT_STATE_IDLE)
+	//{
+	//	// UŒ‚ó‘Ô‚Ö
+	//	catRobot_->ChangeState(CAT_ROBOT_STATE_ATTACK);
+	//}
 }

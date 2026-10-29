@@ -22,9 +22,10 @@ namespace
 
 	// 攻撃1の（食材攻撃）
 	constexpr float ATTACK1_POS_Y = 1000.0f;	// Y座標
-	constexpr int ATTACK1_NUM = 10;				// 最大個数
-	constexpr int ATTACK1_RANGE = 2000;			// 最大個数
-	constexpr int ATTACK1_TRY_MAX = 10;		// 最大個数
+	constexpr int ATTACK1_NUM = 3;				// 攻撃を行う回数
+	constexpr int ATTACK1_FALL_NUM = 10;		// 降ってくる個数
+	constexpr int ATTACK1_RANGE = 2000;			// 攻撃範囲
+	constexpr int ATTACK1_TRY_MAX = 10;			// 最大挑戦回数
 }
 
 CatRobot::CatRobot(void)
@@ -193,6 +194,13 @@ void CatRobot::InitAttackSelect(CatRobot& catRobot)
 
 void CatRobot::InitAttack1(CatRobot& catRobot)
 {
+	// 0より大きければ初期化を行わない
+	if (catRobot.info_.attack1Num_ <= 0)
+	{
+		// 食材攻撃の回数初期化
+		catRobot.info_.attack1Num_ = ATTACK1_NUM;
+	}
+
 	// 攻撃1の座標決め
 	catRobot.ResetAttack1Pos();
 }
@@ -238,6 +246,17 @@ void CatRobot::UpdateAttack1(CatRobot& catRobot)
 	// すべて下へ落ち切っていたら
 	if (isAllEnd)
 	{
+		// 攻撃回数を減らす
+		catRobot.info_.attack1Num_--;
+
+		// 回数が残っていたら攻撃終了しない
+		if (catRobot.info_.attack1Num_ > 0)
+		{
+			// もう一度攻撃させる
+			catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_1);
+			return;
+		}
+
 		// 攻撃終了へ
 		catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_END);
 	}
@@ -348,7 +367,7 @@ void CatRobot::AddComponets(void)
 		static_cast<int>(CAT_ROBOT_ANIMATION::STANDING_IDLE));
 
 	// 攻撃1(食材攻撃)個数分回す
-	for (int i = 0; i < ATTACK1_NUM; i++)
+	for (int i = 0; i < ATTACK1_FALL_NUM; i++)
 	{
 		Attack1* attack = attack1_.emplace_back(owner_->AddComponent<Attack1>());
 		attack->Init();

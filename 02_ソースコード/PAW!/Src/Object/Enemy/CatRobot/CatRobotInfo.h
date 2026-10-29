@@ -82,6 +82,8 @@ struct catRobotInfo
 	int invincibleTime_ = 0;	// –³“GŠÔ
 
 	int waitTime_ = 0;	// ‘Ò‹@ŠÔ
+
+	int attack1Num_ = 0;	// UŒ‚‚ğs‚¤‰ñ”
 };
 
 enum class CAT_ROBOT_ANIMATION
