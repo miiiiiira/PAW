@@ -23,6 +23,8 @@ namespace
 	// 攻撃1の（食材攻撃）
 	constexpr float ATTACK1_POS_Y = 1000.0f;	// Y座標
 	constexpr int ATTACK1_NUM = 10;				// 最大個数
+	constexpr int ATTACK1_RANGE = 2000;			// 最大個数
+	constexpr int ATTACK1_TRY_MAX = 10;		// 最大個数
 }
 
 CatRobot::CatRobot(void)
@@ -438,14 +440,58 @@ void CatRobot::ResetAttack1Pos(void)
 	attack1_.front()->
 		StartAttack({ playerTransform_->pos_.x,ATTACK1_POS_Y,playerTransform_->pos_.z });
 
+	// ランダム座標
+	int randX, randZ = 0;
+	VECTOR pos = {};
+
 	// 攻撃数分回す
 	for (int i = 1; i < attack1_.size(); i++)
 	{
-		float randX = static_cast<float>(GetRand(1000.0f));
-		float randZ = static_cast<float>(GetRand(1000.0f));
+		for (int tryNum = 0; tryNum < ATTACK1_TRY_MAX; tryNum++)
+		{
+			// ランダムで座標を決める
+			randX = GetRand(ATTACK1_RANGE);
+			randZ = GetRand(ATTACK1_RANGE);
+			randX -= ATTACK1_RANGE / 2;
+			randZ -= ATTACK1_RANGE / 2;
 
-		attack1_[i]->StartAttack({ randX,ATTACK1_POS_Y,randZ });
+			pos = { static_cast<float>(randX),ATTACK1_POS_Y,static_cast<float>(randZ) };
+
+			// 判定に自分が含まれないよう-1
+			if (IsFarEnough(pos, Attack1::ATTACK1_RADIUS, i - 1))
+			{
+				// 座標を設定
+				attack1_[i]->StartAttack(pos);
+				break;
+			}
+
+			// 10回しても重なっていたらあきらめる
+			if (tryNum >= ATTACK1_TRY_MAX - 1)
+			{
+				// 座標を設定
+				attack1_[i]->StartAttack(pos);
+			}
+		}
 	}
+}
+
+bool CatRobot::IsFarEnough(VECTOR pos, float rad, int i)
+{
+	VECTOR vec = {};
+	for (int j = 0; j < i; j++)
+	{
+		vec = VSub(attack1_[j]->GetTransform()->pos_, pos);
+		// 距離を求める
+		float distance = VSize(vec);
+		// それぞれの半径の和
+		float radius = rad + rad;
+
+		// 当たっていたらfalseを返す
+		if (distance < radius)return false;
+	}
+
+	// 当たっていないためtrueを返す
+	return true;
 }
 
 void CatRobot::SetDamage(void)

@@ -102,6 +102,8 @@ private:
 
 	// 攻撃1の座標決め
 	void ResetAttack1Pos(void);
+	// 攻撃の範囲が重なっていなかったらtrueを返す（円で見る）
+	bool IsFarEnough(VECTOR pos, float rad, int i = 0);
 
 	// ダメージを与える
 	void SetDamage(void);

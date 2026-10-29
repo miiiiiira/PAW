@@ -23,7 +23,10 @@ public:
 	void Update(void) override;	// 更新
 
 public:
-	// プレイヤー状態を取得
+	// Transformを返す
+	Transform* GetTransform(void) { return transform_; }
+
+	// 状態を取得
 	ATTACK1_STATE GetState(void) { return stateCtrl_.state_; }
 
 	// 攻撃を開始

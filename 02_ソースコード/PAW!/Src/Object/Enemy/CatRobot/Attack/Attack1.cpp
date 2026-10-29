@@ -85,8 +85,8 @@ void Attack1::InitEnd(Attack1& attack1)
 	// ƒ^ƒO‚ðNONE‚Ö
 	attack1.sphereCollder_->SetCollisionTag(CollisionTag::NONE);
 
-	// 0‰Šú‰»
-	attack1.transform_->pos_.y = 0.0f;
+	// À•W‰Šú‰»
+	attack1.transform_->pos_ = {};
 }
 
 void Attack1::UpdateIdle(Attack1& attack1)
