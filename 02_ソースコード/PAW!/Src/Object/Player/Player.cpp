@@ -7,6 +7,7 @@
 #include "../Component/Animation/Animation.h"
 #include "../../Collision/3DCollider/CapsuleCollider.h"
 #include "../../Collision/3DCollider/SphereCollider.h"
+#include "../../Application.h"
 
 #include "Player.h"
 
@@ -63,11 +64,23 @@ namespace
 	constexpr int  HP_DRAW_POS_Y = 50;			// HPの描画Y軸
 	constexpr int STATUS_DRAW_POS_OFFSET = 10;	// オフセット
 
-	// HP
+	// HP画像
 	constexpr int HP_UI_SIZE_X = 1024;
 	constexpr int HP_UI_SIZE_Y = 256;
 	constexpr int HP_UI_DEAW_SIZE_X = HP_UI_SIZE_X / 2;
 	constexpr int HP_UI_DEAW_SIZE_Y = HP_UI_SIZE_Y / 2;
+
+	// ボタンガイド画像サイズ
+	constexpr int BUTTON_GUIDE_UI_SIZE_X = 551;
+	constexpr int BUTTON_GUIDE_UI_SIZE_Y = 101;
+	constexpr int BUTTON_GUIDE_UI_POS_X = Application::SCREEN_SIZE_X - BUTTON_GUIDE_UI_SIZE_X / 2;
+	constexpr int BUTTON_GUIDE_UI_POS_Y = Application::SCREEN_SIZE_Y - 50;
+
+	// 攻撃ボタンガイド画像サイズ
+
+	// 回避ボタンガイド
+
+	// ジャンプボタンガイド
 }
 
 Player::Player(void)
@@ -147,6 +160,11 @@ void Player::Load(void)
 		HP_UI_SIZE_X,
 		HP_UI_SIZE_Y,
 		uiInfo_.hpImage_);
+
+	// ボタンガイド画像読み込み
+	uiInfo_.attackImage_ = LoadGraph("Data/Image/Game/Attack.png");
+	uiInfo_.avoidImage_ = LoadGraph("Data/Image/Game/Avoid.png");
+	uiInfo_.jumpImage_ = LoadGraph("Data/Image/Game/Jump.png");
 }
 
 // 初期化
@@ -194,6 +212,9 @@ void Player::Draw2D(void)
 {
 	// HP描画
 	DrawHP();
+
+	// ボタンガイド描画
+	DrawButtonGuide();
 
 #ifdef _DEBUG
 	// デバッグ表示
@@ -1292,6 +1313,36 @@ void Player::DrawHP(void)
 		0.5,
 		0.0,
 		uiInfo_.hpImage_[info_.hp_],
+		true);
+}
+
+void Player::DrawButtonGuide(void)
+{
+	// 攻撃ガイド描画
+	DrawRotaGraph(
+		BUTTON_GUIDE_UI_POS_X,
+		BUTTON_GUIDE_UI_POS_Y,
+		1.0,
+		0.0,
+		uiInfo_.attackImage_,
+		true);
+
+	// 回避ガイド描画
+	DrawRotaGraph(
+		BUTTON_GUIDE_UI_POS_X,
+		BUTTON_GUIDE_UI_POS_Y,
+		1.0,
+		0.0,
+		uiInfo_.avoidImage_,
+		true);
+
+	// ジャンプガイド描画
+	DrawRotaGraph(
+		BUTTON_GUIDE_UI_POS_X,
+		BUTTON_GUIDE_UI_POS_Y,
+		1.0,
+		0.0,
+		uiInfo_.jumpImage_,
 		true);
 }
 

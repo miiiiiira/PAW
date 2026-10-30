@@ -151,7 +151,8 @@ private:
 	void AttackOnCollision(void);				// 攻撃判定の検知
 
 	// 描画系
-	void DrawHP(void);	// HP描画
+	void DrawHP(void);			// HP描画
+	void DrawButtonGuide(void);	// ボタンガイド描画
 
 #ifdef _DEBUG
 	// デバッグ用描画

@@ -120,6 +120,9 @@ struct playerUiInfo
 {
 	// 画像ハンドル
 	int hpImage_[HP_UI_DIV];	// HP
+	int attackImage_ = -1;		// 攻撃
+	int avoidImage_ = -1;		// 回避
+	int jumpImage_ = -1;		// ジャンプ
 };
 
 enum class PLAYER_ANIMATION
