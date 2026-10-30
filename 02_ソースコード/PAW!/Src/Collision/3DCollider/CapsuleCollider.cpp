@@ -1,10 +1,35 @@
 #include "CapsuleCollider.h"
 #include "SphereCollider.h"
+#include "CylinderCollider.h"
 
 #include "../../Object/Object.h"
 #include "../../Math/Math.h"
 
 #include <algorithm>
+#include <cmath>
+
+namespace
+{
+    // 円柱(Y軸平行・中心c・半径r・半高h)上で、点pに最も近い点を求める
+    VECTOR ClosestPointOnCylinder(const VECTOR& p, const VECTOR& c, float r, float halfH)
+    {
+        // 水平方向は円内に収める
+        float dx = p.x - c.x;
+        float dz = p.z - c.z;
+        float d = sqrtf(dx * dx + dz * dz);
+        if (d > r)
+        {
+            float s = r / d;
+            dx *= s;
+            dz *= s;
+        }
+
+        // 高さ方向は上下の範囲に収める
+        float y = fmaxf(c.y - halfH, fminf(p.y, c.y + halfH));
+
+        return VGet(c.x + dx, y, c.z + dz);
+    }
+}
 
 bool CapsuleCollider::CheckCollision(Collider* other)
 {
@@ -131,6 +156,115 @@ bool CapsuleCollider::CheckCollision(Collider* other)
 
             // 最近接点と球の中心の中間を衝突位置とする
             collisionInfo_.point = VScale(VAdd(closest, center), 0.5f);
+
+            bestPenetration = penetration;
+        }
+
+        return collisionInfo_.hit;
+    }
+
+    // カプセルと円柱の衝突判定
+    if (auto cyl = dynamic_cast<CylinderCollider*>(other))
+    {
+        // 相手の座標情報を取得できなければ処理しない
+        if (!cyl->GetOwner() || !cyl->GetOwner()->GetComponent<Transform>())
+            return false;
+
+        VECTOR center = cyl->GetCenter();
+        float halfH = cyl->GetHeight() * 0.5f;
+        float cylRadius = cyl->GetRadius();
+        float bestPenetration = 0.0f;
+
+        // 自分が持つ全てのカプセルを判定
+        for (const auto& cap : capsules_)
+        {
+            VECTOR start = VAdd(transform_->pos_, cap.startOffset);
+            VECTOR end = VAdd(transform_->pos_, cap.endOffset);
+
+            // 円柱と線分の最近接点を、交互に射影して求める
+            // (円柱も線分も凸なので、繰り返すと最近接点に収束する)
+            VECTOR p = Math::ClosestPointOnSegment(center, start, end);
+            for (int i = 0; i < 4; ++i)
+            {
+                VECTOR q = ClosestPointOnCylinder(p, center, cylRadius, halfH);
+                p = Math::ClosestPointOnSegment(q, start, end);
+            }
+
+            // p:カプセル線分上の最近接点 / q:円柱上の最近接点
+            VECTOR q = ClosestPointOnCylinder(p, center, cylRadius, halfH);
+
+            VECTOR delta = VSub(q, p);
+            float distanceSq = Math::LengthSq(delta);
+
+            VECTOR normal;
+            float penetration;
+
+            if (distanceSq > 0.000001f)
+            {
+                // 線分が円柱の外側にある場合
+                float distance = sqrtf(distanceSq);
+
+                // 半径以上離れていれば衝突しない
+                if (distance >= cap.radius)
+                    continue;
+
+                penetration = cap.radius - distance;
+
+                // カプセル側から円柱側へ向かう方向を衝突法線とする
+                normal = VScale(delta, 1.0f / distance);
+            }
+            else
+            {
+                // 線分が円柱の内部に入り込んでいる場合
+                // 最も近い面から外へ押し出す
+                float dx = p.x - center.x;
+                float dz = p.z - center.z;
+                float distH = sqrtf(dx * dx + dz * dz);
+
+                float penSide = cylRadius - distH;
+                float penTop = (center.y + halfH) - p.y;
+                float penBottom = p.y - (center.y - halfH);
+
+                float minPen;
+                VECTOR outward;   // 円柱から外へ向かう方向
+                if (penSide <= penTop && penSide <= penBottom)
+                {
+                    minPen = penSide;
+                    outward = distH > 0.0001f ?
+                        VGet(dx / distH, 0.0f, dz / distH) :
+                        VGet(1.0f, 0.0f, 0.0f);
+                }
+                else if (penTop <= penBottom)
+                {
+                    minPen = penTop;
+                    outward = VGet(0.0f, 1.0f, 0.0f);
+                }
+                else
+                {
+                    minPen = penBottom;
+                    outward = VGet(0.0f, -1.0f, 0.0f);
+                }
+
+                penetration = minPen + cap.radius;
+
+                // 法線はカプセル側から円柱側へ向けるので、外向きの逆にする
+                normal = VScale(outward, -1.0f);
+
+                // 円柱表面上の点を求め直す
+                q = VSub(p, VScale(outward, minPen));
+            }
+
+            // 複数のカプセルがある場合、最も深く重なった結果を残す
+            if (penetration <= bestPenetration)
+                continue;
+
+            collisionInfo_.hit = true;
+            collisionInfo_.normal = normal;
+            collisionInfo_.penetration = penetration;
+
+            // カプセル表面と円柱表面の中間を衝突位置とする
+            VECTOR capSurface = VAdd(p, VScale(normal, cap.radius));
+            collisionInfo_.point = VScale(VAdd(q, capSurface), 0.5f);
 
             bestPenetration = penetration;
         }

@@ -11,6 +11,7 @@ class Animation;
 class CapsuleCollider;
 class SphereCollider;
 class Attack1;
+class PlateAttack;
 
 class CatRobot : public Component
 {
@@ -100,10 +101,13 @@ private:
 	// 引数をtrueにするとプレイヤーから離れる方向を算出
 	void GetDirectionToPlayer(bool isRetreat = false);
 
-	// 攻撃1の座標決め
-	void ResetAttack1Pos(void);
-	// 攻撃の範囲が重なっていなかったらtrueを返す（円で見る）
-	bool IsFarEnough(VECTOR pos, float rad, int i = 0);
+	// 攻撃1（食材攻撃）
+	void ResetAttack1Pos(void);							// 座標決め
+	bool IsFarEnough(VECTOR pos, float rad, int i = 0);	// 攻撃の範囲が重なっていなかったらtrueを返す（円で見る）
+
+	// 攻撃2,3（お皿攻撃）
+	void ResetPlateAttackPos(bool leftRight);		// 座標決め
+	VECTOR SelectPlateAttackDir(bool leftRight);	// 向き決め
 
 	// ダメージを与える
 	void SetDamage(void);
@@ -119,7 +123,8 @@ private:
 	Animation* animation_ = nullptr;
 
 	// 攻撃コンポーネント
-	std::vector<Attack1*> attack1_;
+	std::vector<Attack1*> attack1_;	// 攻撃1
+	std::vector<PlateAttack*> plateAttack_;	// 攻撃2
 
 	// プレイヤーTransform
 	const Transform* playerTransform_ = nullptr;

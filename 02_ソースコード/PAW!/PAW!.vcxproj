@@ -138,7 +138,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Src\Object\Enemy\CatRobot\Attack\Attack1.cpp" />
+    <ClCompile Include="Src\Collision\3DCollider\CylinderCollider.cpp" />
+    <ClCompile Include="Src\Object\Enemy\CatRobot\Attack\PlateAttack\PlateAttack.cpp" />
+    <ClCompile Include="Src\Object\Enemy\CatRobot\Attack\Attack1\Attack1.cpp" />
     <ClCompile Include="Src\Object\Enemy\EnemyCommander.cpp" />
     <ClCompile Include="Src\Object\Enemy\CatRobot\CatRobot.cpp" />
     <ClCompile Include="Src\Collision\3DCollider\CapsuleCollider.cpp" />
@@ -179,8 +181,11 @@
     <ClCompile Include="Src\System\FpsControl\FpsControl.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Src\Object\Enemy\CatRobot\Attack\Attack1.h" />
-    <ClInclude Include="Src\Object\Enemy\CatRobot\Attack\Attack1Info.h" />
+    <ClInclude Include="Src\Collision\3DCollider\CylinderCollider.h" />
+    <ClInclude Include="Src\Object\Enemy\CatRobot\Attack\PlateAttack\PlateAttack.h" />
+    <ClInclude Include="Src\Object\Enemy\CatRobot\Attack\Attack1\Attack1.h" />
+    <ClInclude Include="Src\Object\Enemy\CatRobot\Attack\Attack1\Attack1Info.h" />
+    <ClInclude Include="Src\Object\Enemy\CatRobot\Attack\PlateAttack\PlateAttackInfo.h" />
     <ClInclude Include="Src\Object\Enemy\EnemyCommander.h" />
     <ClInclude Include="Src\Object\Enemy\CatRobot\CatRobot.h" />
     <ClInclude Include="Src\Collision\3DCollider\AABBCollider.h" />

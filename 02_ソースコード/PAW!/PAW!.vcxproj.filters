@@ -38,6 +38,10 @@
     <ClCompile Include="Src\Collision\CollisionManager.cpp" />
     <ClCompile Include="Src\Collision\CollisionMath.cpp" />
     <ClCompile Include="Src\Object\Enemy\CatRobot\CatRobot.cpp" />
+    <ClCompile Include="Src\Object\Enemy\CatRobot\Attack\Attack1\Attack1.cpp" />
+    <ClCompile Include="Src\Object\Enemy\EnemyCommander.cpp" />
+    <ClCompile Include="Src\Object\Enemy\CatRobot\Attack\PlateAttack\PlateAttack.cpp" />
+    <ClCompile Include="Src\Collision\3DCollider\CylinderCollider.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Application.h" />
@@ -89,5 +93,11 @@
     <ClInclude Include="Src\Collision\CollisionMath.h" />
     <ClInclude Include="Src\Object\Enemy\CatRobot\CatRobot.h" />
     <ClInclude Include="Src\Object\Enemy\CatRobot\CatRobotInfo.h" />
+    <ClInclude Include="Src\Object\Enemy\CatRobot\Attack\Attack1\Attack1.h" />
+    <ClInclude Include="Src\Object\Enemy\CatRobot\Attack\Attack1\Attack1Info.h" />
+    <ClInclude Include="Src\Object\Enemy\EnemyCommander.h" />
+    <ClInclude Include="Src\Object\Enemy\CatRobot\Attack\PlateAttack\PlateAttack.h" />
+    <ClInclude Include="Src\Object\Enemy\CatRobot\Attack\PlateAttack\PlateAttackInfo.h" />
+    <ClInclude Include="Src\Collision\3DCollider\CylinderCollider.h" />
   </ItemGroup>
 </Project>

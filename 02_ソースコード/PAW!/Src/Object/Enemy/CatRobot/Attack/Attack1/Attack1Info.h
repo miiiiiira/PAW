@@ -19,7 +19,6 @@ enum ATTACK1_STATE
 // 状態遷移
 struct attack1StateCtrl
 {
-	// 猫ロボット状態
 	// ステート
 	ATTACK1_STATE state_;
 	// ステートテーブル

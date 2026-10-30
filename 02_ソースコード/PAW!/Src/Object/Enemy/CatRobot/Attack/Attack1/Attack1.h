@@ -2,8 +2,8 @@
 
 #include <DxLib.h>
 
-#include "../../../Component/Component.h"
-#include "../../../Component/Transform/Transform.h"
+#include "../../../../Component/Component.h"
+#include "../../../../Component/Transform/Transform.h"
 #include "Attack1Info.h"
 
 // 前方宣言
@@ -64,10 +64,10 @@ private:
 	SphereCollider* sphereCollder_ = nullptr;
 
 private:
-	// 猫ロボット情報
+	// 攻撃情報
 	attack1Info info_;
 
-	// 猫ロボット状態情報
+	// 状態情報
 	attack1StateCtrl stateCtrl_;
 };
 
