@@ -71,16 +71,17 @@ namespace
 	constexpr int HP_UI_DEAW_SIZE_Y = HP_UI_SIZE_Y / 2;
 
 	// ボタンガイド画像サイズ
-	constexpr int BUTTON_GUIDE_UI_SIZE_X = 551;
-	constexpr int BUTTON_GUIDE_UI_SIZE_Y = 101;
-	constexpr int BUTTON_GUIDE_UI_POS_X = Application::SCREEN_SIZE_X - BUTTON_GUIDE_UI_SIZE_X / 2;
-	constexpr int BUTTON_GUIDE_UI_POS_Y = Application::SCREEN_SIZE_Y - 50;
-
-	// 攻撃ボタンガイド画像サイズ
-
+	constexpr int BUTTON_GUIDE_UI_SIZE_X = 220;
+	constexpr int BUTTON_GUIDE_UI_SIZE_Y = 40;
+	// 攻撃ボタンガイド
+	constexpr int ATTACK_BUTTON_GUIDE_UI_POS_X = Application::SCREEN_SIZE_X - BUTTON_GUIDE_UI_SIZE_X / 2;
+	constexpr int ATTACK_BUTTON_GUIDE_UI_POS_Y = Application::SCREEN_SIZE_Y - (BUTTON_GUIDE_UI_SIZE_Y + 90);
 	// 回避ボタンガイド
-
+	constexpr int AVOID_BUTTON_GUIDE_UI_POS_X = Application::SCREEN_SIZE_X - BUTTON_GUIDE_UI_SIZE_X / 2;
+	constexpr int AVOID_BUTTON_GUIDE_UI_POS_Y = Application::SCREEN_SIZE_Y - (BUTTON_GUIDE_UI_SIZE_Y / 2 + 60);
 	// ジャンプボタンガイド
+	constexpr int JUMP_BUTTON_GUIDE_UI_POS_X = Application::SCREEN_SIZE_X - BUTTON_GUIDE_UI_SIZE_X / 2;
+	constexpr int JUMP_BUTTON_GUIDE_UI_POS_Y = Application::SCREEN_SIZE_Y - 30;
 }
 
 Player::Player(void)
@@ -1320,27 +1321,27 @@ void Player::DrawButtonGuide(void)
 {
 	// 攻撃ガイド描画
 	DrawRotaGraph(
-		BUTTON_GUIDE_UI_POS_X,
-		BUTTON_GUIDE_UI_POS_Y,
-		1.0,
+		ATTACK_BUTTON_GUIDE_UI_POS_X,
+		ATTACK_BUTTON_GUIDE_UI_POS_Y,
+		0.4,
 		0.0,
 		uiInfo_.attackImage_,
 		true);
 
 	// 回避ガイド描画
 	DrawRotaGraph(
-		BUTTON_GUIDE_UI_POS_X,
-		BUTTON_GUIDE_UI_POS_Y,
-		1.0,
+		AVOID_BUTTON_GUIDE_UI_POS_X,
+		AVOID_BUTTON_GUIDE_UI_POS_Y,
+		0.4,
 		0.0,
 		uiInfo_.avoidImage_,
 		true);
 
 	// ジャンプガイド描画
 	DrawRotaGraph(
-		BUTTON_GUIDE_UI_POS_X,
-		BUTTON_GUIDE_UI_POS_Y,
-		1.0,
+		JUMP_BUTTON_GUIDE_UI_POS_X,
+		JUMP_BUTTON_GUIDE_UI_POS_Y,
+		0.4,
 		0.0,
 		uiInfo_.jumpImage_,
 		true);
