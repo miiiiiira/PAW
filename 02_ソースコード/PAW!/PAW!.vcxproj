@@ -164,6 +164,9 @@
     <ClCompile Include="Src\Object\Component\Graphics\Render2D.cpp" />
     <ClCompile Include="Src\Object\Component\Graphics\Render3D.cpp" />
     <ClCompile Include="Src\Object\Component\Transform\Transform.cpp" />
+    <ClCompile Include="Src\Object\Enemy\Wave\Wave1.cpp" />
+    <ClCompile Include="Src\Object\Enemy\Wave\WaveBase.cpp" />
+    <ClCompile Include="Src\Object\Enemy\Wave\WaveManager.cpp" />
     <ClCompile Include="Src\Object\Grid\Grid.cpp" />
     <ClCompile Include="Src\Object\ObjectManager.cpp" />
     <ClCompile Include="Src\Object\Player\Player.cpp" />
@@ -217,6 +220,9 @@
     <ClInclude Include="Src\Object\Component\Transform\Transform.h" />
     <ClInclude Include="Src\Object\Component\Transform\Transform2D.h" />
     <ClInclude Include="Src\Object\Enemy\Rat\RatInfo.h" />
+    <ClInclude Include="Src\Object\Enemy\Wave\Wave1.h" />
+    <ClInclude Include="Src\Object\Enemy\Wave\WaveBase.h" />
+    <ClInclude Include="Src\Object\Enemy\Wave\WaveManager.h" />
     <ClInclude Include="Src\Object\Grid\Grid.h" />
     <ClInclude Include="Src\Object\Object.h" />
     <ClInclude Include="Src\Object\ObjectManager.h" />

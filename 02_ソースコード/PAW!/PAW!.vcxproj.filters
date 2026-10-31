@@ -42,6 +42,9 @@
     <ClCompile Include="Src\Object\Enemy\EnemyCommander.cpp" />
     <ClCompile Include="Src\Object\Enemy\CatRobot\Attack\PlateAttack\PlateAttack.cpp" />
     <ClCompile Include="Src\Collision\3DCollider\CylinderCollider.cpp" />
+    <ClCompile Include="Src\Object\Enemy\Wave\WaveBase.cpp" />
+    <ClCompile Include="Src\Object\Enemy\Wave\WaveManager.cpp" />
+    <ClCompile Include="Src\Object\Enemy\Wave\Wave1.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Application.h" />
@@ -99,5 +102,8 @@
     <ClInclude Include="Src\Object\Enemy\CatRobot\Attack\PlateAttack\PlateAttack.h" />
     <ClInclude Include="Src\Object\Enemy\CatRobot\Attack\PlateAttack\PlateAttackInfo.h" />
     <ClInclude Include="Src\Collision\3DCollider\CylinderCollider.h" />
+    <ClInclude Include="Src\Object\Enemy\Wave\WaveBase.h" />
+    <ClInclude Include="Src\Object\Enemy\Wave\WaveManager.h" />
+    <ClInclude Include="Src\Object\Enemy\Wave\Wave1.h" />
   </ItemGroup>
 </Project>
