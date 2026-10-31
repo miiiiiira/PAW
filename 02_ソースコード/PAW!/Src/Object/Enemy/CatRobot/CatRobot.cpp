@@ -6,6 +6,7 @@
 #include "../../../Math/Math.h"
 #include "Attack/Attack1/Attack1.h"
 #include "Attack/PlateAttack/PlateAttack.h"
+#include "../../../Scene/SceneManager.h"
 
 #include "CatRobot.h"
 
@@ -19,7 +20,7 @@ namespace
 	constexpr float MAX_FALL = -20.0f;	// 最大落下速度
 
 	// リミット設定
-	constexpr int INVINCIBLE_TIME = 60;	// 無敵時間
+	constexpr int INVINCIBLE_TIME = 20;	// 無敵時間
 
 	// 攻撃1の（食材攻撃）
 	constexpr float ATTACK1_POS_Y = 1000.0f;	// Y座標
@@ -148,6 +149,8 @@ void CatRobot::InitDead(CatRobot& catRobot)
 
 void CatRobot::InitEnd(CatRobot& catRobot)
 {
+	// ボスを倒したためゲームクリア
+	SceneManager::GetInstance()->TrueGameClear();
 }
 
 void CatRobot::UpdateIdle(CatRobot& catRobot)
@@ -180,6 +183,8 @@ void CatRobot::UpdateChance(CatRobot& catRobot)
 
 void CatRobot::UpdateDead(CatRobot& catRobot)
 {
+	// 完全終了へ
+	catRobot.ChangeState(CAT_ROBOT_STATE_END);
 }
 
 void CatRobot::UpdateEnd(CatRobot& catRobot)
@@ -700,6 +705,9 @@ void CatRobot::SetDamage(void)
 	{
 		// 0初期化しておく
 		info_.hp_ = 0;
+
+		// 死亡状態へ
+		ChangeState(CAT_ROBOT_STATE_DEAD);
 	}
 	else
 	{
@@ -717,6 +725,8 @@ void CatRobot::OnCollision(Collider* other)
 		break;
 
 	case CollisionTag::PLAYER_ATTACK:
+		// ダメージを与える
+		SetDamage();
 		break;
 
 	default:
