@@ -1,6 +1,7 @@
 #include "../ObjectManager.h"
 #include "CatRobot/CatRobot.h"
 #include "Rat/Rat.h"
+#include "Wave/WaveManager.h"
 
 #include "EnemyCommander.h"
 
@@ -38,35 +39,49 @@ void EnemyCommander::Release(void)
 
 void EnemyCommander::RatControl(void)
 {
-	int i = 0;
 
-	// ƒlƒYƒ~‚ÌUŒ‚ˆ—
-	for (const auto& rat : rats_)
+	switch (WaveManager::GetInstance().GetCurrentWave()->GetState())
 	{
-		// UŒ‚ó‘Ô‚ÌƒlƒYƒ~‚ð2•C‚Ü‚Å‚Æ‚·‚é
-		if (i >= 2)break;
+	case WaveBase::WaveState::RAT:
+	{
+		int i = 0;
 
-		// UŒ‚ó‘Ô‚¾‚Á‚½‚ç
-		if (rat->GetState() == RAT_STATE_ATTACK)
+		// ƒlƒYƒ~‚ÌUŒ‚ˆ—
+		for (const auto& rat : rats_)
 		{
-			// ƒJƒEƒ“ƒg‚µ‚ÄŽŸ‚Ö
-			i++;
-			continue;
-		}
+			// UŒ‚ó‘Ô‚ÌƒlƒYƒ~‚ð2•C‚Ü‚Å‚Æ‚·‚é
+			if (i >= 2)break;
 
-		// ‘Ò‹@ó‘Ô‚¾‚Á‚½‚ç
-		if (rat->IsCanAttack())
-		{
-			// UŒ‚ˆ—‚Ö
-			rat->ChangeState(RAT_STATE_ATTACK);
-			i++;
+			// UŒ‚ó‘Ô‚¾‚Á‚½‚ç
+			if (rat->GetState() == RAT_STATE_ATTACK)
+			{
+				// ƒJƒEƒ“ƒg‚µ‚ÄŽŸ‚Ö
+				i++;
+				continue;
+			}
+
+			// ‘Ò‹@ó‘Ô‚¾‚Á‚½‚ç
+			if (rat->IsCanAttack())
+			{
+				// UŒ‚ˆ—‚Ö
+				rat->ChangeState(RAT_STATE_ATTACK);
+				i++;
+			}
 		}
 	}
+		break;
+	case WaveBase::WaveState::CAT_ROBOT:
+		// ”Lƒƒ{ƒbƒg‚ª‘Ò‹@ó‘Ô‚¾‚Á‚½‚ç
+		if (catRobot_->GetState() == CAT_ROBOT_STATE_IDLE)
+		{
+			// UŒ‚ó‘Ô‚Ö
+			catRobot_->ChangeState(CAT_ROBOT_STATE_ATTACK);
+		}
+		break;
 
-	// ”Lƒƒ{ƒbƒg‚ª‘Ò‹@ó‘Ô‚¾‚Á‚½‚ç
-	if (catRobot_->GetState() == CAT_ROBOT_STATE_IDLE)
-	{
-		// UŒ‚ó‘Ô‚Ö
-		catRobot_->ChangeState(CAT_ROBOT_STATE_ATTACK);
+	case WaveBase::WaveState::EVENT:
+	case WaveBase::WaveState::CLEARED:
+	default:
+		break;
 	}
 }

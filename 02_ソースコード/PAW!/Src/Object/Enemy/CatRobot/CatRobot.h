@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include "../../Component/Component.h"
 #include "../../Component/Transform/Transform.h"
 #include "CatRobotInfo.h"
@@ -20,6 +21,7 @@ public:
 
 	void Init(void) override;	// 初期化
 	void Update(void) override;	// 更新
+	void Draw2D(void) override;	// 2D描画
 
 public:
 	// Transformを返す
@@ -33,6 +35,9 @@ public:
 
 	// プレイヤーのTransformポインタを取得
 	void SetPlayerTransform(const Transform* transform) { playerTransform_ = transform; }
+
+	// HPを返す
+	int GetNowHP(void) { return info_.hp_; }
 
 private:
 	// 状態別更新処理

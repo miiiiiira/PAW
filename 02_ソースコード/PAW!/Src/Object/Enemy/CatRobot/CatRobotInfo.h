@@ -83,7 +83,11 @@ struct catRobotInfo
 
 	int waitTime_ = 0;	// 待機時間
 
-	int attackNum_ = 0;	// 攻撃を行う回数
+	int attackNum_ = 0;	// 特定の種類の攻撃を行う回数
+
+	int attackNumAll_ = 0;	// 攻撃を行う回数
+
+	int stunTime_ = 0;	// スタン時間
 };
 
 enum class CAT_ROBOT_ANIMATION

@@ -1,6 +1,10 @@
 #pragma once
 
 #include <DxLib.h>
+#include <vector>
+
+class Rat;
+class CatRobot;
 
 class WaveBase
 {
@@ -29,9 +33,19 @@ public:
     // ウェーブ開始させる
     void StartInWave(void);
 
+    // ネズミと猫ロボットのポインタをセット
+    void SetRatCatRobotPoint(std::vector<Rat*>rats, CatRobot* catRobot)
+    {
+        rats_ = rats, catRobot_ = catRobot;
+    }
+
 protected:
     // 固定フレーム
     static constexpr int ONE_SECOND = 60;
+
+protected:
+    std::vector<Rat*>rats_;
+    CatRobot* catRobot_;
 
 protected:
     // ウェーブ状態

@@ -185,6 +185,7 @@ void Rat::InitDead(Rat& rat)
 
 void Rat::InitEnd(Rat& rat)
 {
+	rat.render3D_->SetIsDraw(false);
 }
 
 void Rat::UpdateIdle(Rat& rat)

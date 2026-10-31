@@ -10,9 +10,10 @@ WaveManager::~WaveManager(void)
 {
 }
 
-void WaveManager::AddWave(std::unique_ptr<WaveBase> wave)
+void WaveManager::AddWave(std::unique_ptr<WaveBase> wave, std::vector<Rat*> rats, CatRobot* catRobot)
 {
 	// ウェーブの追加
+	wave->SetRatCatRobotPoint(rats, catRobot);
 	waves_.push_back(std::move(wave));
 }
 

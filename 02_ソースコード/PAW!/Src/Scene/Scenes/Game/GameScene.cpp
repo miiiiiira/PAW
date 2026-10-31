@@ -21,6 +21,8 @@
 #include "../../../Object/Camera/CameraUtility.h"
 #include "../../../Object/Enemy/EnemyCommander.h"
 #include "../../../Object/Grid/Grid.h"
+#include "../../../Object/Enemy/Wave/WaveManager.h"
+#include "../../../Object/Enemy/Wave/Wave1.h"
 
 #include "GameScene.h"
 
@@ -48,6 +50,10 @@ void GameScene::Init(void)
 	auto rats = objectManager_->FindComponentWithTagAll<Rat>(TAG_3D::RAT);
 	auto catRobot = objectManager_->FindComponentWithTag<CatRobot>(TAG_3D::CAT_ROBOT);
 	enemyCommander_->Init(rats,catRobot);
+
+	// ウェーブの作成・各ウェーブの追加
+	WaveManager::CreateInstance();
+	WaveManager::GetInstance().AddWave(std::make_unique<Wave1>(),rats, catRobot);
 
 	// BGM再生
 	//AudioManager::GetInstance()->PlayBGM(SoundID::BGM_GAME_1);
@@ -122,6 +128,16 @@ void GameScene::Update(void)
 	// 全ての登録コライダーを検査
 	CollisionManager::GetInstance()->CheckAll();
 
+	// ウェーブの更新
+	WaveManager::GetInstance().Update();
+
+	// WAVEが最終段階かつ、敵全てが死亡していたら
+	if (WaveManager::GetInstance().AllCleared())
+	{
+		// ゲームクリアに遷移
+		SceneManager::GetInstance()->TrueGameClear();
+	}
+
 	// Effekseerにより再生中のエフェクトを更新する
 	UpdateEffekseer3D();
 
@@ -152,6 +168,9 @@ void GameScene::Draw(void)
 	// オブジェクトの2D描画
 	objectManager_->Draw2D();
 
+	// ウェーブの描画
+	WaveManager::GetInstance().Draw();
+
 #ifdef _DEBUG
 
 	DrawString(0, 0, "Game", 0xffffff);
@@ -162,6 +181,9 @@ void GameScene::Draw(void)
 
 void GameScene::Release(void)
 {
+	// ウェーブの解放
+	WaveManager::GetInstance().DeleteInstance();
+
 	// 敵司令官の解放
 	enemyCommander_->Release();
 	delete enemyCommander_;

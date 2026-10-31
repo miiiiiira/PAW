@@ -6,7 +6,6 @@
 #include "../../../Math/Math.h"
 #include "Attack/Attack1/Attack1.h"
 #include "Attack/PlateAttack/PlateAttack.h"
-#include "../../../Scene/SceneManager.h"
 
 #include "CatRobot.h"
 
@@ -36,6 +35,12 @@ namespace
 	constexpr int PLATE_FLYING_NUM = 4;				// 個数
 	constexpr float PLATE_MOVE_DISTANCE = 2000.0f;	// 攻撃距離
 	constexpr int PLATE_IDLE_COUNT = 60;			// 待機時間の基準値
+
+	// 攻撃全体の回数
+	constexpr int ATTACK_NUM_ALL = 1;
+
+	// スタン時間
+	constexpr int STUN_TIME = 300;
 
 	constexpr int ATTACK_RAND_NUM = 5000;		// ランダム用数
 }
@@ -112,6 +117,20 @@ void CatRobot::Update(void)
 	UpdateInvincible();
 }
 
+void CatRobot::Draw2D(void)
+{
+	unsigned int col = 0xff0000;
+
+	if (stateCtrl_.state_ == CAT_ROBOT_STATE_CHANCE &&
+		stateCtrl_.chanceState_ == CAT_ROBOT_CHANCE_STUN)
+	{
+		col = 0x0000ff;
+	}
+
+	// HP描画
+	DrawFormatString(0, 200, col, "%d", info_.hp_);
+}
+
 void CatRobot::UpdateState(void)
 {
 	// Transformがなければ処理しない
@@ -135,12 +154,16 @@ void CatRobot::InitMove(CatRobot& catRobot)
 
 void CatRobot::InitAttack(CatRobot& catRobot)
 {
+	catRobot.info_.attackNumAll_ = ATTACK_NUM_ALL;
+
 	// 攻撃種類選択へ
 	catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_SELECT);
 }
 
 void CatRobot::InitChance(CatRobot& catRobot)
 {
+	// 攻撃種類選択へ
+	catRobot.ChangeChanceState(CAT_ROBOT_CHANCE_START);
 }
 
 void CatRobot::InitDead(CatRobot& catRobot)
@@ -149,8 +172,6 @@ void CatRobot::InitDead(CatRobot& catRobot)
 
 void CatRobot::InitEnd(CatRobot& catRobot)
 {
-	// ボスを倒したためゲームクリア
-	SceneManager::GetInstance()->TrueGameClear();
 }
 
 void CatRobot::UpdateIdle(CatRobot& catRobot)
@@ -257,8 +278,29 @@ void CatRobot::InitAttackEnd(CatRobot& catRobot)
 
 void CatRobot::UpdateAttackSelect(CatRobot& catRobot)
 {
-	// 攻撃１へ
-	catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_3);
+	catRobot.info_.attackNumAll_--;
+
+	int rand = GetRand(ATTACK_RAND_NUM);
+	// 0～2にする
+	rand %= 3;
+
+	switch (rand)
+	{
+	case 0:
+		// 攻撃1へ
+		catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_1);
+		break;
+	case 1:
+		// 攻撃2へ
+		catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_2);
+		break;
+	case 2:
+		// 攻撃3へ
+		catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_3);
+		break;
+	default:
+		break;
+	}
 }
 
 void CatRobot::UpdateAttack1(CatRobot& catRobot)
@@ -372,8 +414,17 @@ void CatRobot::UpdateAttack4(CatRobot& catRobot)
 
 void CatRobot::UpdateAttackEnd(CatRobot& catRobot)
 {
-	// 待機状態へ
-	catRobot.ChangeState(CAT_ROBOT_STATE_IDLE);
+	// 攻撃回数が残っていたら
+	if (catRobot.info_.attackNumAll_ > 0)
+	{
+		// 攻撃選択へ
+		catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_SELECT);
+	}
+	else
+	{
+		// 攻撃チャンス状態へ
+		catRobot.ChangeState(CAT_ROBOT_STATE_CHANCE);
+	}
 }
 
 void CatRobot::ChangeAttackState(CAT_ROBOT_ATTACK_STATE state)
@@ -395,6 +446,7 @@ void CatRobot::InitChanceStart(CatRobot& catRobot)
 
 void CatRobot::InitChanceStun(CatRobot& catRobot)
 {
+	catRobot.info_.stunTime_ = STUN_TIME;
 }
 
 void CatRobot::InitChanceEnd(CatRobot& catRobot)
@@ -403,14 +455,25 @@ void CatRobot::InitChanceEnd(CatRobot& catRobot)
 
 void CatRobot::UpdateChanceStart(CatRobot& catRobot)
 {
+	// スタン状態へ
+	catRobot.ChangeChanceState(CAT_ROBOT_CHANCE_STUN);
 }
 
 void CatRobot::UpdateChanceStun(CatRobot& catRobot)
 {
+	catRobot.info_.stunTime_--;
+
+	if (catRobot.info_.stunTime_ <= 0)
+	{
+		// スタン終了状態へ
+		catRobot.ChangeChanceState(CAT_ROBOT_CHANCE_END);
+	}
 }
 
 void CatRobot::UpdateChanceEnd(CatRobot& catRobot)
 {
+	// 待機状態へ
+	catRobot.ChangeState(CAT_ROBOT_STATE_IDLE);
 }
 
 void CatRobot::ChangeChanceState(CAT_ROBOT_CHANCE_STATE state)
@@ -725,8 +788,14 @@ void CatRobot::OnCollision(Collider* other)
 		break;
 
 	case CollisionTag::PLAYER_ATTACK:
-		// ダメージを与える
-		SetDamage();
+		// スタン状態だったらダメージを与える
+		if (stateCtrl_.state_ == CAT_ROBOT_STATE_CHANCE &&
+			stateCtrl_.chanceState_ == CAT_ROBOT_CHANCE_STUN)
+		{
+			// ダメージを与える
+			SetDamage();
+		}
+
 		break;
 
 	default:

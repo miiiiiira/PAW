@@ -5,6 +5,9 @@
 #include <memory>
 #include <vector>
 
+class Rat;
+class CatRobot;
+
 class WaveManager
 {
 public:
@@ -32,7 +35,10 @@ public:
 
 public:
     // ウェーブの追加
-    void AddWave(std::unique_ptr<WaveBase> wave);
+    void AddWave(
+        std::unique_ptr<WaveBase> wave,
+        std::vector<Rat*> rats,
+        CatRobot* catRobot);
 
     // 現在のウェーブを取得
     WaveBase* GetCurrentWave(void);
