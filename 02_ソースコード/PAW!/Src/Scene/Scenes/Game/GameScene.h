@@ -44,6 +44,8 @@ private:
 	void RatCreate(void);	
 	// 猫ロボットの作成
 	void CatRobotCreate(void);	
+	// ステージの作成
+	void StageCreate(void);
 
 	// 参照系
 	void SetUp(void);

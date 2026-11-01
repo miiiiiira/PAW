@@ -45,6 +45,7 @@
     <ClCompile Include="Src\Object\Enemy\Wave\WaveBase.cpp" />
     <ClCompile Include="Src\Object\Enemy\Wave\WaveManager.cpp" />
     <ClCompile Include="Src\Object\Enemy\Wave\Wave1.cpp" />
+    <ClCompile Include="Src\Object\Stage\Table\Table.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Application.h" />
@@ -105,5 +106,6 @@
     <ClInclude Include="Src\Object\Enemy\Wave\WaveBase.h" />
     <ClInclude Include="Src\Object\Enemy\Wave\WaveManager.h" />
     <ClInclude Include="Src\Object\Enemy\Wave\Wave1.h" />
+    <ClInclude Include="Src\Object\Stage\Table\Table.h" />
   </ItemGroup>
 </Project>

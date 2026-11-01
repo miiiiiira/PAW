@@ -21,6 +21,7 @@
 #include "../../../Object/Camera/CameraUtility.h"
 #include "../../../Object/Enemy/EnemyCommander.h"
 #include "../../../Object/Grid/Grid.h"
+#include "../../../Object/Stage/Table/Table.h"
 #include "../../../Object/Enemy/Wave/WaveManager.h"
 #include "../../../Object/Enemy/Wave/Wave1.h"
 
@@ -78,6 +79,9 @@ void GameScene::Load(void)
 
 	// 猫ロボットの作成
 	CatRobotCreate();
+
+	// ステージの作成
+	StageCreate();
 
 	// 各オブジェクトのロード
 	objectManager_->Load();
@@ -254,6 +258,18 @@ void GameScene::CatRobotCreate(void)
 
 	// 猫ロボット機能セット
 	catRobot->AddComponent<CatRobot>();
+}
+
+void GameScene::StageCreate(void)
+{
+	// テーブルの生成
+	auto table = objectManager_->CreateObject();
+
+	// タグを付与
+	table->SetTagAndPriority(TAG_3D::STAGE);
+
+	// テーブルの付与
+	table->AddComponent<Table>();
 }
 
 void GameScene::SetUp(void)
