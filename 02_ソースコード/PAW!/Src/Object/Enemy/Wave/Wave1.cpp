@@ -2,6 +2,11 @@
 #include "../CatRobot/CatRobot.h"
 #include "Wave1.h"
 
+namespace
+{
+	constexpr VECTOR RAT_SPAWN_POS = { 0.0f, 0.0f, 1500.0f };
+}
+
 Wave1::Wave1(void)
 {
 }
@@ -12,6 +17,7 @@ Wave1::~Wave1(void)
 
 void Wave1::OnStart(void)
 {
+	rats_[0]->ResetRat(RAT_SPAWN_POS);
 }
 
 void Wave1::OnEvent(void)
@@ -32,7 +38,13 @@ void Wave1::OnClear(void)
 
 bool Wave1::CheckEventClear(void)
 {
-	return true;
+	// イベント移動が終了したら
+	if (rats_[0]->GetState() != RAT_STATE_EVENT_MOVE)
+	{
+		return true;
+	}
+
+	return false;
 }
 
 bool Wave1::CheckRatClear(void)

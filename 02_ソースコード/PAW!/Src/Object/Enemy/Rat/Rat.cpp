@@ -48,12 +48,18 @@ namespace
 	constexpr int WAIT_TIME = 120;			// 待機時間
 	constexpr int SWAY_NUM_MAX = 4;			// 揺れの最大回数
 	constexpr int RANDOM_RIMIT = 1000;		// ランダム用の最大係数
+
+	// イベントシーン設定
+	constexpr float EVENT_MOVE_DISTANCE = 400.0f;	// イベントシーン時の移動距離
+	constexpr int EVENT_IDLE_TIME = 180;			// イベントシーン時の待機時間
 }
 
 Rat::Rat(void)
 {
 	// ネズミ状態
 	// 初期化関数
+	stateCtrl_.initStateTable_[RAT_STATE_EVENT_MOVE] = InitEventMove;
+	stateCtrl_.initStateTable_[RAT_STATE_EVENT_IDLE] = InitEventIdle;
 	stateCtrl_.initStateTable_[RAT_STATE_IDLE] = InitIdle;
 	stateCtrl_.initStateTable_[RAT_STATE_MOVE] = InitMove;
 	stateCtrl_.initStateTable_[RAT_STATE_RETREAT] = InitRetreat;
@@ -62,6 +68,8 @@ Rat::Rat(void)
 	stateCtrl_.initStateTable_[RAT_STATE_DEAD] = InitDead;
 	stateCtrl_.initStateTable_[RAT_STATE_END] = InitEnd;
 	// 更新関数
+	stateCtrl_.updateStateTable_[RAT_STATE_EVENT_MOVE] = UpdateEventMove;
+	stateCtrl_.updateStateTable_[RAT_STATE_EVENT_IDLE] = UpdateEventIdle;
 	stateCtrl_.updateStateTable_[RAT_STATE_IDLE] = UpdateIdle;
 	stateCtrl_.updateStateTable_[RAT_STATE_MOVE] = UpdateMove;
 	stateCtrl_.updateStateTable_[RAT_STATE_RETREAT] = UpdateRetreat;
@@ -108,7 +116,6 @@ void Rat::Init(void)
 	// コンポーネントの追加
 	AddComponets();
 
-	// HPの初期化
 	info_.hp_ = DEFAULT_HP;
 
 	// ネズミの状態初期化
@@ -143,6 +150,18 @@ void Rat::UpdateState(void)
 	}
 }
 
+void Rat::InitEventMove(Rat& rat)
+{
+	// 移動アニメーション再生
+	rat.animation_->Play(static_cast<int>(RAT_ANIMATION::MOVE));
+}
+
+void Rat::InitEventIdle(Rat& rat)
+{
+	// 待機アニメーション再生
+	rat.animation_->Play(static_cast<int>(RAT_ANIMATION::IDLE));
+}
+
 void Rat::InitIdle(Rat& rat)
 {
 	// 待機状態を初期化
@@ -153,7 +172,7 @@ void Rat::InitMove(Rat& rat)
 {
 	// ネズミの移動速度を設定
 	rat.info_.moveSpeed_ = MOVE_SPEED;
-	// 待機アニメーション再生
+	// 移動アニメーション再生
 	rat.animation_->Play(static_cast<int>(RAT_ANIMATION::MOVE));
 }
 
@@ -161,7 +180,7 @@ void Rat::InitRetreat(Rat& rat)
 {
 	// ネズミの移動速度を設定
 	rat.info_.moveSpeed_ = MOVE_SPEED;
-	// 待機アニメーション再生
+	// 移動アニメーション再生
 	rat.animation_->Play(static_cast<int>(RAT_ANIMATION::MOVE));
 }
 
@@ -186,6 +205,34 @@ void Rat::InitDead(Rat& rat)
 void Rat::InitEnd(Rat& rat)
 {
 	rat.render3D_->SetIsDraw(false);
+}
+
+void Rat::UpdateEventMove(Rat& rat)
+{
+	// 移動処理
+	rat.Move();
+
+	// 距離を調べる
+	VECTOR vec = VSub(rat.transform_->pos_, rat.info_.goalPos_);
+	float distance = vec.x * vec.x + vec.z * vec.z;
+
+	// 目標距離を超えていたら
+	if (distance >= EVENT_MOVE_DISTANCE * EVENT_MOVE_DISTANCE)
+	{
+		// イベント時用待機状態へ
+		rat.ChangeState(RAT_STATE_EVENT_IDLE);
+	}
+}
+
+void Rat::UpdateEventIdle(Rat& rat)
+{
+	rat.info_.eventIdleTime_++;
+
+	if (rat.info_.eventIdleTime_ >= EVENT_IDLE_TIME)
+	{
+		// 待機状態へ
+		rat.ChangeState(RAT_STATE_IDLE);
+	}
 }
 
 void Rat::UpdateIdle(Rat& rat)
@@ -307,6 +354,34 @@ bool Rat::IsCanAttack(void)
 
 	// 待機中かつプレイヤーとの距離がちょうどよかったらtrueを返す
 	return stateCtrl_.state_ == RAT_STATE_IDLE && isDistance;
+}
+
+void Rat::ResetRat(VECTOR pos)
+{
+	// 指定の座標を設定
+	transform_->pos_ = pos;
+
+	// HPを初期化
+	info_.hp_ = DEFAULT_HP;
+
+	// 向きを設定
+	info_.moveDir_ = { 0.0f,0.0f,-1.0f };
+	transform_->angle_.y = atan2(info_.moveDir_.x, info_.moveDir_.z);
+	transform_->angle_.y += DX_PI_F;
+
+	// 移動スピード設定
+	info_.moveSpeed_ = MOVE_SPEED;
+
+	// 目標座標を設定
+	info_.goalPos_ =
+		VAdd(transform_->pos_,
+			VScale(info_.moveDir_, EVENT_MOVE_DISTANCE));
+
+	// 待機時間初期化
+	info_.eventIdleTime_ = 0;
+
+	// イベントシーン用にする
+	ChangeState(RAT_STATE_EVENT_MOVE);
 }
 
 void Rat::InitIdleWait(Rat& rat)

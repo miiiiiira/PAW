@@ -14,6 +14,7 @@ void WaveManager::AddWave(std::unique_ptr<WaveBase> wave, std::vector<Rat*> rats
 {
 	// ウェーブの追加
 	wave->SetRatCatRobotPoint(rats, catRobot);
+	wave->StartInWave();
 	waves_.push_back(std::move(wave));
 }
 

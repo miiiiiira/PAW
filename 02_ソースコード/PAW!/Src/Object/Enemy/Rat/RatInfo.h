@@ -10,13 +10,15 @@ typedef void(*ratStateFunction)(Rat&);
 // ネズミの状態
 enum RAT_STATE
 {
-	RAT_STATE_IDLE,		// 待機中
-	RAT_STATE_MOVE,		// 移動中
-	RAT_STATE_RETREAT,	// 後退中
-	RAT_STATE_ATTACK,	// 攻撃中
-	RAT_STATE_HIT,		// 被ダメージ
-	RAT_STATE_DEAD,		// 死亡
-	RAT_STATE_END,		// 終了
+	RAT_STATE_EVENT_MOVE,	// イベントシーン時の移動
+	RAT_STATE_EVENT_IDLE,	// イベントシーン時の移動
+	RAT_STATE_IDLE,			// 待機中
+	RAT_STATE_MOVE,			// 移動中
+	RAT_STATE_RETREAT,		// 後退中
+	RAT_STATE_ATTACK,		// 攻撃中
+	RAT_STATE_HIT,			// 被ダメージ
+	RAT_STATE_DEAD,			// 死亡
+	RAT_STATE_END,			// 終了
 	
 	RAT_STATE_MAX
 };
@@ -109,6 +111,10 @@ struct ratInfo
 	// 待機時のちょっと近づく
 	float approachDistance_ = 0.0f;	// ちょっと近づく距離
 	bool isApproaching_ = true;		// 近づき中か	　true / 近づく , false/ 遠ざかる
+
+	// イベントシーン用
+	VECTOR goalPos_ = {};			// 目標座標
+	int eventIdleTime_ = 0;			// 待機時間
 };
 
 enum class RAT_ANIMATION

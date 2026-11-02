@@ -33,12 +33,17 @@ public:
 	// 攻撃できる状態か
 	bool IsCanAttack(void);
 
+	// 敵のパラメータをリセットする
+	void ResetRat(VECTOR pos);
+
 private:
 	// 状態別更新処理
 	void UpdateState(void);
 
 	// 行動状態
 	// 状態別初期化
+	static void InitEventMove(Rat& rat);	// イベントシーン時の移動
+	static void InitEventIdle(Rat& rat);	// イベントシーン時の待機
 	static void InitIdle(Rat& rat);			// 待機
 	static void InitMove(Rat& rat);			// 移動
 	static void InitRetreat(Rat& rat);		// 後退
@@ -47,6 +52,8 @@ private:
 	static void InitDead(Rat& rat);			// 死亡
 	static void InitEnd(Rat& rat);			// 終了
 	// 状態別更新
+	static void UpdateEventMove(Rat& rat);	// イベントシーン時の移動
+	static void UpdateEventIdle(Rat& rat);	// イベントシーン時の待機
 	static void UpdateIdle(Rat& rat);		// 待機
 	static void UpdateMove(Rat& rat);		// 移動
 	static void UpdateRetreat(Rat& rat);	// 後退
