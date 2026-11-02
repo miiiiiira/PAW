@@ -6,6 +6,7 @@
 #include "../../../Math/Math.h"
 #include "Attack/Attack1/Attack1.h"
 #include "Attack/PlateAttack/PlateAttack.h"
+#include "../../../Application.h"
 
 #include "CatRobot.h"
 
@@ -42,7 +43,12 @@ namespace
 	// スタン時間
 	constexpr int STUN_TIME = 300;
 
-	constexpr int ATTACK_RAND_NUM = 5000;		// ランダム用数
+	// ランダム用数
+	constexpr int ATTACK_RAND_NUM = 5000;		
+
+	// 攻撃画像座標
+	constexpr int ATTACK_CHANCE_POS_X = Application::SCREEN_SIZE_X - 160;
+	constexpr int ATTACK_CHANCE_POS_Y = 65;
 }
 
 CatRobot::CatRobot(void)
@@ -90,6 +96,18 @@ CatRobot::CatRobot(void)
 	stateCtrl_.updateChanceTable_[CAT_ROBOT_CHANCE_END] = UpdateChanceEnd;
 }
 
+CatRobot::~CatRobot(void)
+{
+	// 画像解放
+	DeleteGraph(info_.attackChanceImage_);
+}
+
+void CatRobot::Load(void)
+{
+	// 攻撃チャンス画像読み込み
+	info_.attackChanceImage_ = LoadGraph("Data/Image/Game/AttackChance.png");
+}
+
 void CatRobot::Init(void)
 {
 	// コンポーネントの追加
@@ -119,16 +137,18 @@ void CatRobot::Update(void)
 
 void CatRobot::Draw2D(void)
 {
-	unsigned int col = 0xff0000;
-
 	if (stateCtrl_.state_ == CAT_ROBOT_STATE_CHANCE &&
 		stateCtrl_.chanceState_ == CAT_ROBOT_CHANCE_STUN)
 	{
-		col = 0x0000ff;
+		// 攻撃チャンス画像描画
+		DrawRotaGraph(
+			ATTACK_CHANCE_POS_X,
+			ATTACK_CHANCE_POS_Y,
+			0.5,
+			0.0,
+			info_.attackChanceImage_,
+			true);
 	}
-
-	// HP描画
-	DrawFormatString(0, 200, col, "%d", info_.hp_);
 }
 
 void CatRobot::UpdateState(void)

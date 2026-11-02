@@ -88,6 +88,8 @@ struct catRobotInfo
 	int attackNumAll_ = 0;	// 攻撃を行う回数
 
 	int stunTime_ = 0;	// スタン時間
+
+	int attackChanceImage_ = -1;	// 攻撃チャンス画像
 };
 
 enum class CAT_ROBOT_ANIMATION

@@ -18,7 +18,9 @@ class CatRobot : public Component
 {
 public:
 	CatRobot(void);				// コンストラクタ
+	~CatRobot(void);			// デストラクタ
 
+	void Load(void) override;	// 読み込み
 	void Init(void) override;	// 初期化
 	void Update(void) override;	// 更新
 	void Draw2D(void) override;	// 2D描画
