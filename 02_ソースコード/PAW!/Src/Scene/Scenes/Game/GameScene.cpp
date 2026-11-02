@@ -52,9 +52,11 @@ void GameScene::Init(void)
 	auto catRobot = objectManager_->FindComponentWithTag<CatRobot>(TAG_3D::CAT_ROBOT);
 	enemyCommander_->Init(rats,catRobot);
 
+	auto camera = objectManager_->FindComponentWithTag<Camera>(TAG_3D::CAMERA);
+
 	// ウェーブの作成・各ウェーブの追加
 	WaveManager::CreateInstance();
-	WaveManager::GetInstance().AddWave(std::make_unique<Wave1>(),rats, catRobot);
+	WaveManager::GetInstance().AddWave(std::make_unique<Wave1>(),rats, catRobot, camera);
 
 	// BGM再生
 	//AudioManager::GetInstance()->PlayBGM(SoundID::BGM_GAME_1);
@@ -219,9 +221,6 @@ void GameScene::CameraCreate(void)
 
 	// カメラコンポーネントの付与
 	auto camera = cameraObj->AddComponent<Camera>();
-
-	// カメラのモードを変更
-	camera->ChangeMode(Camera::MODE::FOLLOW);
 }
 
 void GameScene::PlayerCreate(void)

@@ -29,9 +29,6 @@ void Camera::Init(void)
 
 void Camera::Update(void)
 {
-	// カメラの回転処理
-	ProcessRot(true);
-
 	switch (mode_)
 	{
 	case Camera::MODE::FIXED:
@@ -41,6 +38,11 @@ void Camera::Update(void)
 		break;
 
 	case Camera::MODE::FOLLOW:
+		transform_->pos_ = Math::Lerp(transform_->pos_, goalPos_, 0.01f);
+
+		// カメラの回転処理
+		ProcessRot(true);
+
 		UpdateFollow();
 		break;
 
@@ -84,6 +86,34 @@ void Camera::SetBeforeDraw(void)
 
 	// DXライブラリのカメラとEffekseerのカメラを同期する
 	Effekseer_Sync3DSetting();
+}
+
+void Camera::ChangeMode(MODE mode, VECTOR pos, VECTOR angle)
+{
+	mode_ = mode;
+
+	switch (mode_)
+	{
+	case Camera::MODE::FIXED:
+		transform_->pos_ = pos;
+		transform_->angle_ = angle;
+		break;
+
+	case Camera::MODE::FREE:
+		break;
+
+	case Camera::MODE::FOLLOW:
+		transform_->pos_ = pos;
+		transform_->angle_ = angle;
+
+		// マウスカーソルを画面中央に戻す
+		SetMousePoint(Application::SCREEN_SIZE_X / 2, Application::SCREEN_SIZE_Y / 2);
+		break;
+
+	case Camera::MODE::NONE:
+	default:
+		break;
+	}
 }
 
 void Camera::UpdateFollow(void)
@@ -170,7 +200,7 @@ void Camera::ProcessRot(bool isLimit)
 		transform_->angle_.y += rad360;
 	}
 
-		// 座標とアングルを更新
+	// 座標とアングルを更新
 	SetCameraPositionAndAngle(
 		transform_->pos_,
 		transform_->angle_.x,

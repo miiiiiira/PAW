@@ -1,4 +1,12 @@
+#include "../../Camera/Camera.h"
 #include "WaveBase.h"
+
+namespace
+{
+    VECTOR EVENT_CAMERA_POS = { 200.0f,30.0f,400.0f };
+    VECTOR EVENT_CAMERA_ANGLE = 
+    { -10.0f * DX_PI_F / 180.0f, -40.0f * DX_PI_F / 180.0f,0.0f };
+}
 
 WaveBase::WaveBase(void)
 {
@@ -24,7 +32,7 @@ void WaveBase::Update(void)
         if (CheckEventClear())
         {
             // ネズミ行動へ
-            state_ = WaveState::RAT;
+            ChangeState(WaveState::RAT);
         }
         break;
 
@@ -36,7 +44,7 @@ void WaveBase::Update(void)
         if (CheckRatClear())
         {
             // 猫ロボット行動へ
-            state_ = WaveState::CAT_ROBOT;
+            ChangeState(WaveState::CAT_ROBOT);
         }
         break;
 
@@ -48,7 +56,7 @@ void WaveBase::Update(void)
         if (CheckCatRobotClear())
         {
             // ウェーブクリア
-            state_ = WaveState::CLEARED;
+            ChangeState(WaveState::CLEARED);
             OnClear();
         }
         break;
@@ -88,8 +96,35 @@ void WaveBase::Draw(void)
 void WaveBase::StartInWave(void)
 {
     // ウェーブ開始させる
-    state_ = WaveState::EVENT;
+    ChangeState(WaveState::EVENT);
 
     // 初期化処理
     OnStart();
+}
+
+void WaveBase::ChangeState(WaveState state)
+{
+    state_ = state;
+
+    switch (state_)
+    {
+    case WaveBase::WaveState::EVENT:
+        // カメラのモード変更
+        camera_->ChangeMode(Camera::MODE::FIXED, EVENT_CAMERA_POS, EVENT_CAMERA_ANGLE);
+        break;
+
+    case WaveBase::WaveState::RAT:
+        // カメラのモード変更
+        camera_->ChangeMode(Camera::MODE::FOLLOW);
+        break;
+
+    case WaveBase::WaveState::CAT_ROBOT:
+        break;
+
+    case WaveBase::WaveState::CLEARED:
+        break;
+
+    default:
+        break;
+    }
 }

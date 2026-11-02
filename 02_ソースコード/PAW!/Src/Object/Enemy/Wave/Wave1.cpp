@@ -39,7 +39,8 @@ void Wave1::OnClear(void)
 bool Wave1::CheckEventClear(void)
 {
 	// イベント移動が終了したら
-	if (rats_[0]->GetState() != RAT_STATE_EVENT_MOVE)
+	if (rats_[0]->GetState() != RAT_STATE_EVENT_MOVE &&
+		rats_[0]->GetState() != RAT_STATE_EVENT_IDLE)
 	{
 		return true;
 	}

@@ -39,7 +39,7 @@ public:
 	void SetBeforeDraw(void);
 
 	// モード変更
-	void ChangeMode(MODE mode) { mode_ = mode; }
+	void ChangeMode(MODE mode, VECTOR pos = {}, VECTOR angle = {});
 
 	// 追従対象
 	void SetTarget(Transform* targetTransform) { targetTransform_ = targetTransform; }
@@ -88,10 +88,11 @@ private:
 private:
 
 	// カメラのモード
-	MODE mode_ = MODE::FOLLOW;
+	MODE mode_ = MODE::NONE;
 
 	// 追従対象の座標
-	VECTOR targetPos_{};
+	VECTOR targetPos_ = {};
+	VECTOR goalPos_ = {};
 
 	// マウス画像
 	int mousePosX_ = 0;

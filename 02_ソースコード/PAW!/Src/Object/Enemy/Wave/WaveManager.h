@@ -7,6 +7,7 @@
 
 class Rat;
 class CatRobot;
+class Camera;
 
 class WaveManager
 {
@@ -38,7 +39,8 @@ public:
     void AddWave(
         std::unique_ptr<WaveBase> wave,
         std::vector<Rat*> rats,
-        CatRobot* catRobot);
+        CatRobot* catRobot,
+        Camera* camera);
 
     // 現在のウェーブを取得
     WaveBase* GetCurrentWave(void);

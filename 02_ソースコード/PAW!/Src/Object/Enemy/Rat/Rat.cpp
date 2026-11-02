@@ -366,7 +366,7 @@ void Rat::ResetRat(VECTOR pos)
 
 	// 向きを設定
 	info_.moveDir_ = { 0.0f,0.0f,-1.0f };
-	transform_->angle_.y = atan2(info_.moveDir_.x, info_.moveDir_.z);
+	transform_->angle_.y = atan2f(info_.moveDir_.x, info_.moveDir_.z);
 	transform_->angle_.y += DX_PI_F;
 
 	// 移動スピード設定

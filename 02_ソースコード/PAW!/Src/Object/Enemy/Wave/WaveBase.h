@@ -5,6 +5,7 @@
 
 class Rat;
 class CatRobot;
+class Camera;
 
 class WaveBase
 {
@@ -34,9 +35,9 @@ public:
     void StartInWave(void);
 
     // ネズミと猫ロボットのポインタをセット
-    void SetRatCatRobotPoint(std::vector<Rat*>rats, CatRobot* catRobot)
+    void SetRatCatRobotPoint(std::vector<Rat*>rats, CatRobot* catRobot, Camera* camera)
     {
-        rats_ = rats, catRobot_ = catRobot;
+        rats_ = rats, catRobot_ = catRobot, camera_ = camera;
     }
 
 protected:
@@ -46,6 +47,7 @@ protected:
 protected:
     std::vector<Rat*>rats_;
     CatRobot* catRobot_;
+    Camera* camera_;
 
 protected:
     // ウェーブ状態
@@ -71,4 +73,5 @@ protected:
     virtual bool CheckRatClear(void) = 0;
     virtual bool CheckCatRobotClear(void) = 0;
 
+    virtual void ChangeState(WaveState state);
 };
