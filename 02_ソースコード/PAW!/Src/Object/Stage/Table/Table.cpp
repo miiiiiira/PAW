@@ -15,7 +15,7 @@ void Table::Init(void)
 {
 	// À•W‚ÌÝ’è
 	transform_ = owner_->AddComponent<Transform>();
-	transform_->scale_ = { 0.9f,0.9f,0.9f };
+	transform_->scale_ = { 1.0f,1.0f,1.0f };
 
 	// 3Dƒ‚ƒfƒ‹Ý’è
 	render3D_ = owner_->AddComponent<Render3D>();

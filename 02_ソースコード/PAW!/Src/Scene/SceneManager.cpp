@@ -71,7 +71,7 @@ void SceneManager::Init3D(void)
 	SetLightDifColor(GetColorF(1.0f, 1.0f, 1.0f, 1.0f));
 	
 	// フォグ設定
-	SetFogEnable(true);
+	SetFogEnable(false);
 	// フォグの色
 	SetFogColor(0, 0, 0);
 	// フォグを発生させる奥行きの最小、最大距離

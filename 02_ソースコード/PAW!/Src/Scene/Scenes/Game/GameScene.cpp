@@ -26,6 +26,7 @@
 #include "../../../Object/Enemy/Wave/Wave1.h"
 
 #include "GameScene.h"
+#include "../../../Object/Stage/Floor/Floor.h"
 
 GameScene::GameScene(void)
 {
@@ -269,6 +270,15 @@ void GameScene::StageCreate(void)
 
 	// テーブルの付与
 	table->AddComponent<Table>();
+
+	// 床の生成
+	auto floor = objectManager_->CreateObject();
+
+	// タグを付与
+	floor->SetTagAndPriority(TAG_3D::STAGE);
+
+	// 床の付与
+	floor->AddComponent<Floor>();
 }
 
 void GameScene::SetUp(void)

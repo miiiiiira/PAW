@@ -155,7 +155,7 @@ void PlateAttack::AddComponets(void)
 	transform_ = owner_->AddComponent<Transform>();
 	transform_->pos_ = {};
 	transform_->angle_ = {};
-	transform_->scale_ = { 4.0f,4.0f,4.0f };
+	transform_->scale_ = { 1.0f,1.0f,1.0f };
 
 	// 3Dƒ‚ƒfƒ‹Ý’è
 	render3D_ = owner_->AddComponent<Render3D>();

@@ -57,7 +57,7 @@ private:
 
 	// カメラのクリップ範囲
 	static constexpr float VIEW_NEAR = 20.0f;
-	static constexpr float VIEW_FAR = 5000.0f;
+	static constexpr float VIEW_FAR = 12000.0f;
 
 	// カメラのX回転上限度角
 	static constexpr float LIMIT_X_UP_RAD = -60.0f * (DX_PI_F / 180.0f);	// 上上限

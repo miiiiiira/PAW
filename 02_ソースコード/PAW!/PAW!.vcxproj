@@ -170,6 +170,7 @@
     <ClCompile Include="Src\Object\Grid\Grid.cpp" />
     <ClCompile Include="Src\Object\ObjectManager.cpp" />
     <ClCompile Include="Src\Object\Player\Player.cpp" />
+    <ClCompile Include="Src\Object\Stage\Floor\Floor.cpp" />
     <ClCompile Include="Src\Object\Stage\Table\Table.cpp" />
     <ClCompile Include="Src\Scene\SceneBase.cpp" />
     <ClCompile Include="Src\Scene\SceneManager.cpp" />
@@ -229,6 +230,7 @@
     <ClInclude Include="Src\Object\ObjectManager.h" />
     <ClInclude Include="Src\Object\Player\Player.h" />
     <ClInclude Include="Src\Object\Player\PlayerInfo.h" />
+    <ClInclude Include="Src\Object\Stage\Floor\Floor.h" />
     <ClInclude Include="Src\Object\Stage\Table\Table.h" />
     <ClInclude Include="Src\Object\Tag.h" />
     <ClInclude Include="Src\Scene\SceneBase.h" />
