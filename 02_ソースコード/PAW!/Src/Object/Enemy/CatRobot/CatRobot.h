@@ -95,9 +95,6 @@ private:
 	// コンポーネント追加
 	void AddComponets(void);
 
-	// 重力
-	void ApplyGravity(void);
-
 	// 無敵時間を更新
 	void UpdateInvincible(void);
 

@@ -764,7 +764,7 @@ void Player::AddComponets(void)
 	capsuleCollder_->Init();
 	// カプセルの設定
 	capsuleCollder_->AddCapsule(
-		VGet(0.0f, 150.0f, 0.0f),
+		VGet(0.0f, 75.0f, 0.0f),
 		VGet(0.0f, 30.0f, 0.0f),
 		40.0f);
 	// タグの設定

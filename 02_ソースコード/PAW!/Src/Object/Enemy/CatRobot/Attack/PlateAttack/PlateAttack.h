@@ -8,6 +8,7 @@
 
 // 前方宣言
 class Transform;
+class Render3D;
 class CylinderCollider;
 
 class PlateAttack : public Component
@@ -62,6 +63,7 @@ private:
 private:
 	// コンポーネント
 	Transform* transform_ = nullptr;
+	Render3D* render3D_ = nullptr;
 	CylinderCollider* cylinderCollider_ = nullptr;
 
 private:

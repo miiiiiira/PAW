@@ -30,7 +30,7 @@ namespace
 	constexpr int ATTACK1_TRY_MAX = 10;			// 最大挑戦回数
 
 	// 攻撃2,3の（お皿攻撃）
-	constexpr float ATTACK2_POS_Y = 10.0f;			// Y座標
+	constexpr float ATTACK2_POS_Y = 70.0f;			// Y座標
 	constexpr int ATTACK2_NUM = 2;					// 攻撃を行う回数
 	constexpr int ATTACK3_NUM = 2;					// 攻撃を行う回数
 	constexpr int PLATE_FLYING_NUM = 4;				// 個数
@@ -127,9 +127,6 @@ void CatRobot::Update(void)
 
 	// 状態別更新処理
 	UpdateState();
-
-	// 重力処理
-	ApplyGravity();
 
 	// 無敵時間を更新
 	UpdateInvincible();
@@ -513,9 +510,9 @@ void CatRobot::AddComponets(void)
 {
 	// 座標の設定
 	transform_ = owner_->AddComponent<Transform>();
-	transform_->pos_ = { 0.0f,500.0f,2000.0f };
+	transform_->pos_ = { 0.0f,-1500.0f,2200.0f };
 	transform_->angle_ = {};
-	transform_->scale_ = {};
+	transform_->scale_ = {20.0f,20.0f ,20.0f };
 
 	// 当たり判定の設定(カプセル)
 	capsuleCollder_ = owner_->AddComponent<CapsuleCollider>();
@@ -523,9 +520,9 @@ void CatRobot::AddComponets(void)
 
 	// カプセルの設定
 	capsuleCollder_->AddCapsule(
-		VGet(0.0f, 800.0f, 0.0f),
-		VGet(0.0f, 30.0f, 0.0f),
-		350.0f);
+		VGet(0.0f, 2000.0f, 0.0f),
+		VGet(0.0f, 500.0f, 0.0f),
+		600.0f);
 
 	// タグの設定
 	capsuleCollder_->SetCollisionTag(CollisionTag::BOSS);
@@ -534,7 +531,7 @@ void CatRobot::AddComponets(void)
 	// 3Dモデル設定
 	render3D_ = owner_->AddComponent<Render3D>();
 	render3D_->Init();
-	render3D_->SetModel("Data/Model/Enemy/CatRobot.mv1");
+	render3D_->SetModel("Data/Model/Enemy/NekoBot/NekoBot.mv1");
 
 	// アニメーション設定
 	animation_ = owner_->AddComponent<Animation>();
@@ -560,35 +557,6 @@ void CatRobot::AddComponets(void)
 	{
 		PlateAttack* attack = plateAttack_.emplace_back(owner_->AddComponent<PlateAttack>());
 		attack->Init();
-	}
-}
-
-void CatRobot::ApplyGravity(void)
-{
-	// ステージコライダが無ければ処理を行わない
-	//if (!stageColl_) return;
-	// Y座標へ反映
-	transform_->pos_.y += info_.velocityY_;
-	// 接地判定
-
-	// 空中
-	//if (!stageColl_->IsGround())
-	if (transform_->pos_.y > 0.0f)
-	{
-		// 重力加算
-		info_.velocityY_ += GRAVITY;
-
-		// 最大落下速度
-		if (info_.velocityY_ < MAX_FALL)
-			info_.velocityY_ = MAX_FALL;
-	}
-	else
-	{
-		transform_->pos_.y = 0.0f;
-
-		// 地面上なら少し下方向に押す
-		// 0だと浮く場合があるため
-		info_.velocityY_ = -0.1f;
 	}
 }
 

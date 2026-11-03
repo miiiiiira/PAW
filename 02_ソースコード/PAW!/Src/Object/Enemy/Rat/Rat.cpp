@@ -693,7 +693,7 @@ void Rat::AddComponets(void)
 
 	// ƒJƒvƒZƒ‹‚ÌÝ’è
 	capsuleCollder_->AddCapsule(
-		VGet(0.0f, 150.0f, 0.0f),
+		VGet(0.0f, 90.0f, 0.0f),
 		VGet(0.0f, 30.0f, 0.0f),
 		40.0f);
 

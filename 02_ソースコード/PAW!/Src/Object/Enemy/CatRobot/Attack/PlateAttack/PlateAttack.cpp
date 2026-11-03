@@ -1,4 +1,5 @@
 #include "../../../../Object.h"
+#include "../../../../Component/Graphics/Render3D.h"
 #include "../../../../../Collision/3DCollider/CylinderCollider.h"
 
 #include "PlateAttack.h"
@@ -77,6 +78,8 @@ void PlateAttack::UpdateState(void)
 
 void PlateAttack::InitIdle(PlateAttack& plateAttack)
 {
+	// •`‰æ‚µ‚È‚¢
+	plateAttack.render3D_->SetIsDraw(true);
 }
 
 void PlateAttack::InitMove(PlateAttack& plateAttack)
@@ -92,6 +95,9 @@ void PlateAttack::InitEnd(PlateAttack& plateAttack)
 
 	// À•W‰Šú‰»
 	plateAttack.transform_->pos_ = {};
+
+	// •`‰æ‚µ‚È‚¢
+	plateAttack.render3D_->SetIsDraw(false);
 }
 
 void PlateAttack::UpdateIdle(PlateAttack& plateAttack)
@@ -150,6 +156,11 @@ void PlateAttack::AddComponets(void)
 	transform_->pos_ = {};
 	transform_->angle_ = {};
 	transform_->scale_ = { 4.0f,4.0f,4.0f };
+
+	// 3Dƒ‚ƒfƒ‹Ý’è
+	render3D_ = owner_->AddComponent<Render3D>();
+	render3D_->SetTransform(transform_);
+	render3D_->SetModel("Data/Model/Enemy/NekoBot/Plate/Plate.mv1");
 
 	// “–‚½‚è”»’è‚ÌÝ’è(‰~’Œ)
 	cylinderCollider_ = owner_->AddComponent<CylinderCollider>();

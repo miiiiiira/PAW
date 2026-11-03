@@ -23,6 +23,9 @@ public:
 	void SetModel(std::string path);
 	void SetModelHandles(std::string path);
 
+	// Transform‚ğİ’è
+	void SetTransform(Transform* transform) { transform_ = transform; }
+
 	// •`‰æƒtƒ‰ƒO‚ğİ’è
 	void SetIsDraw(bool flg) { isDraw_ = flg; }
 

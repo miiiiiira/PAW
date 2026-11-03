@@ -69,8 +69,6 @@ struct catRobotStateCtrl
 
 struct catRobotInfo
 {
-	float velocityY_ = 0.0f;	// Œ»İ‚Ì—‰º‘¬“x
-
 	float velocityRot_ = 0.0f;	// Œ»İ‚ÌŠp‘¬“x
 
 	VECTOR moveDir_ = {};	// ˆÚ“®•ûŒü
