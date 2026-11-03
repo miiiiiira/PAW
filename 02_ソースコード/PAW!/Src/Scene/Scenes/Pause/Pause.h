@@ -37,9 +37,6 @@ public:
 
 private:
 	 
-	static constexpr int PAUSE_POS_X = 50;
-	static constexpr int PAUSE_POS_Y = 50;
-
 	// 画像サイズ
 	static constexpr int IMAGE_SIZE_X = 200;
 	static constexpr int IMAGE_SIZE_Y = 50;
@@ -71,12 +68,12 @@ private:
 	void PadSelect(void);		// パッド選択
 
 private:
+	// 背景画像ハンドル
+	int backImage_ = -1;	
 
-	std::shared_ptr<Confirm> confirm_;
+	// ポーズボタンの情報を格納する配列
+	std::vector<ButtonInfo>  pauseButtons_;	
 
-	int handle_;	// PAUSEの文字画像
-
-	std::vector<ButtonInfo>  pauseButtons_;	// ポーズボタンの情報を格納する配列
-
-	PAUSE currentMenu_;		// 現在選択されているポーズ
+	// 現在選択されているポーズ
+	PAUSE currentPause_;		
 };

@@ -14,9 +14,6 @@
 
 Pause::Pause(void)
 {
-	handle_ = -1;
-	confirm_ = nullptr;
-
 	// マウスの表示する
 	MouseCursor::GetInstance()->SetMouseDraw(true);
 }
@@ -28,13 +25,12 @@ Pause::~Pause(void)
 void Pause::Init(void)
 {
 	ChangeSelect(PAUSE::NONE);
-
-	confirm_ = std::make_shared<Confirm>();
 }
 
 void Pause::Load(void)
 {
-	handle_ = LoadGraph("Pause/pause.png");		// PAUSEの文字画像
+	// 背景画像読み込み
+	backImage_ = LoadGraph("Data/Image/Game/Pause.png");		
 
 	pauseButtons_.clear();
 
@@ -71,10 +67,10 @@ void Pause::Update(void)
 	if (!InputManager::GetInstance()->DecideButton()) return;
 
 	// 選択されているメニューがない場合も、ここで終了
-	if (currentMenu_ == PAUSE::NONE) return;
+	if (currentPause_ == PAUSE::NONE) return;
 
 	// クリックされていて、かつメニューが選ばれている場合
-	switch (currentMenu_)
+	switch (currentPause_)
 	{
 	case PAUSE::CONTINUE:
 		UpdateContinue();
@@ -95,26 +91,19 @@ void Pause::Update(void)
 
 void Pause::Draw(void)
 {
-	// 背景色を半透明で表示
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 230);
-	DrawBox(0, 0, Application::SCREEN_SIZE_X, Application::SCREEN_SIZE_Y, 0x000000, true);
-	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-
-	DrawGraph(PAUSE_POS_X, PAUSE_POS_Y, handle_, true);					// PAUSEの文字を表示
+	// 背景描画
+	DrawGraph(0, 0, backImage_, true);
 
 
 	for (const auto& button : pauseButtons_)
 	{
-		if (button.type == currentMenu_)
+		if (button.type == currentPause_)
 		{
 			//FrameRenderer::Draw(button.x,button.y);
 		}
 
 		DrawGraph(button.x, button.y, button.graphHandle, true);		// メニューの文字を表示
 	}
-
-
-	DrawString(Application::SCREEN_SIZE_X / 2, Application::SCREEN_SIZE_Y / 2, "Pause", 0xffffff);
 }
 
 void Pause::Release(void)
@@ -125,13 +114,13 @@ void Pause::Release(void)
 	}
 	pauseButtons_.clear();
 
-	DeleteGraph(handle_);
-	handle_ = -1;
+	DeleteGraph(backImage_);
+	backImage_ = -1;
 }
 
 void Pause::ChangeSelect(PAUSE pause)
 {
-	currentMenu_ = pause;
+	currentPause_ = pause;
 }
 
 void Pause::UpdateContinue(void)
@@ -151,20 +140,16 @@ void Pause::UpdateContinue(void)
 
 void Pause::UpdateMainMenu(void)
 {
-	// 確認シーンへ
-	SceneManager::GetInstance()->PushScene(confirm_);
 }
 
 void Pause::UpdateQuit(void)
 {
-	// 確認シーンへ
-	SceneManager::GetInstance()->PushScene(confirm_);
 }
 
 void Pause::SelectUpgrade(void)
 {
 	// 前回の選択物を入れておく
-	PAUSE prevSelect = currentMenu_;
+	PAUSE prevSelect = currentPause_;
 
 	if (InputManager::GetInstance()->GetActiveDevice() == InputManager::ActiveDevice::KEY_MOUSE)
 	{
@@ -178,8 +163,8 @@ void Pause::SelectUpgrade(void)
 	}
 
 	// 中身がNONじゃないかつ、選択物が変わっていたら
-	if (currentMenu_ != PAUSE::NONE
-		&& currentMenu_ != prevSelect)
+	if (currentPause_ != PAUSE::NONE
+		&& currentPause_ != prevSelect)
 	{
 		// ボタンに乗ったサウンドを出す
 		//AudioManager::GetInstance()->PlaySE(SoundID::SYS_SELECT_ON);
@@ -207,9 +192,9 @@ void Pause::MouseSelect(void)
 
 void Pause::PadSelect(void)
 {
-	auto prevMenu = currentMenu_;
+	auto prevMenu = currentPause_;
 
-	switch (currentMenu_)
+	switch (currentPause_)
 	{
 	case PAUSE::NONE:
 		ChangeSelect(PAUSE::CONTINUE);
