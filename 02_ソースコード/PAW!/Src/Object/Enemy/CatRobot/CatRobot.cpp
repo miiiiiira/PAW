@@ -12,6 +12,14 @@
 
 namespace
 {
+	// 座標設定
+	constexpr VECTOR DEFAULT_POS = { 0.0f,-1500.0f,2200.0f };
+
+	// カプセル設定
+	constexpr VECTOR CAPSULE_START_OFFSET = {0.0f,2000.0f,0.0f};
+	constexpr VECTOR CAPSULE_END_OFFSET = {0.0f,500.0f,0.0f};
+	constexpr float CAPSULE_RADIUS = 600.0f;
+
 	// 体力設定
 	constexpr int DEFAULT_HP = 20;	// 初期HP
 
@@ -510,7 +518,7 @@ void CatRobot::AddComponets(void)
 {
 	// 座標の設定
 	transform_ = owner_->AddComponent<Transform>();
-	transform_->pos_ = { 0.0f,-1500.0f,2200.0f };
+	transform_->pos_ = DEFAULT_POS;
 	transform_->angle_ = {};
 	transform_->scale_ = {20.0f,20.0f ,20.0f };
 
@@ -520,9 +528,9 @@ void CatRobot::AddComponets(void)
 
 	// カプセルの設定
 	capsuleCollder_->AddCapsule(
-		VGet(0.0f, 2000.0f, 0.0f),
-		VGet(0.0f, 500.0f, 0.0f),
-		600.0f);
+		CAPSULE_START_OFFSET,
+		CAPSULE_END_OFFSET,
+		CAPSULE_RADIUS);
 
 	// タグの設定
 	capsuleCollder_->SetCollisionTag(CollisionTag::BOSS);
@@ -765,6 +773,22 @@ void CatRobot::SetDamage(void)
 		// 無敵時間を設ける
 		info_.invincibleTime_ = INVINCIBLE_TIME;
 	}
+}
+
+void CatRobot::UpdateAngle(void)
+{
+	// モデルに角度を設定
+	MV1SetRotationXYZ(render3D_->GetHandle(), transform_->angle_);
+
+	// カメラの回転行列を作成
+	MATRIX mat = MGetIdent();
+	mat = MMult(mat, MGetRotX(transform_->angle_.x));
+	mat = MMult(mat, MGetRotY(transform_->angle_.y));
+	// 回転させた相対座標
+	VECTOR LocalRotPosUp = VTransform(VGet(0.0f, 2000.0f, 0.0f), mat);
+	VECTOR LocalRotPosDown = VTransform(VGet(0.0f, 500.0f, 0.0f), mat);
+	capsuleCollder_->SetStartOffset(LocalRotPosUp);
+	capsuleCollder_->SetEndOffset(LocalRotPosDown);
 }
 
 void CatRobot::OnCollision(Collider* other)

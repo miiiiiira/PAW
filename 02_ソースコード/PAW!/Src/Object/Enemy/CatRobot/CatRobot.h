@@ -116,6 +116,9 @@ private:
 	// ダメージを与える
 	void SetDamage(void);
 
+	// 角度を更新
+	void UpdateAngle(void);
+
 	// 衝突判定の検知
 	void OnCollision(Collider* other) override;
 
