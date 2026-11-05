@@ -1,6 +1,7 @@
 #include "../Rat/Rat.h"
 #include "../CatRobot/CatRobot.h"
 #include "Wave1.h"
+#include "../../../Audio/AudioManager.h"
 
 namespace
 {
@@ -17,11 +18,14 @@ Wave1::~Wave1(void)
 
 void Wave1::OnStart(void)
 {
+	// BGMÄ¶
 	rats_[0]->ResetRat(RAT_SPAWN_POS);
 }
 
 void Wave1::OnEvent(void)
 {
+	// BGMÄ¶
+	AudioManager::GetInstance()->PlayBGM(SoundID::BGM_RAT_EVENT);
 }
 
 void Wave1::OnRat(void)
@@ -42,6 +46,8 @@ bool Wave1::CheckEventClear(void)
 	if (rats_[0]->GetState() != RAT_STATE_EVENT_MOVE &&
 		rats_[0]->GetState() != RAT_STATE_EVENT_IDLE)
 	{
+		// BGM‚ð–Â‚ç‚·
+		AudioManager::GetInstance()->PlayBGM(SoundID::BGM_GAME);
 		return true;
 	}
 

@@ -53,9 +53,6 @@ void GameScene::Init(void)
 	// ウェーブの作成・各ウェーブの追加
 	WaveManager::CreateInstance();
 	WaveManager::GetInstance().AddWave(std::make_unique<Wave1>(),rats, catRobot, camera);
-
-	// BGM再生
-	//AudioManager::GetInstance()->PlayBGM(SoundID::BGM_GAME_1);
 }
 
 void GameScene::Load(void)
@@ -91,7 +88,7 @@ void GameScene::Load(void)
 	enemyCommander_ = new EnemyCommander();
 
 	// サウンド読みこみ
-	//AudioManager::GetInstance()->LoadSceneSound(LoadScene::GAME);
+	AudioManager::GetInstance()->LoadSceneSound(LoadScene::GAME);
 }
 
 void GameScene::LoadEnd(void)
@@ -197,7 +194,7 @@ void GameScene::Release(void)
 	objectManager_ = nullptr;
 
 	// 音の解放
-	//AudioManager::GetInstance()->DeleteSceneSound(LoadScene::GAME);
+	AudioManager::GetInstance()->DeleteSceneSound(LoadScene::GAME);
 }
 
 void GameScene::CameraCreate(void)
@@ -312,7 +309,8 @@ bool GameScene::ChangePauseScene(void)
 	if (InputManager::GetInstance()->PauseButton())
 	{
 		// ポーズ画面を開いたサウンド
-		//AudioManager::GetInstance()->PlaySE(SoundID::SYS_PAUSE_ON);
+		AudioManager::GetInstance()->PlaySE(SoundID::SYS_PAUSE_ON);
+		
 		// ポーズモードへ
 		SceneManager::GetInstance()->PushScene(std::make_shared<Pause>());
 		return true;

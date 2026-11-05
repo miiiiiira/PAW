@@ -7,6 +7,7 @@
 #include "Attack/Attack1/Attack1.h"
 #include "Attack/PlateAttack/PlateAttack.h"
 #include "../../../Application.h"
+#include "../../../Audio/AudioManager.h"
 
 #include "CatRobot.h"
 
@@ -186,6 +187,9 @@ void CatRobot::InitMove(CatRobot& catRobot)
 void CatRobot::InitAttack(CatRobot& catRobot)
 {
 	catRobot.info_.attackNumAll_ = ATTACK_NUM_ALL;
+
+	// 攻撃開始音
+	AudioManager::GetInstance()->PlaySE(SoundID::SE_ROBOT_ATTACK_START);
 
 	// 攻撃種類選択へ
 	catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_SELECT);
@@ -473,6 +477,9 @@ void CatRobot::ChangeAttackState(CAT_ROBOT_ATTACK_STATE state)
 
 void CatRobot::InitChanceStart(CatRobot& catRobot)
 {
+	// 倒れる音
+	AudioManager::GetInstance()->PlaySE(SoundID::SE_ROBOT_FALL_DOWN);
+
 }
 
 void CatRobot::InitChanceStun(CatRobot& catRobot)
@@ -482,6 +489,8 @@ void CatRobot::InitChanceStun(CatRobot& catRobot)
 
 void CatRobot::InitChanceEnd(CatRobot& catRobot)
 {
+	// 起き上がり音
+	AudioManager::GetInstance()->PlaySE(SoundID::SE_ROBOT_GET_UP);
 }
 
 void CatRobot::UpdateChanceStart(CatRobot& catRobot)
@@ -782,6 +791,9 @@ void CatRobot::SetDamage(void)
 	}
 	else
 	{
+		// 被ダメージ音
+		AudioManager::GetInstance()->PlaySE(SoundID::SE_ROBOT_DAMAGE);
+
 		// 無敵時間を設ける
 		info_.invincibleTime_ = INVINCIBLE_TIME;
 	}

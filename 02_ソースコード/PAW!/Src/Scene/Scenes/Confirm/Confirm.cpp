@@ -119,9 +119,6 @@ void Confirm::Update(void)
 		UpdateNo();
 		break;
 	}
-
-	// ボタン押下のSEを流す
-	//AudioManager::GetInstance()->PlaySE(SoundID::SYS_BUTTON_1);
 }
 
 void Confirm::Draw(void)
@@ -201,6 +198,8 @@ void Confirm::UpdateYes(void)
 		{
 		case SCENE_TAG::TITLE:
 		case SCENE_TAG::MAINMANU:
+			// ボタン押下のSEを流す
+			AudioManager::GetInstance()->PlaySE(SoundID::SYS_BUTTON);
 			Application::GetInstance()->SetEnd(true);
 			break;
 
@@ -215,6 +214,9 @@ void Confirm::UpdateNo(void)
 	// 決定ボタンを押されたら
 	if (InputManager::GetInstance()->DecideButton())
 	{
+		// ボタン押下のSEを流す
+		AudioManager::GetInstance()->PlaySE(SoundID::SYS_BUTTON);
+
 		// 確認シーンを閉じる
 		SceneManager::GetInstance()->PopScene();
 	}
@@ -241,7 +243,7 @@ void Confirm::UpdateSelect(void)
 		&& currentSelect_ != prevSelect)
 	{
 		// ボタンに乗ったサウンドを出す
-		//AudioManager::GetInstance()->PlaySE(SoundID::SYS_SELECT_ON);
+		AudioManager::GetInstance()->PlaySE(SoundID::SYS_SELECT_ON);
 	}
 }
 

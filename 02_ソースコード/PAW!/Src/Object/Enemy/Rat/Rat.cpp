@@ -7,6 +7,7 @@
 #include "../../../Math/Math.h"
 
 #include "Rat.h"
+#include "../../../Audio/AudioManager.h"
 
 namespace
 {
@@ -964,10 +965,16 @@ void Rat::SetDamage(void)
 		// 0初期化しておく
 		info_.hp_ = 0;
 
+		// ネズミの声
+		AudioManager::GetInstance()->PlaySE(SoundID::SE_RAT_DEAD);
+
 		ChangeState(RAT_STATE_DEAD);
 	}
 	else
 	{
+		// 被ダメージ音
+		AudioManager::GetInstance()->PlaySE(SoundID::SE_RAT_DAMAGE);
+
 		// 無敵時間を設ける
 		info_.invincibleTime_ = INVINCIBLE_TIME;
 	}

@@ -1,6 +1,7 @@
 #include "../../../../Object.h"
 #include "../../../../Component/Graphics/Render3D.h"
 #include "../../../../../Collision/3DCollider/CylinderCollider.h"
+#include "../../../../../Audio/AudioManager.h"
 
 #include "PlateAttack.h"
 
@@ -112,6 +113,9 @@ void PlateAttack::UpdateIdle(PlateAttack& plateAttack)
 
 		// ˆÚ“®ó‘Ô‚Ö
 		plateAttack.ChangeState(PLATE_ATTACK_STATE_MOVE);
+
+		// UŒ‚2
+		AudioManager::GetInstance()->PlaySE(SoundID::SE_ROBOT_ATTACK2);
 	}
 }
 

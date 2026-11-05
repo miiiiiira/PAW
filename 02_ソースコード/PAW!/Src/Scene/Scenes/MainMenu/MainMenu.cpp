@@ -43,14 +43,12 @@ MainMenu::~MainMenu(void)
 void MainMenu::Init(void)
 {
 	ChangeSelect(MENU::NONE);
-
-	//AudioManager::GetInstance()->PlayBGM(SoundID::BGM_MAINMENU);
 }
 
 void MainMenu::Load(void)
 {
 	// メインメニューサウンド読みこみ
-	//AudioManager::GetInstance()->LoadSceneSound(LoadScene::MAIN_MENU);
+	AudioManager::GetInstance()->LoadSceneSound(LoadScene::MAIN_MENU);
 
 	menuButtons_.clear();
 
@@ -113,9 +111,6 @@ void MainMenu::Update(void)
 		UpdateExit();
 		break;
 	}
-
-	// ボタン押下のSEを流す
-	//AudioManager::GetInstance()->PlaySE(SoundID::SYS_BUTTON_1);
 }
 
 void MainMenu::Draw(void)
@@ -152,7 +147,7 @@ void MainMenu::Release(void)
 	}
 	menuButtons_.clear();
 
-	//AudioManager::GetInstance()->DeleteSceneSound(LoadScene::MAIN_MENU);
+	AudioManager::GetInstance()->DeleteSceneSound(LoadScene::MAIN_MENU);
 }
 
 void MainMenu::ChangeSelect(MENU menu)
@@ -165,6 +160,10 @@ void MainMenu::UpdateGameStart(void)
 	// 決定ボタンを押されたら
 	if (InputManager::GetInstance()->DecideButton())
 	{
+		// ボタン押下のSEを流す
+		AudioManager::GetInstance()->PlaySE(SoundID::SE_CAT_VOICE_1);
+
+		// ゲームシーンへ飛ばす
 		SceneManager::GetInstance()->NextChangeScene(std::make_shared<GameScene>(), SCENE_TAG::GAME, true);
 	}
 }
@@ -174,6 +173,10 @@ void MainMenu::UpdateTitle(void)
 	// 決定ボタンを押されたら
 	if (InputManager::GetInstance()->DecideButton())
 	{
+		// ボタン押下のSEを流す
+		AudioManager::GetInstance()->PlaySE(SoundID::SYS_BUTTON);
+
+		// このシーンを閉じる
 		SceneManager::GetInstance()->PopScene();
 	}
 }
@@ -183,6 +186,9 @@ void MainMenu::UpdateExit(void)
 	// 決定ボタンを押されたら
 	if (InputManager::GetInstance()->DecideButton())
 	{
+		// ボタン押下のSEを流す
+		AudioManager::GetInstance()->PlaySE(SoundID::SYS_BUTTON);
+
 		// 確認画面を積む
 		SceneManager::GetInstance()->PushScene(std::make_shared<Confirm>());
 	}
@@ -209,7 +215,7 @@ void MainMenu::SelectUpgrade(void)
 		&& currentMenu_ != prevMenu)
 	{
 		// ボタンに乗ったサウンドを出す
-		//AudioManager::GetInstance()->PlaySE(SoundID::SYS_SELECT_ON);
+		AudioManager::GetInstance()->PlaySE(SoundID::SYS_SELECT_ON);
 	}
 }
 

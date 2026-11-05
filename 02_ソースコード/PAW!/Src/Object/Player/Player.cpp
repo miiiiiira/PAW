@@ -2,6 +2,7 @@
 #include "../../Math/Math.h"
 #include "../../Input/InputManager.h"
 #include "../../Scene/SceneManager.h"
+#include "../../Audio/AudioManager.h"
 #include "../Camera/CameraUtility.h"
 #include "../Component/Graphics/Render3D.h"
 #include "../Component/Animation/Animation.h"
@@ -312,11 +313,17 @@ void Player::InitAvoid(Player& player)
 	player.info_.moveSpeed_ = 0.0f;
 
 	player.info_.isAvoid_ = true;
+
+	// 回避音
+	AudioManager::GetInstance()->PlaySE(SoundID::SE_AVOID);
 }
 
 void Player::InitJump(Player& player)
 {
 	player.ChangeJumpState(PLAYER_JUMP_START);
+
+	// ジャンプ音
+	AudioManager::GetInstance()->PlaySE(SoundID::SE_JUMP);
 
 	// 移動速度を初期化
 	player.info_.moveSpeed_ = 0.0f;
@@ -1075,6 +1082,9 @@ void Player::StartAttack(PLAYER_ANIMATION anim)
 	// 移動先の向きを,
 	InputMove();
 
+	// 攻撃音
+	AudioManager::GetInstance()->PlaySE(SoundID::SE_ATTACK_1);
+
 	// プレイヤーの移動速度を設定
 	info_.moveSpeed_ = ATTACK_MOVE_SPEED;
 
@@ -1281,6 +1291,9 @@ void Player::OnCollision(Collider* other)
 		// 死亡処理に入っていたら処理を行わない
 		if (stateCtrl_.state_ == PLAYER_STATE_DEAD ||
 			stateCtrl_.state_ == PLAYER_STATE_END)return;
+
+		// 被ダメージ音
+		AudioManager::GetInstance()->PlaySE(SoundID::SE_PLAYER_DAMAGE);
 
 		// ダメージ処理
 		SetDamage(1);

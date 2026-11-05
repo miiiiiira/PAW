@@ -1,5 +1,6 @@
 #include "../../../../Object.h"
 #include "../../../../../Collision/3DCollider/SphereCollider.h"
+#include "../../../../../Audio/AudioManager.h"
 
 #include "Attack1.h"
 
@@ -122,6 +123,9 @@ void Attack1::UpdateIdle(Attack1& attack1)
 	{
 		// ƒJƒEƒ“ƒg‚ğ0‚É‰Šú‰»
 		attack1.info_.idleCount_ = 0;
+
+		// UŒ‚1—‰º‰¹
+		AudioManager::GetInstance()->PlaySE(SoundID::SE_ROBOT_ATTACK1);
 
 		// ˆÚ“®ó‘Ô‚Ö
 		attack1.ChangeState(ATTACK1_STATE_MOVE);

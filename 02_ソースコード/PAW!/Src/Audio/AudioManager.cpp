@@ -91,7 +91,7 @@ void AudioManager::DeleteSceneSound(LoadScene scene)
 	case LoadScene::TITLE: table = &SoundTable_Title::Table; break;
 	case LoadScene::GAME:  table = &SoundTable_Game::Table; break;
 	case LoadScene::GAME_OVER:  table = &SoundTable_GameOver::Table; break;
-	case LoadScene::GAME_CLEAR:  table = &SoundTable_Game::Table; break;
+	case LoadScene::GAME_CLEAR:  table = &SoundTable_GameClear::Table; break;
 	}
 
 	// 存在しないテーブルを選んでいたら処理しない
