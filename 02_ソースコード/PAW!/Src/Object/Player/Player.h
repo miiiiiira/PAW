@@ -45,6 +45,7 @@ public:
 
 	// 敵ネズミのポインタをもらう
 	void SetRatPoint(const Transform* ratTransform) { ratsTransform_.emplace_back(ratTransform); }
+	void SetTablePoint(const Transform* tableTransform) { tableTransform_ = tableTransform; }
 
 private:
 	// 状態別更新処理
@@ -116,10 +117,6 @@ private:
 	// 無敵時間を更新
 	void UpdateInvincible(void);
 
-	// ヒットストップ系
-	void UpdateHitStop(void);			// 更新
-	void GetShakeOffset(int& offset);	// 揺らし量を計算
-
 	// 移動系
 	bool InputMove(void);			// 移動しているか	true / 移動している, false / 移動していない
 	void Move(void);				// 移動処理
@@ -150,6 +147,9 @@ private:
 	void OnCollision(Collider* other) override;	// 衝突判定の検知
 	void AttackOnCollision(void);				// 攻撃判定の検知
 
+	// 座標を範囲内に収める
+	void ClampPosition(void);
+
 	// 描画系
 	void DrawHP(void);			// HP描画
 	void DrawButtonGuide(void);	// ボタンガイド描画
@@ -170,6 +170,8 @@ private:
 
 	// ネズミのTransformポインタ
 	std::vector<const Transform*>ratsTransform_;
+	// テーブルのTransformポインタ
+	const Transform* tableTransform_ = nullptr;
 
 private:
 	// プレイヤー情報

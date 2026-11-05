@@ -47,6 +47,20 @@ void Attack1::Update(void)
 	UpdateState();
 }
 
+void Attack1::Draw3D(void)
+{
+	if (stateCtrl_.state_ == ATTACK1_STATE_END)return;
+
+	DrawSphere3D(
+		transform_->pos_,
+		sphereCollder_->GetRadius(),
+		16,
+		0xff0000,
+		0xff0000,
+		true
+	);
+}
+
 void Attack1::StartAttack(VECTOR pos)
 {
 	// w’è‚ÌÀ•W‚ğİ’è

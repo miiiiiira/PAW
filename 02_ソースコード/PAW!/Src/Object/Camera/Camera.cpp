@@ -8,6 +8,12 @@
 
 #include "Camera.h"
 
+namespace
+{
+	// カメラの半径
+	constexpr float CAMERA_RADIUS = 10.0f;
+}
+
 void Camera::Init(void)
 {
 	// 座標の設定
@@ -128,6 +134,12 @@ void Camera::UpdateFollow(void)
 
 	// カメラの移動
 	CameraPosUpdate(mat);
+
+	// 下に行き過ぎないようにする
+	if (transform_->pos_.y < CAMERA_RADIUS)
+	{
+		transform_->pos_.y = CAMERA_RADIUS;
+	}
 }
 
 void Camera::SetBeforeDrawFixedPoint()

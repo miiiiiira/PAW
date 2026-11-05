@@ -8,6 +8,7 @@
 #include "../../Collision/3DCollider/CapsuleCollider.h"
 #include "../../Collision/3DCollider/SphereCollider.h"
 #include "../Enemy/Wave/WaveManager.h"
+#include "../Stage/Table/Table.h"
 #include "../../Application.h"
 
 #include "Player.h"
@@ -83,6 +84,9 @@ namespace
 	// ジャンプボタンガイド
 	constexpr int JUMP_BUTTON_GUIDE_UI_POS_X = Application::SCREEN_SIZE_X - BUTTON_GUIDE_UI_SIZE_X / 2;
 	constexpr int JUMP_BUTTON_GUIDE_UI_POS_Y = Application::SCREEN_SIZE_Y - 30;
+
+	// 範囲外判定用座標処理
+	constexpr float CLAMP_POS_RADIUS = 100.0f;
 }
 
 Player::Player(void)
@@ -194,6 +198,7 @@ void Player::Update(void)
 		return;
 	}
 
+	// イベントシーン時は更新を行わない
 	if (WaveManager::GetInstance().GetCurrentWave()->GetState() == WaveBase::WaveState::EVENT)return;
 
 	// 状態別更新処理
@@ -205,15 +210,22 @@ void Player::Update(void)
 	// 無敵時間を更新
 	UpdateInvincible();
 
-	// ヒットストップ更新
-	UpdateHitStop();
-
 	// 死亡座標へ到達しているか
 	IsReachedDeadPos();
+
+	// 座標を範囲内に収める
+	ClampPosition();
 }
 
 void Player::Draw2D(void)
 {
+	// イベントシーン時は描画を行わない
+	auto currentWave = WaveManager::GetInstance().GetCurrentWave();
+	if (currentWave != nullptr)
+	{
+		if (currentWave->GetState() == WaveBase::WaveState::EVENT)return;
+	}
+
 	// HP描画
 	DrawHP();
 
@@ -847,14 +859,10 @@ void Player::ApplyGravity(void)
 	// 回避中は重力処理を行わない
 	if (stateCtrl_.state_ == PLAYER_STATE_AVOID)return;
 
-	// ステージコライダが無ければ処理を行わない
-	//if (!stageColl_) return;
 	// Y座標へ反映
 	transform_->pos_.y += info_.velocityY_;
-	// 接地判定
 
-	// 空中
-	//if (!stageColl_->IsGround())
+	// 接地判定
 	if (transform_->pos_.y > 0.0f)
 	{
 		// 重力加算
@@ -881,29 +889,11 @@ void Player::UpdateInvincible(void)
 	{
 		--info_.invincibleTime_;
 	}
-}
-
-void Player::UpdateHitStop(void)
-{
-	// ヒットストップ更新処理
-	if (info_.hitStopCounter_ > 0) {
-		info_.hitStopCounter_--;
-	}
-}
-
-void Player::GetShakeOffset(int& offset)
-{
-	if (info_.hitStopCounter_ > 0) {
-		// 振動先をカウンターから計算する----------
-		// 0 or 1
-		offset = (info_.hitStopCounter_ / 5) % 2;
-		// 0 or 2 中心を作る
-		offset *= 2;
-		// -1 or 1 0を中心にする
-		offset -= 1;
-		// -5 or 5 振れ幅を付ける
-		offset *= 5;
-		// ----------------------------------------
+	// タグがNONEなため
+	else if (capsuleCollder_->GetCollisionTag() == CollisionTag::NONE)
+	{
+		// プレイヤータグをセット
+		capsuleCollder_->SetCollisionTag(CollisionTag::PLAYER);
 	}
 }
 
@@ -1017,8 +1007,8 @@ void Player::SetDamage(int damage)
 		// 無敵時間を設ける
 		info_.invincibleTime_ = INVINCIBLE_TIME;
 
-		// HP描画を揺らす
-		info_.hitStopCounter_ = SHAKE_TIME;
+		// 当たり判定を行わないようタグをNONEへ
+		capsuleCollder_->SetCollisionTag(CollisionTag::NONE);
 	}
 }
 
@@ -1276,9 +1266,6 @@ void Player::OnCollision(Collider* other)
 		if (stateCtrl_.state_ == PLAYER_STATE_DEAD ||
 			stateCtrl_.state_ == PLAYER_STATE_END)return;
 
-		// 無敵時間があれば処理を行わない
-		if (info_.invincibleTime_ > 0)return;
-
 		// ダメージ処理
 		SetDamage(1);
 
@@ -1308,6 +1295,32 @@ void Player::AttackOnCollision(void)
 
 	default:
 		break;
+	}
+}
+
+void Player::ClampPosition(void)
+{
+	// 中心 -> 自分 のベクトル(高さは無視)
+	VECTOR vec = VSub(transform_->pos_, tableTransform_->pos_);
+	vec.y = 0.0f;
+
+	float distance = VSize(vec);
+
+	float radius = Table::TABLE_RADIUS - CLAMP_POS_RADIUS;
+
+	// 範囲内なら何もしない
+	if (distance <= radius) return;
+
+	// 範囲外なら、境界上に引き戻す
+	VECTOR dir = VNorm(vec);
+	transform_->pos_.x = tableTransform_->pos_.x + dir.x * radius;
+	transform_->pos_.z = tableTransform_->pos_.z + dir.z * radius;
+
+	// 回避状態であれば固まってしまうため
+	if (stateCtrl_.state_ == PLAYER_STATE_AVOID)
+	{
+		// 強制的に待機状態へ
+		ChangeState(PLAYER_STATE_IDLE);
 	}
 }
 
@@ -1372,6 +1385,16 @@ void Player::DebugDraw3D(void)
 		16,
 		0x0000ff,
 		0x0000ff,
+		false
+	);
+
+	// 範囲外用の描画
+	DrawSphere3D(
+		transform_->pos_,
+		CLAMP_POS_RADIUS,
+		16,
+		0x00ff00,
+		0x00ff00,
 		false
 	);
 }

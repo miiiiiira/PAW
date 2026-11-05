@@ -20,7 +20,6 @@
 #include "../../../Object/Camera/Camera.h"
 #include "../../../Object/Camera/CameraUtility.h"
 #include "../../../Object/Enemy/EnemyCommander.h"
-#include "../../../Object/Grid/Grid.h"
 #include "../../../Object/Stage/Table/Table.h"
 #include "../../../Object/Enemy/Wave/WaveManager.h"
 #include "../../../Object/Enemy/Wave/Wave1.h"
@@ -42,10 +41,6 @@ void GameScene::Init(void)
 {
 	// オブジェクトマネージャー初期化
 	objectManager_->Init();
-
-	// グリッド初期化
-	grid_ = new Grid();
-	grid_->Init();
 
 	// 敵司令官の初期化
 	// ネズミの参照を渡す
@@ -163,9 +158,6 @@ void GameScene::Draw(void)
 	// オブジェクトの描画前
 	objectManager_->PreDraw();
 
-	// グリッド描画
-	grid_->Draw();
-
 	// オブジェクトの3D描画
 	objectManager_->Draw3D();
 
@@ -195,10 +187,6 @@ void GameScene::Release(void)
 	enemyCommander_->Release();
 	delete enemyCommander_;
 	enemyCommander_ = nullptr;
-
-	// グリッド解放
-	grid_->Release();
-	delete grid_;
 
 	// 当たり判定のマネジャー削除
 	CollisionManager::GetInstance()->Clear();
@@ -292,6 +280,8 @@ void GameScene::SetUp(void)
 	auto rats = objectManager_->FindComponentWithTagAll<Rat>(TAG_3D::RAT);
 	// 猫ロボット
 	auto catRobot = objectManager_->FindComponentWithTag<CatRobot>(TAG_3D::CAT_ROBOT);
+	// テーブル
+	auto table = objectManager_->FindComponentWithTag<Table>(TAG_3D::STAGE);
 
 	// プレイヤーのTransformをカメラに設定
 	camera->SetTarget(player->GetTransform());
@@ -310,6 +300,9 @@ void GameScene::SetUp(void)
 
 	// 猫ロボットにプレイヤーTransformを渡す
 	catRobot->SetPlayerTransform(player->GetTransform());
+
+	// プレイヤーにテーブルTransformを渡す
+	player->SetTablePoint(table->GetTransform());
 }
 
 bool GameScene::ChangePauseScene(void)

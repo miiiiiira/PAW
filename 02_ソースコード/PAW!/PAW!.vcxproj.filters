@@ -30,7 +30,6 @@
     <ClCompile Include="Src\Math\Easing.cpp" />
     <ClCompile Include="Src\Object\Camera\CameraUtility.cpp" />
     <ClCompile Include="Src\Math\MatrixUtility.cpp" />
-    <ClCompile Include="Src\Object\Grid\Grid.cpp" />
     <ClCompile Include="Src\Object\Enemy\Rat\Rat.cpp" />
     <ClCompile Include="Src\Collision\3DCollider\CapsuleCollider.cpp" />
     <ClCompile Include="Src\Collision\3DCollider\SphereCollider.cpp" />
@@ -86,7 +85,6 @@
     <ClInclude Include="Src\Math\Easing.h" />
     <ClInclude Include="Src\Object\Camera\CameraUtility.h" />
     <ClInclude Include="Src\Math\MatrixUtility.h" />
-    <ClInclude Include="Src\Object\Grid\Grid.h" />
     <ClInclude Include="Src\Object\Enemy\Rat\Rat.h" />
     <ClInclude Include="Src\Object\Enemy\Rat\RatInfo.h" />
     <ClInclude Include="Src\Collision\3DCollider\AABBCollider.h" />

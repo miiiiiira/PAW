@@ -104,8 +104,6 @@ struct playerInfo
 
 	int invincibleTime_ = 0;	// 無敵時間
 
-	int hitStopCounter_ = 0;	// ヒットストップ用のカウンター
-
 	bool isAttackHit_ = false;	// 攻撃が当たったか		true / 当たった , false / 当たっていない
 	
 	PLAYER_ATTACK_STATE currentAttack_ = PLAYER_ATTACK_MAX;	// 攻撃中の種類を入れる

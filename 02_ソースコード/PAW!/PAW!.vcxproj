@@ -72,9 +72,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>$(ProjectDir)</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -130,6 +132,7 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <AdditionalIncludeDirectories>C:\DxLib;$(DXLIB_DIR)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -167,7 +170,6 @@
     <ClCompile Include="Src\Object\Enemy\Wave\Wave1.cpp" />
     <ClCompile Include="Src\Object\Enemy\Wave\WaveBase.cpp" />
     <ClCompile Include="Src\Object\Enemy\Wave\WaveManager.cpp" />
-    <ClCompile Include="Src\Object\Grid\Grid.cpp" />
     <ClCompile Include="Src\Object\ObjectManager.cpp" />
     <ClCompile Include="Src\Object\Player\Player.cpp" />
     <ClCompile Include="Src\Object\Stage\Floor\Floor.cpp" />
@@ -225,7 +227,6 @@
     <ClInclude Include="Src\Object\Enemy\Wave\Wave1.h" />
     <ClInclude Include="Src\Object\Enemy\Wave\WaveBase.h" />
     <ClInclude Include="Src\Object\Enemy\Wave\WaveManager.h" />
-    <ClInclude Include="Src\Object\Grid\Grid.h" />
     <ClInclude Include="Src\Object\Object.h" />
     <ClInclude Include="Src\Object\ObjectManager.h" />
     <ClInclude Include="Src\Object\Player\Player.h" />

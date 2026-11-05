@@ -27,3 +27,11 @@ void Table::Init(void)
 void Table::Update(void)
 {
 }
+
+#ifdef _DEBUG
+void Table::Draw3D(void)
+{
+	// ‹…•`‰æ
+	DrawSphere3D(transform_->pos_, TABLE_RADIUS, 12, 0xff0000, 0xff0000,false);
+}
+#endif // _DEBUG
