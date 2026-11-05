@@ -50,8 +50,6 @@ bool Wave1::CheckEventClear(void)
 
 bool Wave1::CheckRatClear(void)
 {
-	bool isAllDead = true;
-
 	// 全ネズミ死亡しているか
 	for (const auto& rat: rats_)
 	{
@@ -59,11 +57,17 @@ bool Wave1::CheckRatClear(void)
 		if (rat->GetState() != RAT_STATE_END)
 		{
 			// フラグを折る
-			isAllDead = false;
+			return false;
 		}
 	}
 
-	return isAllDead;
+	// カウントを進める。
+	ratToCatRobotCount_++;
+
+	// カウントが指定値に達していなかったら処理を行わない
+	if (ratToCatRobotCount_ < RAT_TO_CATROBOT_COUNT)return false;
+
+	return true;
 }
 
 bool Wave1::CheckCatRobotClear(void)

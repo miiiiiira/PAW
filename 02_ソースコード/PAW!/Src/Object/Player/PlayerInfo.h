@@ -100,6 +100,9 @@ struct playerInfo
 
 	int hp_ = 0;	// ¡Œ»İ‚ÌHP
 
+	bool isJump_ = false;	// ƒWƒƒƒ“ƒv‚ğ‚µ‚Ä‚¢‚éÅ’†‚©‚Ç‚¤‚©
+	bool isAvoid_ = false;	// ‰ñ”ğ‚ğ‚µ‚Ä‚¢‚éÅ’†‚©‚Ç‚¤‚©
+
 	VECTOR avoidPos_ = {};	// ‰ñ”ğæ‚ÌÀ•W
 
 	int invincibleTime_ = 0;	// –³“GŠÔ

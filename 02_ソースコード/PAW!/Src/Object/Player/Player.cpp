@@ -310,6 +310,8 @@ void Player::InitAvoid(Player& player)
 
 	// 移動速度を初期化
 	player.info_.moveSpeed_ = 0.0f;
+
+	player.info_.isAvoid_ = true;
 }
 
 void Player::InitJump(Player& player)
@@ -318,6 +320,9 @@ void Player::InitJump(Player& player)
 
 	// 移動速度を初期化
 	player.info_.moveSpeed_ = 0.0f;
+
+	// ジャンプフラグを立てる
+	player.info_.isJump_ = true;
 }
 
 void Player::InitDead(Player& player)
@@ -345,7 +350,8 @@ void Player::UpdateIdle(Player& player)
 	}
 
 	// 回避ボタンが押されていたら
-	if (InputManager::GetInstance()->AvoidButton())
+	if (InputManager::GetInstance()->AvoidButton() &&
+		!player.info_.isAvoid_)
 	{
 		// 回避状態へ
 		player.ChangeState(PLAYER_STATE_AVOID);
@@ -353,7 +359,8 @@ void Player::UpdateIdle(Player& player)
 	}
 
 	// ジャンプボタンを押されたかつ、ジャンプ中ではなかったら
-	if (InputManager::GetInstance()->JumpButton())
+	if (InputManager::GetInstance()->JumpButton() &&
+		!player.info_.isJump_)
 	{
 		// ジャンプ状態へ
 		player.ChangeState(PLAYER_STATE_JUMP);
@@ -395,7 +402,8 @@ void Player::UpdateMove(Player& player)
 	}
 
 	// 回避ボタンが押されていたら
-	if (InputManager::GetInstance()->AvoidButton())
+	if (InputManager::GetInstance()->AvoidButton()&&
+		!player.info_.isAvoid_)
 	{
 		// 回避状態へ
 		player.ChangeState(PLAYER_STATE_AVOID);
@@ -403,7 +411,8 @@ void Player::UpdateMove(Player& player)
 	}
 
 	// ジャンプボタンを押されたかつ、ジャンプ中ではなかったら
-	if (InputManager::GetInstance()->JumpButton())
+	if (InputManager::GetInstance()->JumpButton() &&
+		!player.info_.isJump_)
 	{
 		// ジャンプ状態へ
 		player.ChangeState(PLAYER_STATE_JUMP);
@@ -430,7 +439,8 @@ void Player::UpdateAttack(Player& player)
 	}
 
 	// 回避ボタンが押されていたら
-	if (InputManager::GetInstance()->AvoidButton())
+	if (InputManager::GetInstance()->AvoidButton() &&
+		!player.info_.isAvoid_)
 	{
 		// 回避状態へ
 		player.ChangeState(PLAYER_STATE_AVOID);
@@ -438,7 +448,8 @@ void Player::UpdateAttack(Player& player)
 	}
 
 	// ジャンプボタンを押されたかつ、ジャンプ中ではなかったら
-	if (InputManager::GetInstance()->JumpButton())
+	if (InputManager::GetInstance()->JumpButton() &&
+		!player.info_.isJump_)
 	{
 		// ジャンプ状態へ
 		player.ChangeState(PLAYER_STATE_JUMP);
@@ -492,7 +503,8 @@ void Player::UpdateJump(Player& player)
 	}
 
 	// 回避ボタンが押されていたら
-	if (InputManager::GetInstance()->AvoidButton())
+	if (InputManager::GetInstance()->AvoidButton() &&
+		!player.info_.isAvoid_)
 	{
 		// 回避状態へ
 		player.ChangeState(PLAYER_STATE_AVOID);
@@ -879,6 +891,10 @@ void Player::ApplyGravity(void)
 		// 地面上なら少し下方向に押す
 		// 0だと浮く場合があるため
 		info_.velocityY_ = -0.1f;
+
+		// 地面についたためジャンプフラグを折る
+		info_.isJump_ = false;
+		info_.isAvoid_ = false;
 	}
 }
 

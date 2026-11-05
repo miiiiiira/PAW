@@ -31,6 +31,8 @@ void WaveBase::Update(void)
         // クリア条件を達成したら
         if (CheckEventClear())
         {
+            // カウント初期化
+            ratToCatRobotCount_ = 0;
             // ネズミ行動へ
             ChangeState(WaveState::RAT);
         }

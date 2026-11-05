@@ -59,6 +59,16 @@ void Attack1::Draw3D(void)
 		0xff0000,
 		true
 	);
+
+	DrawCone3D(
+		{ transform_->pos_.x,2.0f,transform_->pos_.z },
+		{ transform_->pos_.x,-1.0f,transform_->pos_.z },
+		130.0f,
+		16,
+		0xff0000,
+		0xff0000,
+		true
+	);
 }
 
 void Attack1::StartAttack(VECTOR pos)

@@ -44,6 +44,9 @@ protected:
     // 固定フレーム
     static constexpr int ONE_SECOND = 60;
 
+    // ネズミから猫ロボット時のカウント
+    static constexpr int RAT_TO_CATROBOT_COUNT = 120;
+
 protected:
     std::vector<Rat*>rats_;
     CatRobot* catRobot_;
@@ -52,6 +55,9 @@ protected:
 protected:
     // ウェーブ状態
     WaveState state_ = WaveState::EVENT;
+
+    // ネズミから猫ロボット時のカウント
+    int ratToCatRobotCount_ = 0;
 
 protected:
     // システム起動
