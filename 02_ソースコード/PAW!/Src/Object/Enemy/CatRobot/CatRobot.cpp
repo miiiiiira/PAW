@@ -13,11 +13,11 @@
 namespace
 {
 	// 座標設定
-	constexpr VECTOR DEFAULT_POS = { 0.0f,-1500.0f,2200.0f };
+	constexpr VECTOR DEFAULT_POS = { 0.0f,-1500.0f,3000.0f };
 
 	// カプセル設定
-	constexpr VECTOR CAPSULE_START_OFFSET = {0.0f,2000.0f,0.0f};
-	constexpr VECTOR CAPSULE_END_OFFSET = {0.0f,500.0f,0.0f};
+	constexpr VECTOR CAPSULE_START_OFFSET = { 0.0f,2000.0f,0.0f };
+	constexpr VECTOR CAPSULE_END_OFFSET = { 0.0f,500.0f,0.0f };
 	constexpr float CAPSULE_RADIUS = 600.0f;
 
 	// 体力設定
@@ -52,7 +52,13 @@ namespace
 	constexpr int STUN_TIME = 300;
 
 	// ランダム用数
-	constexpr int ATTACK_RAND_NUM = 5000;		
+	constexpr int ATTACK_RAND_NUM = 5000;
+
+	// 補間の係数
+	constexpr float ANGLE_COEFFICIENT = 0.05f;
+
+	// 許容角度誤差
+	constexpr float ANGLE_EPSILON = 0.01f;
 
 	// 攻撃画像座標
 	constexpr int ATTACK_CHANCE_POS_X = Application::SCREEN_SIZE_X - 160;
@@ -480,8 +486,11 @@ void CatRobot::InitChanceEnd(CatRobot& catRobot)
 
 void CatRobot::UpdateChanceStart(CatRobot& catRobot)
 {
-	// スタン状態へ
-	catRobot.ChangeChanceState(CAT_ROBOT_CHANCE_STUN);
+	if (catRobot.UpdateAngle({ -35.0f * DX_PI_F / 180.0f,-20.0f * DX_PI_F / 180.0f,0.0f }))
+	{
+		// スタン状態へ
+		catRobot.ChangeChanceState(CAT_ROBOT_CHANCE_STUN);
+	}
 }
 
 void CatRobot::UpdateChanceStun(CatRobot& catRobot)
@@ -497,8 +506,11 @@ void CatRobot::UpdateChanceStun(CatRobot& catRobot)
 
 void CatRobot::UpdateChanceEnd(CatRobot& catRobot)
 {
-	// 待機状態へ
-	catRobot.ChangeState(CAT_ROBOT_STATE_IDLE);
+	if (catRobot.UpdateAngle({}))
+	{
+		// 待機状態へ
+		catRobot.ChangeState(CAT_ROBOT_STATE_IDLE);
+	}
 }
 
 void CatRobot::ChangeChanceState(CAT_ROBOT_CHANCE_STATE state)
@@ -520,7 +532,7 @@ void CatRobot::AddComponets(void)
 	transform_ = owner_->AddComponent<Transform>();
 	transform_->pos_ = DEFAULT_POS;
 	transform_->angle_ = {};
-	transform_->scale_ = {20.0f,20.0f ,20.0f };
+	transform_->scale_ = { 20.0f,20.0f ,20.0f };
 
 	// 当たり判定の設定(カプセル)
 	capsuleCollder_ = owner_->AddComponent<CapsuleCollider>();
@@ -775,8 +787,26 @@ void CatRobot::SetDamage(void)
 	}
 }
 
-void CatRobot::UpdateAngle(void)
+bool CatRobot::UpdateAngle(VECTOR targetAngle)
 {
+	// 角度補間をかける
+	transform_->angle_.x = Math::LerpAngle(
+		transform_->angle_.x,
+		targetAngle.x,
+		ANGLE_COEFFICIENT);
+
+	// 角度補間をかける
+	transform_->angle_.y = Math::LerpAngle(
+		transform_->angle_.y,
+		targetAngle.y,
+		ANGLE_COEFFICIENT);
+
+	// 角度補間をかける
+	transform_->angle_.z = Math::LerpAngle(
+		transform_->angle_.z,
+		targetAngle.z,
+		ANGLE_COEFFICIENT);
+
 	// モデルに角度を設定
 	MV1SetRotationXYZ(render3D_->GetHandle(), transform_->angle_);
 
@@ -789,6 +819,17 @@ void CatRobot::UpdateAngle(void)
 	VECTOR LocalRotPosDown = VTransform(VGet(0.0f, 500.0f, 0.0f), mat);
 	capsuleCollder_->SetStartOffset(LocalRotPosUp);
 	capsuleCollder_->SetEndOffset(LocalRotPosDown);
+
+	VECTOR sub = VSub(transform_->angle_, targetAngle);
+
+	if (fabs(sub.x) < ANGLE_EPSILON &&
+		fabs(sub.y) < ANGLE_EPSILON &&
+		fabs(sub.z) < ANGLE_EPSILON)
+	{
+		return true;
+	}
+
+	return false;
 }
 
 void CatRobot::OnCollision(Collider* other)
