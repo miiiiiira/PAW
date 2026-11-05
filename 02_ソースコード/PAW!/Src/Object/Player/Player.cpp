@@ -7,6 +7,7 @@
 #include "../Component/Animation/Animation.h"
 #include "../../Collision/3DCollider/CapsuleCollider.h"
 #include "../../Collision/3DCollider/SphereCollider.h"
+#include "../Enemy/Wave/WaveManager.h"
 #include "../../Application.h"
 
 #include "Player.h"
@@ -192,6 +193,8 @@ void Player::Update(void)
 	{
 		return;
 	}
+
+	if (WaveManager::GetInstance().GetCurrentWave()->GetState() == WaveBase::WaveState::EVENT)return;
 
 	// 状態別更新処理
 	UpdateState();
@@ -756,7 +759,7 @@ void Player::AddComponets(void)
 	// 座標の設定
 	transform_ = owner_->AddComponent<Transform>();
 	transform_->pos_ = {};
-	transform_->angle_ = {};
+	transform_->angle_ = { 0.0f,DX_PI_F,0.0f };
 	transform_->scale_ = { 4.0f,4.0f,4.0f };
 
 	// 当たり判定の設定(カプセル)
@@ -785,6 +788,9 @@ void Player::AddComponets(void)
 	render3D_ = owner_->AddComponent<Render3D>();
 	render3D_->Init();
 	render3D_->SetModel("Data/Model/Player/Player.mv1");
+
+	// モデルに回転をセット
+	MV1SetRotationXYZ(render3D_->GetHandle(), transform_->angle_);
 
 	// アニメーション設定
 	animation_ = owner_->AddComponent<Animation>();
