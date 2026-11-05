@@ -3,6 +3,7 @@
 #include "../../Component/Animation/Animation.h"
 #include "../../Camera/CameraUtility.h"
 #include "../../../Collision/3DCollider/CapsuleCollider.h"
+#include "../../Stage/Table/Table.h"
 #include "../../../Math/Math.h"
 
 #include "Rat.h"
@@ -52,6 +53,9 @@ namespace
 	// イベントシーン設定
 	constexpr float EVENT_MOVE_DISTANCE = 400.0f;	// イベントシーン時の移動距離
 	constexpr int EVENT_IDLE_TIME = 180;			// イベントシーン時の待機時間
+
+	// 範囲外判定用座標処理
+	constexpr float CLAMP_POS_RADIUS = 100.0f;
 }
 
 Rat::Rat(void)
@@ -135,6 +139,9 @@ void Rat::Update(void)
 
 	// 無敵時間を更新
 	UpdateInvincible();
+
+	// 座標を範囲内に収める
+	ClampPosition();
 }
 
 void Rat::UpdateState(void)
@@ -1017,4 +1024,23 @@ void Rat::OnCollision(Collider* other)
 	default:
 		break;
 	}
+}
+
+void Rat::ClampPosition(void)
+{
+	// 中心 -> 自分 のベクトル(高さは無視)
+	VECTOR vec = VSub(transform_->pos_, tableTransform_->pos_);
+	vec.y = 0.0f;
+
+	float distance = VSize(vec);
+
+	float radius = Table::TABLE_RADIUS - CLAMP_POS_RADIUS;
+
+	// 範囲内なら何もしない
+	if (distance <= radius) return;
+
+	// 範囲外なら、境界上に引き戻す
+	VECTOR dir = VNorm(vec);
+	transform_->pos_.x = tableTransform_->pos_.x + dir.x * radius;
+	transform_->pos_.z = tableTransform_->pos_.z + dir.z * radius;
 }

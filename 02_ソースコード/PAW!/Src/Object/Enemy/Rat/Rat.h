@@ -24,6 +24,8 @@ public:
 
 	// プレイヤーのTransformポインタを取得
 	void SetPlayerTransform(const Transform* transform) { playerTransform_ = transform; }
+	// テーブルのポインタをもらう
+	void SetTablePoint(const Transform* tableTransform) { tableTransform_ = tableTransform; }
 
 	// 状態を取得
 	RAT_STATE GetState(void)const { return stateCtrl_.state_; }
@@ -145,6 +147,9 @@ private:
 	// 衝突判定の検知
 	void OnCollision(Collider* other) override;
 
+	// 座標を範囲内に収める
+	void ClampPosition(void);
+
 private:
 	// コンポーネント
 	Transform* transform_ = nullptr;
@@ -154,7 +159,8 @@ private:
 
 	// プレイヤーTransform
 	const Transform* playerTransform_ = nullptr;
-
+	// テーブルのTransformポインタ
+	const Transform* tableTransform_ = nullptr;
 private:
 	// ネズミ情報
 	ratInfo info_;

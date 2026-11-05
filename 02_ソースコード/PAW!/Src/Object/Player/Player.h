@@ -45,6 +45,7 @@ public:
 
 	// 敵ネズミのポインタをもらう
 	void SetRatPoint(const Transform* ratTransform) { ratsTransform_.emplace_back(ratTransform); }
+	// テーブルのポインタをもらう
 	void SetTablePoint(const Transform* tableTransform) { tableTransform_ = tableTransform; }
 
 private:

@@ -296,6 +296,8 @@ void GameScene::SetUp(void)
 
 		// ネズミにプレイヤーTransformを渡す
 		rat->SetPlayerTransform(player->GetTransform());
+		// ネズミにテーブルTransformを渡す
+		rat->SetTablePoint(table->GetTransform());
 	}
 
 	// 猫ロボットにプレイヤーTransformを渡す
