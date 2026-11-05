@@ -39,7 +39,7 @@ void TitleScene::Init(void)
 void TitleScene::Load(void)
 {
 	// サウンドをロード
-	//AudioManager::GetInstance()->LoadSceneSound(LoadScene::TITLE);
+	AudioManager::GetInstance()->LoadSceneSound(LoadScene::TITLE);
 
 	// 画像をロード
 	backImg_ = LoadGraph("Data/Image/Title/TitleBack.png");
@@ -52,7 +52,7 @@ void TitleScene::LoadEnd(void)
 	Init();
 
 	// BGMを再生
-	//AudioManager::GetInstance()->PlayBGM(SoundID::BGM_TITLE);
+	AudioManager::GetInstance()->PlayBGM(SoundID::BGM_TITLE);
 }
 
 void TitleScene::Update(void)
@@ -93,7 +93,7 @@ void TitleScene::Draw(void)
 void TitleScene::Release(void)
 {
 	// BGMの解放
-	//AudioManager::GetInstance()->DeleteSceneSound(LoadScene::TITLE);
+	AudioManager::GetInstance()->DeleteSceneSound(LoadScene::TITLE);
 
 	// 画像の解放
 	DeleteGraph(backImg_);
@@ -107,6 +107,9 @@ bool TitleScene::ChangeMainMenu(void)
 	{
 		// PushAnyを透過する
 		alpha_ = 0.0f;
+
+		// メインメニューの作動音
+		AudioManager::GetInstance()->PlaySE(SoundID::SE_CHIME);
 
 		// メインメニューを積む
 		SceneManager::GetInstance()->PushScene(std::make_shared<MainMenu>());

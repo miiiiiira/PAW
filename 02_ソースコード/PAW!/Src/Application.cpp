@@ -5,7 +5,7 @@
 #include "System/FpsControl/FpsControl.h"
 #include "Input/InputManager.h"
 #include "Scene/SceneManager.h"
-//#include "Common/Manager/Audio/AudioManager.h"
+#include "Audio/AudioManager.h"
 
 Application* Application::instance_ = nullptr;
 
@@ -59,9 +59,9 @@ void Application::Init(void)
 	InputManager::GetInstance()->Init();
 
 	//// サウンド
-	//AudioManager::CreateInstance();
-	//AudioManager::GetInstance()->Init();
-	//AudioManager::GetInstance()->LoadSceneSound(LoadScene::SYSTEM);
+	AudioManager::CreateInstance();
+	AudioManager::GetInstance()->Init();
+	AudioManager::GetInstance()->LoadSceneSound(LoadScene::SYSTEM);
 
 	// シーン管理初期化
 	SceneManager::CreateInstance();
@@ -105,10 +105,10 @@ void Application::Delete(void)
 	SceneManager::GetInstance()->Delete();
 	SceneManager::DeleteInstance();
 
-	//// サウンド削除
-	//AudioManager::GetInstance()->DeleteSceneSound(LoadScene::SYSTEM);
-	//AudioManager::GetInstance()->DeleteAll();
-	//AudioManager::DeleteInstance();
+	// サウンド削除
+	AudioManager::GetInstance()->DeleteSceneSound(LoadScene::SYSTEM);
+	AudioManager::GetInstance()->DeleteAll();
+	AudioManager::DeleteInstance();
 
 	// フレームレート解放
 	delete fps_;
