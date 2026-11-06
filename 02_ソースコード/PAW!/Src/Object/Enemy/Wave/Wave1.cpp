@@ -31,10 +31,10 @@ void Wave1::Draw(void)
 		{
 			// “|‚µ‚Ä‚â‚é‰æ‘œ
 			DrawBillboard3D(
-				{ rats_[0]->GetTransform()->pos_.x + 50.0f ,
-				rats_[0]->GetTransform()->pos_.y + 100.0f , 
+				{ rats_[0]->GetTransform()->pos_.x + 60.0f ,
+				rats_[0]->GetTransform()->pos_.y + 120.0f , 
 				rats_[0]->GetTransform()->pos_.z - 20.0f },
-				0.5f, 0.5f,
+				0.7f, 0.7f,
 				64.0f,
 				-0.1f, 
 				taositeyaruImage_,

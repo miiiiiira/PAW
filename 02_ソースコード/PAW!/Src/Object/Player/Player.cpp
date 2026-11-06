@@ -370,6 +370,7 @@ void Player::InitAvoid(Player& player)
 	// 移動速度を初期化
 	player.info_.moveSpeed_ = 0.0f;
 
+	// 回避フラグを立てる
 	player.info_.isAvoid_ = true;
 
 	// 回避音
@@ -533,11 +534,16 @@ void Player::UpdateAvoid(Player& player)
 	// 現在地から回避先までの距離を算出
 	VECTOR vec = VSub(player.info_.avoidPos_, player.transform_->pos_);
 	vec.y = 0.0f;
-
 	float dis = VSize(vec);
 
-	// 回避先の座標にほぼ近ければ
-	if (dis < AVOID_MIN_DISTANCE)
+	// 移動できているか
+	VECTOR prevToNow = VSub(player.transform_->prevPos_, player.transform_->pos_);
+	prevToNow.y = 0.0f;
+	float prevToNowDistance = VSize(prevToNow);
+
+	// 回避先の座標にほぼ近いかほぼ移動していなかったら
+	if (dis < AVOID_MIN_DISTANCE ||
+		prevToNowDistance < 0.00001f)
 	{
 		// 待機状態へ
 		player.ChangeState(PLAYER_STATE_IDLE);
