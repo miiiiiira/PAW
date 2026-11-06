@@ -312,7 +312,7 @@ bool GameScene::ChangePauseScene(void)
 		AudioManager::GetInstance()->PlaySE(SoundID::SYS_PAUSE_ON);
 		
 		// ポーズモードへ
-		SceneManager::GetInstance()->PushScene(std::make_shared<Pause>());
+		SceneManager::GetInstance()->PushScene(std::make_shared<Pause>(), SCENE_TAG::PAUSE);
 		return true;
 	}
 

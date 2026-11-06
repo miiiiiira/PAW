@@ -16,7 +16,7 @@
 namespace
 {
 	// ‰æ‘œƒTƒCƒY
-	static constexpr int IMAGE_SIZE_X = 401;
+	static constexpr int IMAGE_SIZE_X = 400;
 	static constexpr int IMAGE_SIZE_Y = 75;
 
 	// GAME_START

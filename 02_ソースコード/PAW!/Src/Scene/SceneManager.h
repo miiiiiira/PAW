@@ -55,9 +55,11 @@ public:
 
 	// シーンを新しく積む
 	void PushScene(std::shared_ptr<SceneBase> scene);
+	void PushScene(std::shared_ptr<SceneBase> scene, SCENE_TAG sceneTag);
 
 	// 最後に追加したシーンを削除する。
 	void PopScene(void);
+	void PopScene(SCENE_TAG sceneTag);
 
 	// 強制的に特定のシーンに飛ぶ。リセットをかけ特定のシーンのみにする。
 	void JumpScene(std::shared_ptr<SceneBase> scene);

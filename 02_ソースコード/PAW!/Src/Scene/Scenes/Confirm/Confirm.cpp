@@ -55,6 +55,7 @@ void Confirm::Load(void)
 	{
 	case SCENE_TAG::TITLE:
 	case SCENE_TAG::MAINMANU:
+	case SCENE_TAG::PAUSE:
 		// ゲーム終了時の確認画面
 		confirmImg_ = LoadGraph("Data/Image/Confirm/ConfirmExit.png");
 		break;
@@ -198,6 +199,7 @@ void Confirm::UpdateYes(void)
 		{
 		case SCENE_TAG::TITLE:
 		case SCENE_TAG::MAINMANU:
+		case SCENE_TAG::PAUSE:
 			// ボタン押下のSEを流す
 			AudioManager::GetInstance()->PlaySE(SoundID::SYS_BUTTON);
 			Application::GetInstance()->SetEnd(true);
@@ -273,13 +275,13 @@ void Confirm::PadSelect(void)
 	int current = static_cast<int>(currentSelect_);
 
 	// 上が押されたら
-	if (InputManager::GetInstance()->SelectRightPad())
+	if (InputManager::GetInstance()->SelectLeftPad())
 	{
 		// メニューを上に移動
 		current--;
 	}
 	// 下が押されたら
-	else if (InputManager::GetInstance()->SelectLeftPad())
+	else if (InputManager::GetInstance()->SelectRightPad())
 	{
 		// メニューを下に移動
 		current++;
@@ -297,7 +299,7 @@ void Confirm::PadSelect(void)
 	// 上限設定
 	if (next >= SELECT::MAX)
 	{
-		next = SELECT::YES;
+		next = SELECT::NO;
 	}
 
 	// メニューを切り替える

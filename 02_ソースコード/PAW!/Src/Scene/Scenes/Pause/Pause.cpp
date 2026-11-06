@@ -3,14 +3,33 @@
 
 #include "../../../Input/InputManager.h"
 #include "../../../Audio/AudioManager.h"
-//#include "../../Common/FrameRenderer/FrameRenderer.h"
 #include "../../SceneManager.h"
 #include "../../../Collision/CollisionMath.h"
 #include "../../../Application.h"
 #include "../Confirm/Confirm.h"
 #include "../../../Input/MouseCursor/MouseCursor.h"
+#include "../../../Scene/Scenes/Title/TitleScene.h"
 
 #include "Pause.h"
+
+namespace
+{
+	// 画像サイズ
+	constexpr int IMAGE_SIZE_X = 400;
+	constexpr int IMAGE_SIZE_Y = 75;
+
+	// CONTINUE
+	constexpr int CONTINUE_POS_X = Application::SCREEN_SIZE_X / 2;
+	constexpr int CONTINUE_POS_Y = Application::SCREEN_SIZE_Y / 2 + 50.0f;
+
+	// TITLE
+	constexpr int TITLE_POS_X = Application::SCREEN_SIZE_X / 2;
+	constexpr int TITLE_POS_Y = Application::SCREEN_SIZE_Y / 2 + 170.0f;
+
+	// EXIT
+	constexpr int EXIT_POS_X = Application::SCREEN_SIZE_X / 2;
+	constexpr int EXIT_POS_Y = Application::SCREEN_SIZE_Y / 2 + 290.0f;
+}
 
 Pause::Pause(void)
 {
@@ -30,20 +49,33 @@ void Pause::Init(void)
 void Pause::Load(void)
 {
 	// 背景画像読み込み
-	backImage_ = LoadGraph("Data/Image/Game/Pause.png");		
+	backImage_ = LoadGraph("Data/Image/Game/Pause.png");
 
 	pauseButtons_.clear();
 
-	// CONTINUE画像
-	pauseButtons_.push_back({ PAUSE::CONTINUE, LoadGraph("Pause/continue.png"),
-								CONTINUE_POS_X, CONTINUE_POS_Y, IMAGE_SIZE_X, IMAGE_SIZE_Y });
-	// MAIN MENU画像
-	pauseButtons_.push_back({ PAUSE::MAINMENU,  LoadGraph("Pause/mainMenu.png"),
-								MAINMENU_POS_X, MAINMENU_POS_Y, IMAGE_SIZE_X, IMAGE_SIZE_Y });
-	// QUIT画像
-	pauseButtons_.push_back({ PAUSE::QUIT, LoadGraph("Common/quit.png"),
-								QUIT_POS_X, QUIT_POS_Y, IMAGE_SIZE_X, IMAGE_SIZE_Y });
+	// Continue画像
+	pauseButtons_.push_back({
+		PAUSE::CONTINUE,
+		LoadGraph("Data/Image/Game/Button/ContinueOff.png"),
+		LoadGraph("Data/Image/Game/Button/ContinueOn.png"),
+		CONTINUE_POS_X,CONTINUE_POS_Y,
+		IMAGE_SIZE_X, IMAGE_SIZE_Y });
 
+	// Title画像
+	pauseButtons_.push_back({
+		PAUSE::TITLE,
+		LoadGraph("Data/Image/Game/Button/TitleOff.png"),
+		LoadGraph("Data/Image/Game/Button/TitleOn.png"),
+		TITLE_POS_X, TITLE_POS_Y,
+		IMAGE_SIZE_X, IMAGE_SIZE_Y });
+
+	// Exit画像
+	pauseButtons_.push_back({
+		PAUSE::EXIT,
+		LoadGraph("Data/Image/Game/Button/ExitOff.png"),
+		LoadGraph("Data/Image/Game/Button/ExitOn.png"),
+		EXIT_POS_X, EXIT_POS_Y,
+		IMAGE_SIZE_X, IMAGE_SIZE_Y });
 }
 
 void Pause::LoadEnd(void)
@@ -53,18 +85,8 @@ void Pause::LoadEnd(void)
 
 void Pause::Update(void)
 {
-	// Escape押したら
-	if (InputManager::GetInstance()->PauseEndButton())
-	{
-		// ポーズモード終了しゲームシーンへ戻る
-		UpdateContinue();
-	}
-
 	// 選択処理
 	SelectUpgrade();
-
-	// マウスを左クリックされていなかったら、ここで終了
-	if (!InputManager::GetInstance()->DecideButton()) return;
 
 	// 選択されているメニューがない場合も、ここで終了
 	if (currentPause_ == PAUSE::NONE) return;
@@ -76,17 +98,14 @@ void Pause::Update(void)
 		UpdateContinue();
 		break;
 
-	case PAUSE::MAINMENU:
-		UpdateMainMenu();
+	case PAUSE::TITLE:
+		UpdateTitle();
 		break;
 
-	case PAUSE::QUIT:
-		UpdateQuit();
+	case PAUSE::EXIT:
+		UpdateExit();
 		break;
 	}
-
-	// ボタン押下のSEを流す
-	//AudioManager::GetInstance()->PlaySE(SoundID::SYS_BUTTON_1);
 }
 
 void Pause::Draw(void)
@@ -94,23 +113,38 @@ void Pause::Draw(void)
 	// 背景描画
 	DrawGraph(0, 0, backImage_, true);
 
-
+	// 全てのボタンを描画
 	for (const auto& button : pauseButtons_)
 	{
+		// 選択されているボタン
 		if (button.type == currentPause_)
 		{
-			//FrameRenderer::Draw(button.x,button.y);
+			DrawRotaGraphF(button.x, button.y, 1.0f, 0.0f, button.graphHandleOn, true);
 		}
-
-		DrawGraph(button.x, button.y, button.graphHandle, true);		// メニューの文字を表示
+		// 選択されていないボタン
+		else
+		{
+			DrawRotaGraphF(button.x, button.y, 1.0f, 0.0f, button.graphHandleOff, true);
+		}
+			DrawBox(button.x- IMAGE_SIZE_X/2, button.y - IMAGE_SIZE_Y / 2, 
+				button.x + IMAGE_SIZE_X / 2, button.y + IMAGE_SIZE_Y / 2,
+				0xff0000, false);
 	}
+
+#ifdef _DEBUG
+
+	DrawString(0, 0, "Pause", 0xffffff);
+	DrawFormatString(0, 100, 0xff0000, "currentPause_ %d", currentPause_);
+
+#endif // _DEBUG
 }
 
 void Pause::Release(void)
 {
 	for (const auto& button : pauseButtons_)
 	{
-		DeleteGraph(button.graphHandle);
+		DeleteGraph(button.graphHandleOff);
+		DeleteGraph(button.graphHandleOn);
 	}
 	pauseButtons_.clear();
 
@@ -125,25 +159,48 @@ void Pause::ChangeSelect(PAUSE pause)
 
 void Pause::UpdateContinue(void)
 {
-	// マウスカーソルを画面中央に戻す
-	SetMousePoint(Application::SCREEN_SIZE_X / 2, Application::SCREEN_SIZE_Y / 2);
+	// 決定ボタンかEscapeを押されたら
+	if (InputManager::GetInstance()->DecideButton() ||
+		InputManager::GetInstance()->PauseEndButton())
+	{
+		// ゲームシーンへ戻る(ポーズモードを終了する)
+		AudioManager::GetInstance()->PlaySE(SoundID::SYS_BUTTON);
 
-	// マウスの表示を消す
-	MouseCursor::GetInstance()->SetMouseDraw(false);
+		// マウスカーソルを画面中央に戻す
+		SetMousePoint(Application::SCREEN_SIZE_X / 2, Application::SCREEN_SIZE_Y / 2);
 
-	// ゲームシーンへ戻る(ポーズモードを終了する)
-	//AudioManager::GetInstance()->PlaySE(SoundID::SYS_PAUSE_OFF);
+		// マウスの表示を消す
+		MouseCursor::GetInstance()->SetMouseDraw(false);
 
-	// ゲームシーンへ
-	SceneManager::GetInstance()->PopScene();
+		// ゲームシーンへ
+		SceneManager::GetInstance()->PopScene(SCENE_TAG::GAME);
+	}
 }
 
-void Pause::UpdateMainMenu(void)
+void Pause::UpdateTitle(void)
 {
+	// 決定ボタンを押されたら
+	if (InputManager::GetInstance()->DecideButton())
+	{
+		// ボタン押下のSEを流す
+		AudioManager::GetInstance()->PlaySE(SoundID::SYS_BUTTON);
+
+		// ゲームシーンへ飛ばす
+		SceneManager::GetInstance()->NextChangeScene(std::make_shared<TitleScene>(), SCENE_TAG::TITLE, true);
+	}
 }
 
-void Pause::UpdateQuit(void)
+void Pause::UpdateExit(void)
 {
+	// 決定ボタンを押されたら
+	if (InputManager::GetInstance()->DecideButton())
+	{
+		// ボタン押下のSEを流す
+		AudioManager::GetInstance()->PlaySE(SoundID::SYS_BUTTON);
+
+		// 確認画面を積む
+		SceneManager::GetInstance()->PushScene(std::make_shared<Confirm>());
+	}
 }
 
 void Pause::SelectUpgrade(void)
@@ -167,7 +224,7 @@ void Pause::SelectUpgrade(void)
 		&& currentPause_ != prevSelect)
 	{
 		// ボタンに乗ったサウンドを出す
-		//AudioManager::GetInstance()->PlaySE(SoundID::SYS_SELECT_ON);
+		AudioManager::GetInstance()->PlaySE(SoundID::SYS_SELECT_ON);
 	}
 }
 
@@ -178,9 +235,14 @@ void Pause::MouseSelect(void)
 	// 衝突判定
 	for (const auto& button : pauseButtons_)
 	{
-		if (Collision::HitMouseImg2Box({ static_cast<float>(button.x), static_cast<float>(button.y) },
-			static_cast<float>(button.sizeX), static_cast<float>(button.sizeY)))
+		// ボタンと当たっているか
+		if (Collision::HitMouseImg2Box(
+			{ button.x - static_cast<float>(button.sizeX / 2),
+			button.y - static_cast<float>(button.sizeY / 2) },
+			static_cast<float>(button.sizeX),
+			static_cast<float>(button.sizeY)))
 		{
+			// 当たっている場所をアクティブなボタンに変更
 			nextSelect = button.type;
 			break;
 		}
@@ -192,42 +254,38 @@ void Pause::MouseSelect(void)
 
 void Pause::PadSelect(void)
 {
-	auto prevMenu = currentPause_;
+	// 現在選択しているメニュー
+	int current = static_cast<int>(currentPause_);
 
-	switch (currentPause_)
+	// 上が押されたら
+	if (InputManager::GetInstance()->SelectUpPad())
 	{
-	case PAUSE::NONE:
-		ChangeSelect(PAUSE::CONTINUE);
-		break;
-
-	case PAUSE::CONTINUE:
-		if (InputManager::GetInstance()->SelectDownPad())
-		{
-			ChangeSelect(PAUSE::MAINMENU);
-		}
-		break;
-
-	case PAUSE::MAINMENU:
-		if (InputManager::GetInstance()->SelectUpPad())
-		{
-			ChangeSelect(PAUSE::CONTINUE);
-		}
-
-		if (InputManager::GetInstance()->SelectDownPad())
-		{
-			ChangeSelect(PAUSE::QUIT);
-		}
-		break;
-
-	case PAUSE::QUIT:
-		if (InputManager::GetInstance()->SelectUpPad())
-		{
-			ChangeSelect(PAUSE::MAINMENU);
-		}
-		break;
-
-	default:
-		break;
+		// メニューを上に移動
+		current--;
 	}
+	// 下が押されたら
+	else if (InputManager::GetInstance()->SelectDownPad())
+	{
+		// メニューを下に移動
+		current++;
+	}
+
+	// 移動先をキャスト
+	PAUSE next = static_cast<PAUSE>(current);
+
+	// 下限設定
+	if (next <= PAUSE::NONE)
+	{
+		next = PAUSE::CONTINUE;
+	}
+
+	// 上限設定
+	if (next >= PAUSE::MAX)
+	{
+		next = PAUSE::EXIT;
+	}
+
+	// メニューを切り替える
+	ChangeSelect(next);
 }
 

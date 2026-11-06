@@ -8,23 +8,26 @@ class Confirm;
 class Pause : public SceneBase
 {
 public:
-
 	enum class PAUSE
 	{
 		NONE,
 		CONTINUE,
-		MAINMENU,
-		QUIT,
+		TITLE,
+		EXIT,
+
+		MAX
 	};
 
 	struct ButtonInfo
 	{
-		PAUSE type;
-		int graphHandle;
-		int x, y;
-		int sizeX, sizeY;
+		PAUSE type;			// 選択している種類
+		int graphHandleOff;	// 選択されていない場合の画像ハンドル
+		int graphHandleOn;	// 選択されている場合の画像ハンドル
+		float x, y;			// 座標
+		int sizeX, sizeY;	// 画像サイズ
 	};
 
+public:
 	Pause(void);				// コンストラクタ
 	~Pause(void) override;		// デストラクタ
 
@@ -36,44 +39,27 @@ public:
 	void Release(void)	override;	// 解放
 
 private:
-	 
-	// 画像サイズ
-	static constexpr int IMAGE_SIZE_X = 200;
-	static constexpr int IMAGE_SIZE_Y = 50;
-
-	// CONTINUE
-	static constexpr int CONTINUE_POS_X = 80;
-	static constexpr int CONTINUE_POS_Y = 200;
-
-	// MAIN MENU
-	static constexpr int MAINMENU_POS_X = 80;
-	static constexpr int MAINMENU_POS_Y = 360;
-
-	// QUIT
-	static constexpr int QUIT_POS_X = 80;
-	static constexpr int QUIT_POS_Y = 550;
-
-	void ChangeSelect(PAUSE pause);
-
-	// メニュー選択時の処理
-	void UpdateContinue(void);
-	void UpdateMainMenu(void);
-	void UpdateQuit(void);
-private:
-
-	void SelectUpgrade(void);	// 選択処理
-
-	void MouseSelect(void);		// マウス選択
-
-	void PadSelect(void);		// パッド選択
-
-private:
 	// 背景画像ハンドル
-	int backImage_ = -1;	
+	int backImage_ = -1;
 
 	// ポーズボタンの情報を格納する配列
-	std::vector<ButtonInfo>  pauseButtons_;	
+	std::vector<ButtonInfo>  pauseButtons_;
 
 	// 現在選択されているポーズ
-	PAUSE currentPause_;		
+	PAUSE currentPause_;
+
+private:
+	// 選択中の種類を変更
+	void ChangeSelect(PAUSE pause);
+
+	// 選択時の処理
+	void UpdateContinue(void);	// コンテニュー
+	void UpdateTitle(void);		// タイトル
+	void UpdateExit(void);		// ゲーム終了
+
+	// 選択処理
+	void SelectUpgrade(void);	
+	void MouseSelect(void);		// マウス選択
+	void PadSelect(void);		// パッド選択
+	
 };

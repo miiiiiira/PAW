@@ -192,7 +192,7 @@ bool InputManager::IsTrgUpMouseLeft(void) const
 bool InputManager::ChangeDeviceMouse(void)
 {
 	return  FindMouse(MOUSE_INPUT_LEFT).keyTrgDown || FindMouse(MOUSE_INPUT_RIGHT).keyTrgDown
-		|| PushAnyButton();
+		|| CheckHitKeyAll(DX_CHECKINPUT_KEY);
 }
 
 bool InputManager::ChangeDevicePad(void)
@@ -300,8 +300,8 @@ bool InputManager::AttackButton(void)
 bool InputManager::AvoidButton(void)
 {
 	return  IsTrgDown(KEY_INPUT_LSHIFT) ||
-		IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::L_TRIGGER) ||
-		IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::R_TRIGGER);
+		IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::LB) ||
+		IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::RB);
 }
 
 InputManager::InputManager(void)
