@@ -18,15 +18,6 @@ class Rat;
 class Player : public Component
 {
 public:
-	// ステージの当たり判定用の法線
-	static constexpr float FLOOR_NORMAL_Y = 0.85f;	// 床
-	static constexpr float WALL_NORMAL_Y = 0.20f;	// 壁
-	static constexpr float SLOPE_NORMAL_Y = 0.65f;	// 坂
-
-	// 段差の登れる量
-	static constexpr float STEP_HEIGHT = 25.0f;
-
-public:
 	Player(void);				// コンストラクタ
 	~Player(void);				// デストラクタ
 
@@ -154,6 +145,8 @@ private:
 	// 描画系
 	void DrawHP(void);			// HP描画
 	void DrawButtonGuide(void);	// ボタンガイド描画
+	void DrawButtonGuideMouse(void);	// ボタンガイド描画マウス
+	void DrawButtonGuidePad(void);		// ボタンガイド描画ゲームパッド
 
 #ifdef _DEBUG
 	// デバッグ用描画

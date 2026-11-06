@@ -20,15 +20,15 @@ namespace
 
 	// CONTINUE
 	constexpr int CONTINUE_POS_X = Application::SCREEN_SIZE_X / 2;
-	constexpr int CONTINUE_POS_Y = Application::SCREEN_SIZE_Y / 2 + 50.0f;
+	constexpr int CONTINUE_POS_Y = Application::SCREEN_SIZE_Y / 2 + 50;
 
 	// TITLE
 	constexpr int TITLE_POS_X = Application::SCREEN_SIZE_X / 2;
-	constexpr int TITLE_POS_Y = Application::SCREEN_SIZE_Y / 2 + 170.0f;
+	constexpr int TITLE_POS_Y = Application::SCREEN_SIZE_Y / 2 + 170;
 
 	// EXIT
 	constexpr int EXIT_POS_X = Application::SCREEN_SIZE_X / 2;
-	constexpr int EXIT_POS_Y = Application::SCREEN_SIZE_Y / 2 + 290.0f;
+	constexpr int EXIT_POS_Y = Application::SCREEN_SIZE_Y / 2 + 290;
 }
 
 Pause::Pause(void)
@@ -126,9 +126,6 @@ void Pause::Draw(void)
 		{
 			DrawRotaGraphF(button.x, button.y, 1.0f, 0.0f, button.graphHandleOff, true);
 		}
-			DrawBox(button.x- IMAGE_SIZE_X/2, button.y - IMAGE_SIZE_Y / 2, 
-				button.x + IMAGE_SIZE_X / 2, button.y + IMAGE_SIZE_Y / 2,
-				0xff0000, false);
 	}
 
 #ifdef _DEBUG

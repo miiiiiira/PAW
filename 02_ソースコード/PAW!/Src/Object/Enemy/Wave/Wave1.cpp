@@ -27,8 +27,19 @@ void Wave1::Draw(void)
 	switch (state_)
 	{
 	case WaveBase::WaveState::EVENT:
-		// “|‚µ‚Ä‚â‚é‰æ‘œ
-		DrawBillboard3D({ rats_[0]->GetTransform()->pos_.x + 50.0f , rats_[0]->GetTransform()->pos_.y + 100.0f , rats_[0]->GetTransform()->pos_.z - 20.0f }, 0.5f, 0.5f, 64.0f, -0.1, taositeyaruImage_, true);
+		if (rats_[0]->GetState() == RAT_STATE_EVENT_IDLE)
+		{
+			// “|‚µ‚Ä‚â‚é‰æ‘œ
+			DrawBillboard3D(
+				{ rats_[0]->GetTransform()->pos_.x + 50.0f ,
+				rats_[0]->GetTransform()->pos_.y + 100.0f , 
+				rats_[0]->GetTransform()->pos_.z - 20.0f },
+				0.5f, 0.5f,
+				64.0f,
+				-0.1f, 
+				taositeyaruImage_,
+				true);
+		}
 		break;
 
 	case WaveBase::WaveState::RAT:

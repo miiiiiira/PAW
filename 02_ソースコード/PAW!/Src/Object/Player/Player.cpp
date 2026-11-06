@@ -149,11 +149,25 @@ Player::Player(void)
 
 Player::~Player(void)
 {
-	// 画像読み込み
+	// 画像解放
 	for (int i = 0; i < HP_UI_DIV; i++)
 	{
 		DeleteGraph(uiInfo_.hpImage_[i]);
 	}
+
+	for (const auto& button : uiInfo_.guidePad_)
+	{
+		DeleteGraph(button.graphHandleOff);
+		DeleteGraph(button.graphHandleOn);
+	}
+	uiInfo_.guidePad_.clear();
+
+	for (const auto& button : uiInfo_.guideMouse_)
+	{
+		DeleteGraph(button.graphHandleOff);
+		DeleteGraph(button.graphHandleOn);
+	}
+	uiInfo_.guideMouse_.clear();
 }
 
 void Player::Load(void)
@@ -172,6 +186,50 @@ void Player::Load(void)
 	uiInfo_.attackImage_ = LoadGraph("Data/Image/Game/Attack.png");
 	uiInfo_.avoidImage_ = LoadGraph("Data/Image/Game/Avoid.png");
 	uiInfo_.jumpImage_ = LoadGraph("Data/Image/Game/Jump.png");
+
+	// X画像
+	uiInfo_.guidePad_.push_back({
+		LoadGraph("Data/Image/Game/Button/xbox_button_color_x_outline.png"),
+		LoadGraph("Data/Image/Game/Button/xbox_button_color_x.png"),
+		ATTACK_BUTTON_GUIDE_UI_POS_X - BUTTON_GUIDE_UI_SIZE_X / 2,
+		ATTACK_BUTTON_GUIDE_UI_POS_Y });
+	// A画像
+	uiInfo_.guidePad_.push_back({
+		LoadGraph("Data/Image/Game/Button/xbox_button_color_a_outline.png"),
+		LoadGraph("Data/Image/Game/Button/xbox_button_color_a.png"),
+		JUMP_BUTTON_GUIDE_UI_POS_X - BUTTON_GUIDE_UI_SIZE_X / 2,
+		JUMP_BUTTON_GUIDE_UI_POS_Y });
+	// RB画像
+	uiInfo_.guidePad_.push_back({
+		LoadGraph("Data/Image/Game/Button/xbox_rb_outline.png"),
+		LoadGraph("Data/Image/Game/Button/xbox_rb.png"),
+		AVOID_BUTTON_GUIDE_UI_POS_X - BUTTON_GUIDE_UI_SIZE_X / 2 + 20,
+		AVOID_BUTTON_GUIDE_UI_POS_Y });
+	// LB画像
+	uiInfo_.guidePad_.push_back({
+		LoadGraph("Data/Image/Game/Button/xbox_lb_outline.png"),
+		LoadGraph("Data/Image/Game/Button/xbox_lb.png"),
+		AVOID_BUTTON_GUIDE_UI_POS_X - BUTTON_GUIDE_UI_SIZE_X / 2 - 30,
+		AVOID_BUTTON_GUIDE_UI_POS_Y });
+
+	// クリック画像
+	uiInfo_.guideMouse_.push_back({
+		LoadGraph("Data/Image/Game/Button/mouse.png"),
+		LoadGraph("Data/Image/Game/Button/mouse_left.png"),
+		ATTACK_BUTTON_GUIDE_UI_POS_X - BUTTON_GUIDE_UI_SIZE_X / 2,
+		ATTACK_BUTTON_GUIDE_UI_POS_Y });
+	// Space画像
+	uiInfo_.guideMouse_.push_back({
+		LoadGraph("Data/Image/Game/Button/keyboard_space_outline.png"),
+		LoadGraph("Data/Image/Game/Button/keyboard_space.png"),
+		JUMP_BUTTON_GUIDE_UI_POS_X - BUTTON_GUIDE_UI_SIZE_X / 2,
+		JUMP_BUTTON_GUIDE_UI_POS_Y });
+	// LShiht画像
+	uiInfo_.guideMouse_.push_back({
+		LoadGraph("Data/Image/Game/Button/keyboard_shift_outline.png"),
+		LoadGraph("Data/Image/Game/Button/keyboard_shift.png"),
+		AVOID_BUTTON_GUIDE_UI_POS_X - BUTTON_GUIDE_UI_SIZE_X / 2,
+		AVOID_BUTTON_GUIDE_UI_POS_Y });
 }
 
 // 初期化
@@ -409,7 +467,7 @@ void Player::UpdateMove(Player& player)
 	}
 
 	// 回避ボタンが押されていたら
-	if (InputManager::GetInstance()->AvoidButton()&&
+	if (InputManager::GetInstance()->AvoidButton() &&
 		!player.info_.isAvoid_)
 	{
 		// 回避状態へ
@@ -1393,6 +1451,38 @@ void Player::DrawButtonGuide(void)
 		0.0,
 		uiInfo_.jumpImage_,
 		true);
+
+
+	if (InputManager::GetInstance()->GetActiveDevice() == InputManager::ActiveDevice::KEY_MOUSE)
+	{
+		// ボタンガイド描画マウス
+		DrawButtonGuideMouse();
+	}
+	else
+	{
+		// ボタンガイド描画ゲームパッド
+		DrawButtonGuidePad();
+	}
+}
+
+void Player::DrawButtonGuideMouse(void)
+{
+	// 全てのボタンを描画
+	for (const auto& button : uiInfo_.guideMouse_)
+	{
+		DrawRotaGraphF(button.x, button.y, 0.5f, 0.0f, button.graphHandleOff, true);
+		DrawRotaGraphF(button.x, button.y, 0.5f, 0.0f, button.graphHandleOn, true);
+	}
+}
+
+void Player::DrawButtonGuidePad(void)
+{
+	// 全てのボタンを描画
+	for (const auto& button : uiInfo_.guidePad_)
+	{
+		DrawRotaGraphF(button.x, button.y, 0.5f, 0.0f, button.graphHandleOff, true);
+		DrawRotaGraphF(button.x, button.y, 0.5f, 0.0f, button.graphHandleOn, true);
+	}
 }
 
 #ifdef _DEBUG

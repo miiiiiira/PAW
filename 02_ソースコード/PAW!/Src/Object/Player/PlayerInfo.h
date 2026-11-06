@@ -1,6 +1,7 @@
 #pragma once
 
 #include <DxLib.h>
+#include <vector>
 
 class Player; // 前方宣言
 
@@ -117,13 +118,22 @@ struct playerInfo
 
 };
 
+struct guideButtonInfo
+{
+	int graphHandleOff;	// 押されていない場合の画像ハンドル
+	int graphHandleOn;	// 押されている場合の画像ハンドル
+	int x, y;			// 座標
+};
+
 struct playerUiInfo
 {
 	// 画像ハンドル
-	int hpImage_[HP_UI_DIV];	// HP
-	int attackImage_ = -1;		// 攻撃
-	int avoidImage_ = -1;		// 回避
-	int jumpImage_ = -1;		// ジャンプ
+	int hpImage_[HP_UI_DIV];					// HP
+	int attackImage_ = -1;						// 攻撃
+	int avoidImage_ = -1;						// 回避
+	int jumpImage_ = -1;						// ジャンプ
+	std::vector<guideButtonInfo> guideMouse_;	// マウスガイドボタン
+	std::vector<guideButtonInfo> guidePad_;		// ゲームパッドガイドボタン
 };
 
 enum class PLAYER_ANIMATION
