@@ -1,7 +1,9 @@
 #include "../Rat/Rat.h"
 #include "../CatRobot/CatRobot.h"
-#include "Wave1.h"
 #include "../../../Audio/AudioManager.h"
+#include "../../Component/Transform/Transform.h"
+
+#include "Wave1.h"
 
 namespace
 {
@@ -10,10 +12,38 @@ namespace
 
 Wave1::Wave1(void)
 {
+	// ‰æ‘œ“Ç‚Ýž‚Ý
+	taositeyaruImage_ = LoadGraph("Data/Image/Game/taositeyaru.png");
 }
 
 Wave1::~Wave1(void)
 {
+	// ‰æ‘œ‰ð•ú
+	DeleteGraph(taositeyaruImage_);
+}
+
+void Wave1::Draw(void)
+{
+	switch (state_)
+	{
+	case WaveBase::WaveState::EVENT:
+		// “|‚µ‚Ä‚â‚é‰æ‘œ
+		DrawBillboard3D({ rats_[0]->GetTransform()->pos_.x + 50.0f , rats_[0]->GetTransform()->pos_.y + 100.0f , rats_[0]->GetTransform()->pos_.z - 20.0f }, 0.5f, 0.5f, 64.0f, -0.1, taositeyaruImage_, true);
+		break;
+
+	case WaveBase::WaveState::RAT:
+		break;
+
+	case WaveBase::WaveState::CAT_ROBOT:
+		break;
+
+	case WaveBase::WaveState::CLEARED:
+		break;
+
+	default:
+		break;
+	}
+
 }
 
 void Wave1::OnStart(void)

@@ -69,32 +69,6 @@ void WaveBase::Update(void)
     }
 }
 
-void WaveBase::Draw(void)
-{
-    switch (state_)
-    {
-    case WaveBase::WaveState::EVENT:
-        DrawString(
-            100,
-            0,
-            "イベント中",
-            0xff0000);
-        break;
-
-    case WaveBase::WaveState::RAT:
-        break;
-
-    case WaveBase::WaveState::CAT_ROBOT:
-        break;
-
-    case WaveBase::WaveState::CLEARED:
-        break;
-
-    default:
-        break;
-    }
-}
-
 void WaveBase::StartInWave(void)
 {
     // ウェーブ開始させる

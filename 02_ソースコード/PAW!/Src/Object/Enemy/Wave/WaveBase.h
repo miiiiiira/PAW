@@ -25,7 +25,7 @@ public:
     virtual ~WaveBase(void);
 
     virtual void Update(void);  // 更新
-    virtual void Draw(void);    // 描画
+    virtual void Draw(void) {};    // 描画
 
 public:
     // ウェーブの状態を渡す

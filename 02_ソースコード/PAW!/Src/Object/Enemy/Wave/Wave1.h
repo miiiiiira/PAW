@@ -5,9 +5,11 @@
 class Wave1 : public WaveBase
 {
 public:
-    Wave1(void);            // コンストラクタ
-    ~Wave1(void)override;   // デストラクタ
+    Wave1(void);                 // コンストラクタ
+    ~Wave1(void)override;          // デストラクタ
 
+    void Draw(void)override;    // 描画
+    
 protected:
     // 準備時間
      static constexpr int PREPARE_TIME = ONE_SECOND * 20;
@@ -28,4 +30,7 @@ protected:
     bool CheckEventClear(void)override;
     bool CheckRatClear(void)override;
     bool CheckCatRobotClear(void)override;
+
+private:
+    int taositeyaruImage_ = -1;
 };
