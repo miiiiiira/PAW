@@ -348,6 +348,9 @@ void Rat::ChangeState(RAT_STATE state)
 
 bool Rat::IsCanAttack(void)
 {
+	if (stateCtrl_.state_ == RAT_STATE_DEAD ||
+		stateCtrl_.state_ == RAT_STATE_END)return false;
+
 	bool isDistance = false;
 
 	// ƒvƒŒƒCƒ„[‚Æ‚Ì‹——£‚ğ’²‚×‚é

@@ -34,6 +34,8 @@ public:
 
 	// 攻撃できる状態か
 	bool IsCanAttack(void);
+	// 攻撃終了しているか
+	bool IsAttackEnd(void) { return stateCtrl_.state_ == RAT_STATE_ATTACK && stateCtrl_.attackState_ == RAT_ATTACK_AFTER; }
 
 	// 敵のパラメータをリセットする
 	void ResetRat(VECTOR pos);

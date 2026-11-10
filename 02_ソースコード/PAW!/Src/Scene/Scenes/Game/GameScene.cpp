@@ -27,6 +27,12 @@
 #include "GameScene.h"
 #include "../../../Object/Stage/Floor/Floor.h"
 
+namespace
+{
+	// 生成するネズミの数
+	constexpr int CREATE_RAT_NUM = 4;
+}
+
 GameScene::GameScene(void)
 {
 	// マウスの表示を消す
@@ -67,7 +73,7 @@ void GameScene::Load(void)
 	PlayerCreate();
 
 	// ネズミの作成
-	for (int i = 0; i < 1; ++i)
+	for (int i = 0; i < CREATE_RAT_NUM; ++i)
 	{
 		RatCreate();
 	}
