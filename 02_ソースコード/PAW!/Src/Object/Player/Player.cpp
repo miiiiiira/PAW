@@ -73,9 +73,13 @@ namespace
 	constexpr int HP_UI_DEAW_SIZE_X = HP_UI_SIZE_X / 2;
 	constexpr int HP_UI_DEAW_SIZE_Y = HP_UI_SIZE_Y / 2;
 
-	// ボタンガイド画像サイズ
+	// ボタンガイド
+	// 画像サイズ
 	constexpr int BUTTON_GUIDE_UI_SIZE_X = 220;
 	constexpr int BUTTON_GUIDE_UI_SIZE_Y = 40;
+	// On表示カウント
+	constexpr int BUTTON_GUIDE_ON_COUNT = 10;
+
 	// 攻撃ボタンガイド
 	constexpr int ATTACK_BUTTON_GUIDE_UI_POS_X = Application::SCREEN_SIZE_X - BUTTON_GUIDE_UI_SIZE_X / 2;
 	constexpr int ATTACK_BUTTON_GUIDE_UI_POS_Y = Application::SCREEN_SIZE_Y - (BUTTON_GUIDE_UI_SIZE_Y + 90);
@@ -192,44 +196,51 @@ void Player::Load(void)
 		LoadGraph("Data/Image/Game/Button/xbox_button_color_x_outline.png"),
 		LoadGraph("Data/Image/Game/Button/xbox_button_color_x.png"),
 		ATTACK_BUTTON_GUIDE_UI_POS_X - BUTTON_GUIDE_UI_SIZE_X / 2,
-		ATTACK_BUTTON_GUIDE_UI_POS_Y });
+		ATTACK_BUTTON_GUIDE_UI_POS_Y ,
+		GUIDE_TYPE::X});
 	// A画像
 	uiInfo_.guidePad_.push_back({
 		LoadGraph("Data/Image/Game/Button/xbox_button_color_a_outline.png"),
 		LoadGraph("Data/Image/Game/Button/xbox_button_color_a.png"),
 		JUMP_BUTTON_GUIDE_UI_POS_X - BUTTON_GUIDE_UI_SIZE_X / 2,
-		JUMP_BUTTON_GUIDE_UI_POS_Y });
+		JUMP_BUTTON_GUIDE_UI_POS_Y ,
+		GUIDE_TYPE::A });
 	// RB画像
 	uiInfo_.guidePad_.push_back({
 		LoadGraph("Data/Image/Game/Button/xbox_rb_outline.png"),
 		LoadGraph("Data/Image/Game/Button/xbox_rb.png"),
 		AVOID_BUTTON_GUIDE_UI_POS_X - BUTTON_GUIDE_UI_SIZE_X / 2 + 20,
-		AVOID_BUTTON_GUIDE_UI_POS_Y });
+		AVOID_BUTTON_GUIDE_UI_POS_Y ,
+		GUIDE_TYPE::RB });
 	// LB画像
 	uiInfo_.guidePad_.push_back({
 		LoadGraph("Data/Image/Game/Button/xbox_lb_outline.png"),
 		LoadGraph("Data/Image/Game/Button/xbox_lb.png"),
 		AVOID_BUTTON_GUIDE_UI_POS_X - BUTTON_GUIDE_UI_SIZE_X / 2 - 30,
-		AVOID_BUTTON_GUIDE_UI_POS_Y });
+		AVOID_BUTTON_GUIDE_UI_POS_Y ,
+		GUIDE_TYPE::LB });
 
 	// クリック画像
 	uiInfo_.guideMouse_.push_back({
 		LoadGraph("Data/Image/Game/Button/mouse.png"),
 		LoadGraph("Data/Image/Game/Button/mouse_left.png"),
 		ATTACK_BUTTON_GUIDE_UI_POS_X - BUTTON_GUIDE_UI_SIZE_X / 2,
-		ATTACK_BUTTON_GUIDE_UI_POS_Y });
+		ATTACK_BUTTON_GUIDE_UI_POS_Y ,
+		GUIDE_TYPE::LEFT_CLICK_MOUSE });
 	// Space画像
 	uiInfo_.guideMouse_.push_back({
 		LoadGraph("Data/Image/Game/Button/keyboard_space_outline.png"),
 		LoadGraph("Data/Image/Game/Button/keyboard_space.png"),
 		JUMP_BUTTON_GUIDE_UI_POS_X - BUTTON_GUIDE_UI_SIZE_X / 2,
-		JUMP_BUTTON_GUIDE_UI_POS_Y });
+		JUMP_BUTTON_GUIDE_UI_POS_Y ,
+		GUIDE_TYPE::SPACE });
 	// LShiht画像
 	uiInfo_.guideMouse_.push_back({
 		LoadGraph("Data/Image/Game/Button/keyboard_shift_outline.png"),
 		LoadGraph("Data/Image/Game/Button/keyboard_shift.png"),
 		AVOID_BUTTON_GUIDE_UI_POS_X - BUTTON_GUIDE_UI_SIZE_X / 2,
-		AVOID_BUTTON_GUIDE_UI_POS_Y });
+		AVOID_BUTTON_GUIDE_UI_POS_Y ,
+		GUIDE_TYPE::L_SHIFT });
 }
 
 // 初期化
@@ -274,6 +285,9 @@ void Player::Update(void)
 
 	// 座標を範囲内に収める
 	ClampPosition();
+
+	// ガイドボタン更新処理
+	UpdateGuideButton();
 }
 
 void Player::Draw2D(void)
@@ -1417,6 +1431,99 @@ void Player::ClampPosition(void)
 	}
 }
 
+void Player::UpdateGuideButton(void)
+{
+	if (InputManager::GetInstance()->GetActiveDevice() == InputManager::ActiveDevice::KEY_MOUSE)
+	{
+		// マウス時更新
+		UpdateGuideButtonMouse();
+	}
+	else
+	{
+		// ゲームパッド時更新
+		UpdateGuideButtonPad();
+	}
+}
+
+void Player::UpdateGuideButtonMouse(void)
+{
+	for (auto& button : uiInfo_.guideMouse_)
+	{
+		// 押されたら表示カウント追加
+		switch (button.type)
+		{
+		case GUIDE_TYPE::LEFT_CLICK_MOUSE:
+			if (InputManager::GetInstance()->AttackButton())
+			{
+				button.onCount = BUTTON_GUIDE_ON_COUNT;
+			}
+			break;
+
+		case GUIDE_TYPE::L_SHIFT:
+			if (InputManager::GetInstance()->AvoidButton())
+			{
+				button.onCount = BUTTON_GUIDE_ON_COUNT;
+			}
+			break;
+
+		case GUIDE_TYPE::SPACE:
+			if (InputManager::GetInstance()->JumpButton())
+			{
+				button.onCount = BUTTON_GUIDE_ON_COUNT;
+			}
+			break;
+
+		default:
+			break;
+		}
+
+		// カウントが0より大きければ減らす
+		if (button.onCount <= 0)continue;
+		button.onCount--;
+	}
+}
+
+void Player::UpdateGuideButtonPad(void)
+{
+	for (auto& button : uiInfo_.guidePad_)
+	{
+		// 押されたら表示カウント追加
+		switch (button.type)
+		{
+		case GUIDE_TYPE::A:
+			if (InputManager::GetInstance()->JumpButton())
+			{
+				button.onCount = BUTTON_GUIDE_ON_COUNT;
+			}
+			break;
+		case GUIDE_TYPE::X:
+			if (InputManager::GetInstance()->AttackButton())
+			{
+				button.onCount = BUTTON_GUIDE_ON_COUNT;
+			}
+			break;
+		case GUIDE_TYPE::LB:
+			if (InputManager::GetInstance()->IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::LB))
+			{
+				button.onCount = BUTTON_GUIDE_ON_COUNT;
+			}
+			break;
+		case GUIDE_TYPE::RB:
+			if (InputManager::GetInstance()->IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RB))
+			{
+				button.onCount = BUTTON_GUIDE_ON_COUNT;
+			}
+			break;
+		default:
+			break;
+		}
+
+		// カウントが0より大きければ減らす
+		if (button.onCount <= 0)continue;
+		button.onCount--;
+	}
+}
+
 void Player::DrawHP(void)
 {
 	// HP描画
@@ -1474,20 +1581,38 @@ void Player::DrawButtonGuide(void)
 void Player::DrawButtonGuideMouse(void)
 {
 	// 全てのボタンを描画
-	for (const auto& button : uiInfo_.guideMouse_)
+	for (auto& button : uiInfo_.guideMouse_)
 	{
-		DrawRotaGraphF(button.x, button.y, 0.5f, 0.0f, button.graphHandleOff, true);
-		DrawRotaGraphF(button.x, button.y, 0.5f, 0.0f, button.graphHandleOn, true);
+		// オンカウントが0より大きければ
+		if (button.onCount > 0)
+		{
+			// On画像
+			DrawRotaGraph(button.x, button.y, 0.5f, 0.0f, button.graphHandleOn, true);
+		}
+		else
+		{
+			// Off画像
+			DrawRotaGraph(button.x, button.y, 0.5f, 0.0f, button.graphHandleOff, true);
+		}
 	}
 }
 
 void Player::DrawButtonGuidePad(void)
 {
 	// 全てのボタンを描画
-	for (const auto& button : uiInfo_.guidePad_)
+	for (auto& button : uiInfo_.guidePad_)
 	{
-		DrawRotaGraphF(button.x, button.y, 0.5f, 0.0f, button.graphHandleOff, true);
-		DrawRotaGraphF(button.x, button.y, 0.5f, 0.0f, button.graphHandleOn, true);
+		// オンカウントが0より大きければ
+		if (button.onCount > 0)
+		{
+			// On画像
+			DrawRotaGraph(button.x, button.y, 0.5f, 0.0f, button.graphHandleOn, true);
+		}
+		else
+		{
+			// Off画像
+			DrawRotaGraph(button.x, button.y, 0.5f, 0.0f, button.graphHandleOff, true);
+		}
 	}
 }
 

@@ -118,11 +118,24 @@ struct playerInfo
 
 };
 
+enum class GUIDE_TYPE
+{
+	LEFT_CLICK_MOUSE,
+	L_SHIFT,
+	SPACE,
+	A,
+	X,
+	LB,
+	RB
+};
+
 struct guideButtonInfo
 {
 	int graphHandleOff;	// 押されていない場合の画像ハンドル
 	int graphHandleOn;	// 押されている場合の画像ハンドル
 	int x, y;			// 座標
+	GUIDE_TYPE type;	// ボタンの種類
+	int onCount = 0;	// 表示するカウント数
 };
 
 struct playerUiInfo

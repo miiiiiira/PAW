@@ -142,6 +142,11 @@ private:
 	// 座標を範囲内に収める
 	void ClampPosition(void);
 
+	// ガイドボタン更新処理
+	void UpdateGuideButton(void);
+	void UpdateGuideButtonMouse(void);	// マウス時更新
+	void UpdateGuideButtonPad(void);	// ゲームパッド時更新
+
 	// 描画系
 	void DrawHP(void);			// HP描画
 	void DrawButtonGuide(void);	// ボタンガイド描画

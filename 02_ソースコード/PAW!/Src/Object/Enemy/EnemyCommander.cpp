@@ -30,7 +30,7 @@ void EnemyCommander::Init(std::vector<Rat*> rats, CatRobot* catRobot)
 void EnemyCommander::Update(void)
 {
 	// ƒlƒYƒ~i—ßˆ—
-	RatControl();
+	EnemyControl();
 }
 
 void EnemyCommander::Release(void)
@@ -83,8 +83,9 @@ void EnemyCommander::RatAttackOrder(void)
 
 	Rat* rat = ratAttackQueue_.front();
 
-	// €–S‚µ‚Ä‚¢‚½‚ç
-	if (rat->GetState() == RAT_STATE_DEAD ||
+	// UŒ‚‚³‚ê‚Ä‚¢‚é‚©€–S‚µ‚Ä‚¢‚½‚ç
+	if (rat->GetState() == RAT_STATE_HIT ||
+		rat->GetState() == RAT_STATE_DEAD ||
 		rat->GetState() == RAT_STATE_END)
 	{
 		// —v‘f‚ğíœ
