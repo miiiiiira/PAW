@@ -69,17 +69,11 @@ struct catRobotStateCtrl
 
 struct catRobotInfo
 {
-	float velocityRot_ = 0.0f;	// 現在の角速度
-
 	VECTOR moveDir_ = {};	// 移動方向
 
 	float moveSpeed_ = 0;	// 移動速度
 
 	int hp_ = 0;	// 今現在のHP
-
-	int invincibleTime_ = 0;	// 無敵時間
-
-	int waitTime_ = 0;	// 待機時間
 
 	int attackNum_ = 0;	// 特定の種類の攻撃を行う回数
 
@@ -88,6 +82,12 @@ struct catRobotInfo
 	int stunTime_ = 0;	// スタン時間
 
 	int attackChanceImage_ = -1;	// 攻撃チャンス画像
+
+	float easingTime_ = 0.0f;	// イージング用時間
+
+	int invincibleTime_ = 0;	// 無敵時間
+
+	int toppleTime_ = 0;	// 倒れるまでの時間
 };
 
 enum class CAT_ROBOT_ANIMATION

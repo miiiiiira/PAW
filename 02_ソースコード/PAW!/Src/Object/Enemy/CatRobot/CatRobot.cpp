@@ -3,7 +3,7 @@
 #include "../../Component/Animation/Animation.h"
 #include "../../Camera/CameraUtility.h"
 #include "../../../Collision/3DCollider/CapsuleCollider.h"
-#include "../../../Math/Math.h"
+#include "../../../Math/Easing.h"
 #include "Attack/Attack1/Attack1.h"
 #include "Attack/PlateAttack/PlateAttack.h"
 #include "../../../Application.h"
@@ -52,6 +52,9 @@ namespace
 	// スタン時間
 	constexpr int STUN_TIME = 300;
 
+	// 倒れるまでの時間
+	constexpr int TOPPLE_TIME = 60;
+
 	// ランダム用数
 	constexpr int ATTACK_RAND_NUM = 5000;
 
@@ -60,6 +63,9 @@ namespace
 
 	// 許容角度誤差
 	constexpr float ANGLE_EPSILON = 0.01f;
+
+	// 開始値から最終値になるまでの時間
+	constexpr float EASING_MAX_TIME = 100;
 
 	// 攻撃画像座標
 	constexpr int ATTACK_CHANCE_POS_X = Application::SCREEN_SIZE_X - 160;
@@ -160,6 +166,14 @@ void CatRobot::Draw2D(void)
 			0.0,
 			info_.attackChanceImage_,
 			true);
+	}
+}
+
+void CatRobot::Draw3D(void)
+{
+	if (info_.toppleTime_ > 0)
+	{
+
 	}
 }
 
@@ -480,6 +494,13 @@ void CatRobot::InitChanceStart(CatRobot& catRobot)
 	// 倒れる音
 	AudioManager::GetInstance()->PlaySE(SoundID::SE_ROBOT_FALL_DOWN);
 
+	// イージング用時間初期化
+	catRobot.info_.easingTime_ = 0.0f;
+
+	// 倒れるまでの時間初期化
+	catRobot.info_.toppleTime_ = TOPPLE_TIME;
+
+	MV1SetShapeRate(catRobot.render3D_->GetHandle(), 4, 1.0f);
 }
 
 void CatRobot::InitChanceStun(CatRobot& catRobot)
@@ -491,14 +512,30 @@ void CatRobot::InitChanceEnd(CatRobot& catRobot)
 {
 	// 起き上がり音
 	AudioManager::GetInstance()->PlaySE(SoundID::SE_ROBOT_GET_UP);
+
+	// イージング用時間初期化
+	catRobot.info_.easingTime_ = 0.0f;
+
+	MV1SetShapeRate(catRobot.render3D_->GetHandle(), 4, 0.0f);
 }
 
 void CatRobot::UpdateChanceStart(CatRobot& catRobot)
 {
-	if (catRobot.UpdateAngle({ -35.0f * DX_PI_F / 180.0f,-20.0f * DX_PI_F / 180.0f,0.0f }))
+	// 倒れるまでの時間があれば
+	if (catRobot.info_.toppleTime_ > 0)
 	{
-		// スタン状態へ
-		catRobot.ChangeChanceState(CAT_ROBOT_CHANCE_STUN);
+		// 減らす
+		catRobot.info_.toppleTime_--;
+	}
+	else
+	{
+		catRobot.info_.easingTime_++;
+
+		if (catRobot.UpdateAngle({ -35.0f * DX_PI_F / 180.0f,-20.0f * DX_PI_F / 180.0f,0.0f }))
+		{
+			// スタン状態へ
+			catRobot.ChangeChanceState(CAT_ROBOT_CHANCE_STUN);
+		}
 	}
 }
 
@@ -515,6 +552,7 @@ void CatRobot::UpdateChanceStun(CatRobot& catRobot)
 
 void CatRobot::UpdateChanceEnd(CatRobot& catRobot)
 {
+	catRobot.info_.easingTime_++;
 	if (catRobot.UpdateAngle({}))
 	{
 		// 待機状態へ
@@ -802,22 +840,25 @@ void CatRobot::SetDamage(void)
 bool CatRobot::UpdateAngle(VECTOR targetAngle)
 {
 	// 角度補間をかける
-	transform_->angle_.x = Math::LerpAngle(
+	transform_->angle_.x = ExpIn(
+		info_.easingTime_,
+		EASING_MAX_TIME,
 		transform_->angle_.x,
-		targetAngle.x,
-		ANGLE_COEFFICIENT);
+		targetAngle.x);
 
 	// 角度補間をかける
-	transform_->angle_.y = Math::LerpAngle(
+	transform_->angle_.y = ExpIn(
+		info_.easingTime_,
+		EASING_MAX_TIME,
 		transform_->angle_.y,
-		targetAngle.y,
-		ANGLE_COEFFICIENT);
+		targetAngle.y);
 
 	// 角度補間をかける
-	transform_->angle_.z = Math::LerpAngle(
+	transform_->angle_.z = ExpIn(
+		info_.easingTime_,
+		EASING_MAX_TIME,
 		transform_->angle_.z,
-		targetAngle.z,
-		ANGLE_COEFFICIENT);
+		targetAngle.z);
 
 	// モデルに角度を設定
 	MV1SetRotationXYZ(render3D_->GetHandle(), transform_->angle_);

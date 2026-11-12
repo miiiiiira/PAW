@@ -24,6 +24,7 @@ public:
 	void Init(void) override;	// ‰Šú‰»
 	void Update(void) override;	// XV
 	void Draw2D(void) override;	// 2D•`‰æ
+	void Draw3D(void) override;	// 3D•`‰æ
 
 public:
 	// Transform‚ğ•Ô‚·
