@@ -796,6 +796,8 @@ void Player::ChangeJumpState(PLAYER_JUMP_STATE state)
 
 void Player::InitHitStart(Player& player)
 {
+	MV1SetShapeRate(player.render3D_->GetHandle(), 13, 1.0f);
+
 }
 
 void Player::InitHitStun(Player& player)
@@ -804,6 +806,8 @@ void Player::InitHitStun(Player& player)
 
 void Player::InitHitEnd(Player& player)
 {
+	MV1SetShapeRate(player.render3D_->GetHandle(), 13, 0.0f);
+
 	// ƒvƒŒƒCƒ„[‚ÌˆÚ“®Œü‚«‚ğŒ³‚É–ß‚·
 	player.info_.moveDir_.x = player.info_.prevMoveDir_.x;
 	player.info_.moveDir_.z = player.info_.prevMoveDir_.z;

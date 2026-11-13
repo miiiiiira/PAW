@@ -38,12 +38,16 @@ namespace
 	constexpr float HIT_REACT_FRICTION = 0.5f;	// ダメージ時のリアクション時の摩擦
 
 	// アニメーション設定
+	constexpr float ANIM_SPEED_IDLE = 0.6f;
+	constexpr float ANIM_SPEED_MOVE = 0.7f;
+	constexpr float ANIM_SPEED_MOVECLOSER = 0.6f;
+	constexpr float ANIM_SPEED_DEAD = 0.6f;
+	constexpr float ANIM_SPEED_ATTACK_START = 0.1f;
 	constexpr float ANIM_SPEED_ATTACK = 0.8f;
-	constexpr float ANIM_SPEED_ATTACK_START = 0.2f;
-	constexpr float ANIM_SPEED_DEAD = 0.4f;
-	constexpr float ANIM_SPEED_IDLE = 0.8f;
-	constexpr float ANIM_SPEED_MOVE = 0.8f;
-	constexpr float ANIM_SPEED_MOVE_CLOSER = 0.8f;
+	constexpr float ANIM_SPEED_ATTACK_END = 0.6f;
+	constexpr float ANIM_SPEED_ORDER = 0.8f;
+	constexpr float ANIM_SPEED_SUPPORT = 0.8f;
+	constexpr float ANIM_SPEED_SUPPORT2 = 0.8f;
 
 	// リミット設定
 	constexpr int INVINCIBLE_TIME = 10;		// 無敵時間
@@ -420,7 +424,7 @@ void Rat::InitIdleSway(Rat& rat)
 	// 移動方向を算出
 	rat.GetDirectionLR(rat.info_.isRightSway_);
 	// 待機アニメーション再生
-	rat.animation_->Play(static_cast<int>(RAT_ANIMATION::MOVE_CLOSER));
+	rat.animation_->Play(static_cast<int>(RAT_ANIMATION::MOVECLOSER));
 }
 
 void Rat::InitIdleApproach(Rat& rat)
@@ -569,7 +573,7 @@ void Rat::InitAttackAfter(Rat& rat)
 	rat.GetAngleToPlayer();
 
 	// 攻撃後アニメーション再生
-	rat.animation_->Play(static_cast<int>(RAT_ANIMATION::MOVE_CLOSER), false);
+	rat.animation_->Play(static_cast<int>(RAT_ANIMATION::ATTACK_END), false);
 
 	// カプセルの種類を敵に戻す
 	rat.capsuleCollder_->SetCollisionTag(CollisionTag::ENEMY);
@@ -722,18 +726,6 @@ void Rat::AddComponets(void)
 	animation_->Init();
 	// アニメーション登録
 	animation_->AddInFbx(
-		static_cast<int>(RAT_ANIMATION::ATTACK),
-		ANIM_SPEED_ATTACK,
-		static_cast<int>(RAT_ANIMATION::ATTACK));
-	animation_->AddInFbx(
-		static_cast<int>(RAT_ANIMATION::ATTACK_START),
-		ANIM_SPEED_ATTACK_START,
-		static_cast<int>(RAT_ANIMATION::ATTACK_START));
-	animation_->AddInFbx(
-		static_cast<int>(RAT_ANIMATION::DEAD),
-		ANIM_SPEED_DEAD,
-		static_cast<int>(RAT_ANIMATION::DEAD));
-	animation_->AddInFbx(
 		static_cast<int>(RAT_ANIMATION::IDLE),
 		ANIM_SPEED_IDLE,
 		static_cast<int>(RAT_ANIMATION::IDLE));
@@ -742,9 +734,38 @@ void Rat::AddComponets(void)
 		ANIM_SPEED_MOVE,
 		static_cast<int>(RAT_ANIMATION::MOVE));
 	animation_->AddInFbx(
-		static_cast<int>(RAT_ANIMATION::MOVE_CLOSER),
-		ANIM_SPEED_MOVE_CLOSER,
-		static_cast<int>(RAT_ANIMATION::MOVE_CLOSER));
+		static_cast<int>(RAT_ANIMATION::MOVECLOSER),
+		ANIM_SPEED_MOVECLOSER,
+		static_cast<int>(RAT_ANIMATION::MOVECLOSER));
+	animation_->AddInFbx(
+		static_cast<int>(RAT_ANIMATION::DEAD),
+		ANIM_SPEED_DEAD,
+		static_cast<int>(RAT_ANIMATION::DEAD));
+	animation_->AddInFbx(
+		static_cast<int>(RAT_ANIMATION::ATTACK_START),
+		ANIM_SPEED_ATTACK_START,
+		static_cast<int>(RAT_ANIMATION::ATTACK_START));
+	animation_->AddInFbx(
+		static_cast<int>(RAT_ANIMATION::ATTACK),
+		ANIM_SPEED_ATTACK,
+		static_cast<int>(RAT_ANIMATION::ATTACK));
+	animation_->AddInFbx(
+		static_cast<int>(RAT_ANIMATION::ATTACK_END),
+		ANIM_SPEED_ATTACK,
+		static_cast<int>(RAT_ANIMATION::ATTACK_END));
+	animation_->AddInFbx(
+		static_cast<int>(RAT_ANIMATION::ORDER),
+		ANIM_SPEED_ATTACK,
+		static_cast<int>(RAT_ANIMATION::ORDER));
+	animation_->AddInFbx(
+		static_cast<int>(RAT_ANIMATION::SUPPORT),
+		ANIM_SPEED_ATTACK,
+		static_cast<int>(RAT_ANIMATION::SUPPORT));
+	animation_->AddInFbx(
+		static_cast<int>(RAT_ANIMATION::SUPPORT2),
+		ANIM_SPEED_ATTACK,
+		static_cast<int>(RAT_ANIMATION::SUPPORT2));
+
 }
 
 void Rat::ApplyGravity(void)

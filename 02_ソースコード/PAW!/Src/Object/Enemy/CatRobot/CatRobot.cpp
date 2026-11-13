@@ -49,8 +49,9 @@ namespace
 	// 攻撃全体の回数
 	constexpr int ATTACK_NUM_ALL = 1;
 
-	// スタン時間
-	constexpr int STUN_TIME = 300;
+	// スタン系
+	constexpr int STUN_TIME = 300;	// 時間
+	constexpr VECTOR STUN_ANGLE = { -35.0f * DX_PI_F / 180.0f,-20.0f * DX_PI_F / 180.0f,0.0f };	// 角度
 
 	// 倒れるまでの時間
 	constexpr int TOPPLE_TIME = 60;
@@ -531,7 +532,7 @@ void CatRobot::UpdateChanceStart(CatRobot& catRobot)
 	{
 		catRobot.info_.easingTime_++;
 
-		if (catRobot.UpdateAngle({ -35.0f * DX_PI_F / 180.0f,-20.0f * DX_PI_F / 180.0f,0.0f }))
+		if (catRobot.UpdateAngle(STUN_ANGLE))
 		{
 			// スタン状態へ
 			catRobot.ChangeChanceState(CAT_ROBOT_CHANCE_STUN);
