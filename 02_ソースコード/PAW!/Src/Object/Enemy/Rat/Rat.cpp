@@ -210,6 +210,9 @@ void Rat::InitHit(Rat& rat)
 
 void Rat::InitDead(Rat& rat)
 {
+	// 当たり判定を行わないようタグをNONEへ
+	rat.capsuleCollder_->SetCollisionTag(CollisionTag::NONE);
+
 	// 死亡アニメーション再生
 	rat.animation_->Play(static_cast<int>(RAT_ANIMATION::DEAD), false);
 }

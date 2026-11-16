@@ -9,6 +9,7 @@
 #include "../../Collision/3DCollider/CapsuleCollider.h"
 #include "../../Collision/3DCollider/SphereCollider.h"
 #include "../Enemy/Wave/WaveManager.h"
+#include "../Enemy/Rat/Rat.h"
 #include "../Stage/Table/Table.h"
 #include "../../Application.h"
 
@@ -73,20 +74,24 @@ namespace
 	constexpr int HP_UI_DEAW_SIZE_X = HP_UI_SIZE_X / 2;
 	constexpr int HP_UI_DEAW_SIZE_Y = HP_UI_SIZE_Y / 2;
 
+	// ダメージ時のリアクション設定
+	constexpr COLOR_F COLOR_DIF_DEFAULT = { 1.0f, 1.0f, 1.0f, 1.0f };	// 標準の拡散光色
+	constexpr COLOR_F COLOR_DIF_BLINK = { 2.0f, 2.0f, 2.0f, 1.0f };		// ダメージ時の拡散光色
+	constexpr int BLINK_INTERVAL = 10;									// チカチカさせる間隔
+
 	// ボタンガイド
 	// 画像サイズ
 	constexpr int BUTTON_GUIDE_UI_SIZE_X = 220;
 	constexpr int BUTTON_GUIDE_UI_SIZE_Y = 40;
 	// On表示カウント
 	constexpr int BUTTON_GUIDE_ON_COUNT = 10;
-
-	// 攻撃ボタンガイド
+	// 攻撃ボタン
 	constexpr int ATTACK_BUTTON_GUIDE_UI_POS_X = Application::SCREEN_SIZE_X - BUTTON_GUIDE_UI_SIZE_X / 2;
 	constexpr int ATTACK_BUTTON_GUIDE_UI_POS_Y = Application::SCREEN_SIZE_Y - (BUTTON_GUIDE_UI_SIZE_Y + 90);
-	// 回避ボタンガイド
+	// 回避ボタン
 	constexpr int AVOID_BUTTON_GUIDE_UI_POS_X = Application::SCREEN_SIZE_X - BUTTON_GUIDE_UI_SIZE_X / 2;
 	constexpr int AVOID_BUTTON_GUIDE_UI_POS_Y = Application::SCREEN_SIZE_Y - (BUTTON_GUIDE_UI_SIZE_Y / 2 + 60);
-	// ジャンプボタンガイド
+	// ジャンプボタン
 	constexpr int JUMP_BUTTON_GUIDE_UI_POS_X = Application::SCREEN_SIZE_X - BUTTON_GUIDE_UI_SIZE_X / 2;
 	constexpr int JUMP_BUTTON_GUIDE_UI_POS_Y = Application::SCREEN_SIZE_Y - 30;
 
@@ -334,6 +339,9 @@ void Player::UpdateState(void)
 
 void Player::InitIdle(Player& player)
 {
+	// 目のシェイプを初期化
+	MV1SetShapeRate(player.render3D_->GetHandle(), 13, 0.0f);
+
 	// 移動速度を初期化
 	player.info_.moveSpeed_ = 0.0f;
 
@@ -797,7 +805,6 @@ void Player::ChangeJumpState(PLAYER_JUMP_STATE state)
 void Player::InitHitStart(Player& player)
 {
 	MV1SetShapeRate(player.render3D_->GetHandle(), 13, 1.0f);
-
 }
 
 void Player::InitHitStun(Player& player)
@@ -806,8 +813,6 @@ void Player::InitHitStun(Player& player)
 
 void Player::InitHitEnd(Player& player)
 {
-	MV1SetShapeRate(player.render3D_->GetHandle(), 13, 0.0f);
-
 	// プレイヤーの移動向きを元に戻す
 	player.info_.moveDir_.x = player.info_.prevMoveDir_.x;
 	player.info_.moveDir_.z = player.info_.prevMoveDir_.z;
@@ -993,6 +998,16 @@ void Player::UpdateInvincible(void)
 	if (info_.invincibleTime_ > 0)
 	{
 		--info_.invincibleTime_;
+
+		if (info_.invincibleTime_ % BLINK_INTERVAL > (BLINK_INTERVAL / 2 - 1))
+		{
+			MV1SetMaterialDifColor(render3D_->GetHandle(), 0, COLOR_DIF_BLINK);
+
+		}
+		else
+		{
+			MV1SetMaterialDifColor(render3D_->GetHandle(), 0, COLOR_DIF_DEFAULT);
+		}
 	}
 	// タグがNONEなため
 	else if (capsuleCollder_->GetCollisionTag() == CollisionTag::NONE)
@@ -1339,16 +1354,20 @@ void Player::ApplyAttackAssist(void)
 	info_.attackAssistCandidates_.clear();		// 補正対象
 	info_.finalCandidateTransform_ = nullptr;	// 決定対象
 
-	for (const auto& transform : ratsTransform_)
+	for (const auto& rat : rats_)
 	{
+		// 死亡していたら次の処理へ
+		if (rat->GetState() == RAT_STATE_DEAD ||
+			rat->GetState() == RAT_STATE_END)continue;
+
 		// プレイヤー周辺の円内にいなければ次の処理へ
-		if (!IsInAssistRange(transform))continue;
+		if (!IsInAssistRange(rat->GetTransform()))continue;
 
 		// 角度判定内に入ってなければ次の処理へ
-		if (!IsWithinAssistAngle(transform))continue;
+		if (!IsWithinAssistAngle(rat->GetTransform()))continue;
 
 		// 補正対象に追加
-		info_.attackAssistCandidates_.emplace_back(transform);
+		info_.attackAssistCandidates_.emplace_back(rat->GetTransform());
 	}
 
 	// 中身がなければ処理終了

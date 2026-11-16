@@ -35,7 +35,7 @@ public:
 	PLAYER_STATE GetState(void) { return stateCtrl_.state_; }
 
 	// 敵ネズミのポインタをもらう
-	void SetRatPoint(const Transform* ratTransform) { ratsTransform_.emplace_back(ratTransform); }
+	void SetRatPoint(Rat* rat) { rats_.emplace_back(rat); }
 	// テーブルのポインタをもらう
 	void SetTablePoint(const Transform* tableTransform) { tableTransform_ = tableTransform; }
 
@@ -168,7 +168,7 @@ private:
 	SphereCollider* sphereCollder_ = nullptr;
 
 	// ネズミのTransformポインタ
-	std::vector<const Transform*>ratsTransform_;
+	std::vector<Rat*>rats_;
 	// テーブルのTransformポインタ
 	const Transform* tableTransform_ = nullptr;
 

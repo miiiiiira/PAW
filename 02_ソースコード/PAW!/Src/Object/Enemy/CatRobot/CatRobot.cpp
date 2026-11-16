@@ -31,13 +31,13 @@ namespace
 	// ƒŠƒ~ƒbƒgÝ’è
 	constexpr int INVINCIBLE_TIME = 20;	// –³“GŽžŠÔ
 
+	// UŒ‚Ý’è
 	// UŒ‚1‚ÌiHÞUŒ‚j
 	constexpr float ATTACK1_POS_Y = 1000.0f;	// YÀ•W
 	constexpr int ATTACK1_NUM = 3;				// UŒ‚‚ðs‚¤‰ñ”
 	constexpr int ATTACK1_FALL_NUM = 10;		// ~‚Á‚Ä‚­‚éŒÂ”
 	constexpr int ATTACK1_RANGE = 2000;			// UŒ‚”ÍˆÍ
 	constexpr int ATTACK1_TRY_MAX = 10;			// Å‘å’§í‰ñ”
-
 	// UŒ‚2,3‚Ìi‚¨ŽMUŒ‚j
 	constexpr float ATTACK2_POS_Y = 70.0f;			// YÀ•W
 	constexpr int ATTACK2_NUM = 2;					// UŒ‚‚ðs‚¤‰ñ”
@@ -45,28 +45,23 @@ namespace
 	constexpr int PLATE_FLYING_NUM = 4;				// ŒÂ”
 	constexpr float PLATE_MOVE_DISTANCE = 2000.0f;	// UŒ‚‹——£
 	constexpr int PLATE_IDLE_COUNT = 60;			// ‘Ò‹@ŽžŠÔ‚ÌŠî€’l
-
 	// UŒ‚‘S‘Ì‚Ì‰ñ”
 	constexpr int ATTACK_NUM_ALL = 1;
 
-	// ƒXƒ^ƒ“Œn
-	constexpr int STUN_TIME = 300;	// ŽžŠÔ
-	constexpr VECTOR STUN_ANGLE = { -35.0f * DX_PI_F / 180.0f,-20.0f * DX_PI_F / 180.0f,0.0f };	// Šp“x
+	// ƒ_ƒ[ƒWŽž‚ÌƒŠƒAƒNƒVƒ‡ƒ“Ý’è
+	constexpr COLOR_F COLOR_DIF_DEFAULT = { 1.0f, 1.0f, 1.0f, 1.0f };	// •W€‚ÌŠgŽUŒõF
+	constexpr COLOR_F COLOR_DIF_BLINK = { 1.0f, 0.2f, 0.2f, 1.0f };		// ƒ_ƒ[ƒWŽž‚ÌŠgŽUŒõF
 
-	// “|‚ê‚é‚Ü‚Å‚ÌŽžŠÔ
-	constexpr int TOPPLE_TIME = 60;
+	// ƒvƒŒƒCƒ„[UŒ‚ƒ`ƒƒƒ“ƒXŽžÝ’è
+	constexpr int TOPPLE_TIME = 60;				// “|‚ê‚é‚Ü‚Å‚ÌŽžŠÔ
+	constexpr int STUN_TIME = 300;				// ŽžŠÔ
+	constexpr VECTOR STUN_ANGLE = { -35.0f * DX_PI_F / 180.0f,-20.0f * DX_PI_F / 180.0f,0.0f };	// Šp“x
+	constexpr float ANGLE_COEFFICIENT = 0.05f;	// •âŠÔ‚ÌŒW”
+	constexpr float ANGLE_EPSILON = 0.01f;		// ‹–—eŠp“xŒë·
+	constexpr float EASING_MAX_TIME = 100;		// ŠJŽn’l‚©‚çÅI’l‚É‚È‚é‚Ü‚Å‚ÌŽžŠÔ
 
 	// ƒ‰ƒ“ƒ_ƒ€—p”
 	constexpr int ATTACK_RAND_NUM = 5000;
-
-	// •âŠÔ‚ÌŒW”
-	constexpr float ANGLE_COEFFICIENT = 0.05f;
-
-	// ‹–—eŠp“xŒë·
-	constexpr float ANGLE_EPSILON = 0.01f;
-
-	// ŠJŽn’l‚©‚çÅI’l‚É‚È‚é‚Ü‚Å‚ÌŽžŠÔ
-	constexpr float EASING_MAX_TIME = 100;
 
 	// UŒ‚‰æ‘œÀ•W
 	constexpr int ATTACK_CHANCE_POS_X = Application::SCREEN_SIZE_X - 160;
@@ -634,6 +629,15 @@ void CatRobot::UpdateInvincible(void)
 	if (info_.invincibleTime_ > 0)
 	{
 		--info_.invincibleTime_;
+		if (info_.invincibleTime_ % INVINCIBLE_TIME > (INVINCIBLE_TIME / 2 - 1))
+		{
+			MV1SetMaterialDifColor(render3D_->GetHandle(), 0, COLOR_DIF_BLINK);
+
+		}
+		else
+		{
+			MV1SetMaterialDifColor(render3D_->GetHandle(), 0, COLOR_DIF_DEFAULT);
+		}
 	}
 }
 

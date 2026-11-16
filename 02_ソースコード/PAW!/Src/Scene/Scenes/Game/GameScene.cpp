@@ -294,8 +294,8 @@ void GameScene::SetUp(void)
 
 	for (const auto& rat : rats)
 	{
-		// プレイヤーにネズミTransformを渡す
-		player->SetRatPoint(rat->GetTransform());
+		// プレイヤーにネズミを渡す
+		player->SetRatPoint(rat);
 
 		// ネズミにプレイヤーTransformを渡す
 		rat->SetPlayerTransform(player->GetTransform());
