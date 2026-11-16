@@ -2,7 +2,19 @@
 #include "../../../Application.h"
 #include "Loading.h"
 
-Loading::Loading()
+namespace
+{
+	// 画面の種類を切り替える間隔
+	constexpr int CHANGE_INTERVAL = 25;
+
+	// 最低でもロード画面を表示する時間
+	constexpr int MIN_LOAD_TIME = 60;	
+
+	// 分割数縦横
+	constexpr int DIV_NUM_XY = 2;	
+}
+
+Loading::Loading(void)
 {
 	// 画像ハンドルの初期化
 	for (int i = 0; i < static_cast<int>(NOW_TYPE::MAX); i++)
@@ -55,38 +67,21 @@ void Loading::Update(void)
 	// 読み込み中
 	else
 	{
-		// 40フレームごとに画像の種類を切り替える
-		if (loadTimer_ % 40 == 0)
+		// 一定の間隔ごとに画像の種類を切り替える
+		if (loadTimer_ % CHANGE_INTERVAL == 0)
 		{
-			switch (nowType_)
+			// 現在の種類をint型に変換
+			int type = static_cast<int>(nowType_);
+			type++;
+
+			// もし種類が最大値以上になったら0に戻す
+			if(type >= static_cast<int>(NOW_TYPE::MAX))
 			{
-			case Loading::Loading0:
-
-				// 現在の種類を1へ
-				nowType_ = Loading1;
-
-				break;
-			case Loading::Loading1:
-
-				// 現在の種類を2へ
-				nowType_ = Loading2;
-
-				break;
-			case Loading::Loading2:
-
-				// 現在の種類を3へ
-				nowType_ = Loading3;
-
-				break;
-			case Loading::Loading3:
-
-				// 現在の種類を0へ
-				nowType_ = Loading0;
-
-				break;
-			default:
-				break;
+				type = 0;
 			}
+
+			// 現在の種類を更新
+			nowType_ = static_cast<NOW_TYPE>(type);
 		}
 	}
 }
@@ -99,12 +94,6 @@ void Loading::Draw(void)
 		pos_.y,
 		handles_[static_cast<int>(nowType_)],
 		true);
-
-	DrawString(
-		Application::SCREEN_SIZE_X/2, 
-		Application::SCREEN_SIZE_Y/2, 
-		"loading",
-		0xffffff);
 }
 
 void Loading::Release(void)
