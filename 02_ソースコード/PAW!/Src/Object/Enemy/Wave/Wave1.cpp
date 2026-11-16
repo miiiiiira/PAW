@@ -2,6 +2,7 @@
 #include "../CatRobot/CatRobot.h"
 #include "../../../Audio/AudioManager.h"
 #include "../../Component/Transform/Transform.h"
+#include "../../Camera/Camera.h"
 
 #include "Wave1.h"
 
@@ -55,6 +56,8 @@ void Wave1::Draw(void)
 		break;
 	}
 
+	// 基底クラスの描画処理
+	WaveBase::Draw();
 }
 
 void Wave1::OnStart(void)
@@ -71,6 +74,9 @@ void Wave1::OnEvent(void)
 
 void Wave1::OnRat(void)
 {
+	// タイマーとアルファ値の初期化
+	skipTimer_ = 0;
+	alpha_ = 0;
 }
 
 void Wave1::OnCatRobot(void)
@@ -83,9 +89,10 @@ void Wave1::OnClear(void)
 
 bool Wave1::CheckEventClear(void)
 {
-	// イベント移動が終了したら
-	if (rats_[0]->GetState() != RAT_STATE_EVENT_MOVE &&
-		rats_[0]->GetState() != RAT_STATE_EVENT_IDLE)
+	// スキップ処理を一定以上押されるか、イベント移動が終了したら
+	if (skipTimer_ >= MAX_SKIP_TIME||
+		(rats_[0]->GetState() != RAT_STATE_EVENT_MOVE &&
+		rats_[0]->GetState() != RAT_STATE_EVENT_IDLE))
 	{
 		// BGMを鳴らす
 		AudioManager::GetInstance()->PlayBGM(SoundID::BGM_GAME);
@@ -93,28 +100,6 @@ bool Wave1::CheckEventClear(void)
 	}
 
 	return false;
-}
-
-bool Wave1::CheckRatClear(void)
-{
-	// 全ネズミ死亡しているか
-	for (const auto& rat: rats_)
-	{
-		// 完全終了までいっていなかったら
-		if (rat->GetState() != RAT_STATE_END)
-		{
-			// フラグを折る
-			return false;
-		}
-	}
-
-	// カウントを進める。
-	ratToCatRobotCount_++;
-
-	// カウントが指定値に達していなかったら処理を行わない
-	if (ratToCatRobotCount_ < RAT_TO_CATROBOT_COUNT)return false;
-
-	return true;
 }
 
 bool Wave1::CheckCatRobotClear(void)
@@ -125,4 +110,33 @@ bool Wave1::CheckCatRobotClear(void)
 	}
 
 	return false;
+}
+
+void Wave1::ChangeState(WaveState state)
+{
+	state_ = state;
+
+	switch (state_)
+	{
+	case WaveBase::WaveState::EVENT:
+		// カメラのモード変更
+		camera_->ChangeMode(Camera::MODE::FIXED, EVENT_CAMERA_POS, EVENT_CAMERA_ANGLE);
+		break;
+
+	case WaveBase::WaveState::RAT:
+		rats_[0]->SetEventEndPos(RAT_SPAWN_POS);
+
+		// カメラのモード変更
+		camera_->ChangeMode(Camera::MODE::FOLLOW);
+		break;
+
+	case WaveBase::WaveState::CAT_ROBOT:
+		break;
+
+	case WaveBase::WaveState::CLEARED:
+		break;
+
+	default:
+		break;
+	}
 }

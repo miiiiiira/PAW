@@ -57,7 +57,7 @@ namespace
 
 	// イベントシーン設定
 	constexpr float EVENT_MOVE_DISTANCE = 400.0f;	// イベントシーン時の移動距離
-	constexpr int EVENT_IDLE_TIME = 180;			// イベントシーン時の待機時間
+	constexpr int EVENT_IDLE_TIME = 180;					// イベントシーン時の待機時間
 
 	// 範囲外判定用座標処理
 	constexpr float CLAMP_POS_RADIUS = 100.0f;
@@ -400,6 +400,14 @@ void Rat::ResetRat(VECTOR pos)
 
 	// イベントシーン用にする
 	ChangeState(RAT_STATE_EVENT_MOVE);
+}
+
+void Rat::SetEventEndPos(VECTOR pos)
+{
+	// 指定の座標を設定
+	transform_->pos_ = 
+		VAdd(pos,
+		VScale(info_.moveDir_, EVENT_MOVE_DISTANCE));
 }
 
 void Rat::InitIdleWait(Rat& rat)

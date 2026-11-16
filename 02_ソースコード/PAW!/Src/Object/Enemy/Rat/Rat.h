@@ -39,6 +39,7 @@ public:
 
 	// 敵のパラメータをリセットする
 	void ResetRat(VECTOR pos);
+	void SetEventEndPos(VECTOR pos);	// 座標のみ
 
 private:
 	// 状態別更新処理

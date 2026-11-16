@@ -28,8 +28,10 @@ protected:
 
     // クリア条件
     bool CheckEventClear(void)override;
-    bool CheckRatClear(void)override;
     bool CheckCatRobotClear(void)override;
+
+    // ウェーブ状態を変更する
+    void ChangeState(WaveState state)override;
 
 private:
     int taositeyaruImage_ = -1;
