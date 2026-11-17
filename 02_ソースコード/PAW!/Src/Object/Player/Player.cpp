@@ -1116,6 +1116,9 @@ void Player::SetDamage(int damage)
 	// HPにダメージを与える
 	info_.hp_ -= damage;
 
+	// 球の当たり判定を行わないようタグをNONEへ
+	sphereCollder_->SetCollisionTag(CollisionTag::NONE);
+
 	// HPが0以下になったら
 	if (info_.hp_ <= 0)
 	{

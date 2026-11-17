@@ -148,8 +148,8 @@ private:
 	void UpdateGuideButtonPad(void);	// ゲームパッド時更新
 
 	// 描画系
-	void DrawHP(void);			// HP描画
-	void DrawButtonGuide(void);	// ボタンガイド描画
+	void DrawHP(void);					// HP描画
+	void DrawButtonGuide(void);			// ボタンガイド描画
 	void DrawButtonGuideMouse(void);	// ボタンガイド描画マウス
 	void DrawButtonGuidePad(void);		// ボタンガイド描画ゲームパッド
 
