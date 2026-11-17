@@ -12,24 +12,27 @@
 #include "../Title/TitleScene.h"
 
 #include "MainMenu.h"
+#include "../../../Object/UI/Paw/Paw.h"
 
 namespace
 {
 	// 画像サイズ
-	static constexpr int IMAGE_SIZE_X = 400;
-	static constexpr int IMAGE_SIZE_Y = 75;
+	constexpr int IMAGE_SIZE_X = 400;
+	constexpr int IMAGE_SIZE_Y = 75;
 
 	// GAME_START
-	static constexpr float GAME_START_POS_X = Application::SCREEN_SIZE_X / 2;
-	static constexpr float GAME_START_POS_Y = Application::SCREEN_SIZE_Y / 2 + 100.0f;
+	constexpr float GAME_START_POS_X = Application::SCREEN_SIZE_X / 2;
+	constexpr float GAME_START_POS_Y = Application::SCREEN_SIZE_Y / 2 + 100.0f;
 
 	// TITLE
-	static constexpr float TITLE_POS_X = Application::SCREEN_SIZE_X / 2;
-	static constexpr float TITLE_POS_Y = Application::SCREEN_SIZE_Y / 2 + 200.0f;
+	constexpr float TITLE_POS_X = Application::SCREEN_SIZE_X / 2;
+	constexpr float TITLE_POS_Y = Application::SCREEN_SIZE_Y / 2 + 200.0f;
 
 	// GAME_END
-	static constexpr float GAME_END_POS_X = Application::SCREEN_SIZE_X / 2;
-	static constexpr float GAME_END_POS_Y = Application::SCREEN_SIZE_Y / 2 + 300.0f;
+	constexpr float GAME_END_POS_X = Application::SCREEN_SIZE_X / 2;
+	constexpr float GAME_END_POS_Y = Application::SCREEN_SIZE_Y / 2 + 300.0f;
+
+	constexpr float PAW_OFFSET_X = 240.0f;
 }
 
 MainMenu::MainMenu(void)
@@ -111,6 +114,9 @@ void MainMenu::Update(void)
 		UpdateExit();
 		break;
 	}
+
+	// 肉球の更新
+	Paw::GetInstance()->Update();
 }
 
 void MainMenu::Draw(void)
@@ -122,6 +128,8 @@ void MainMenu::Draw(void)
 		if (button.type == currentMenu_)
 		{
 			DrawRotaGraphF(button.x, button.y, 1.0f, 0.0f, button.graphHandleOn, true);
+
+			Paw::GetInstance()->DrawF(button.x - PAW_OFFSET_X, button.y);
 		}
 		// 選択されていないボタン
 		else

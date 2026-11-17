@@ -1,12 +1,12 @@
-#include "SceneManager.h"
-
 #include "SceneBase.h"
 #include "Scenes/Loading/Loading.h"
 #include "Scenes/Title/TitleScene.h"
 #include "../Application.h"
-
 #include "../Input/InputManager.h"
 #include "../Input/MouseCursor/MouseCursor.h"
+#include "../Object/UI/Paw/Paw.h"
+
+#include "SceneManager.h"
 
 SceneManager* SceneManager::instance_ = nullptr;
 
@@ -34,6 +34,10 @@ void SceneManager::Init(void)
 	MouseCursor::CreateInstance();
 	MouseCursor::GetInstance()->Load();
 	MouseCursor::GetInstance()->Init();
+
+	// 肉球クラスを生成
+	Paw::CreateInstance();
+	Paw::GetInstance()->Load();
 
 	// 3D情報の初期化
 	Init3D();
@@ -199,13 +203,15 @@ void SceneManager::Delete(void)
 	for (auto& scene : scenes_) { scene->Release(); }
 	scenes_.clear();
 
-	//FrameRenderer::Release();
-
 	// フェーダー解放
-	Fader::GetInstance()->DeleteInstance();
+	Fader::DeleteInstance();
 
 	// マウスカーソル解放
 	MouseCursor::GetInstance()->Destroy();
+
+	// 肉球クラス解放
+	Paw::GetInstance()->Release();
+	Paw::DeleteInstance();
 
 	// ロード画面の削除
 	load_->Release();
