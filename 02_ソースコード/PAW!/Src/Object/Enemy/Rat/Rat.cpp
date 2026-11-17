@@ -34,8 +34,10 @@ namespace
 	constexpr float GRAVITY = -1.98f;	// 重力加速度
 	constexpr float MAX_FALL = -10.0f;	// 最大落下速度
 
-	// ダメージ設定
-	constexpr float HIT_REACT_FRICTION = 0.5f;	// ダメージ時のリアクション時の摩擦
+	// ダメージ系
+	constexpr float HIT_REACT_FRICTION = 0.5f;							// ダメージ時のリアクション時の摩擦
+	constexpr COLOR_F COLOR_DIF_DEFAULT = { 1.0f, 1.0f, 1.0f, 1.0f };	// 標準の拡散光色
+	constexpr COLOR_F COLOR_DIF_BLINK = { 1.0f, 0.2f, 0.2f, 1.0f };		// ダメージ時の拡散光色
 
 	// アニメーション設定
 	constexpr float ANIM_SPEED_IDLE = 0.6f;
@@ -120,6 +122,18 @@ Rat::Rat(void)
 	stateCtrl_.updateHitTable_[RAT_HIT_END] = UpdateHitEnd;
 }
 
+Rat::~Rat(void)
+{
+	// 画像の解放
+	DeleteGraph(exclamationMarkImage_);
+}
+
+void Rat::Load(void)
+{
+	// 画像の読み込み
+	exclamationMarkImage_ = LoadGraph("Data/Image/Game/bikkurima-ku.png");
+}
+
 void Rat::Init(void)
 {
 	// コンポーネントの追加
@@ -147,6 +161,24 @@ void Rat::Update(void)
 
 	// 座標を範囲内に収める
 	ClampPosition();
+}
+
+void Rat::Draw3D(void)
+{
+	if (stateCtrl_.state_ != RAT_STATE_ATTACK)return;
+
+	// 攻撃中の時だけ描画する
+	if (stateCtrl_.attackState_ == RAT_ATTACK_START)
+	{
+		DrawBillboard3D(
+			{transform_->pos_.x, transform_->pos_.y + 120.0f, transform_->pos_.z},
+			0.5f,
+			0.5f,
+			50.0f,
+			0.0,
+			exclamationMarkImage_,
+			true);
+	}
 }
 
 void Rat::UpdateState(void)
@@ -814,6 +846,15 @@ void Rat::UpdateInvincible(void)
 	if (info_.invincibleTime_ > 0)
 	{
 		--info_.invincibleTime_;
+		if (info_.invincibleTime_ % INVINCIBLE_TIME > (INVINCIBLE_TIME / 2 - 1))
+		{
+			MV1SetMaterialDifColor(render3D_->GetHandle(), 0, COLOR_DIF_BLINK);
+
+		}
+		else
+		{
+			MV1SetMaterialDifColor(render3D_->GetHandle(), 0, COLOR_DIF_DEFAULT);
+		}
 	}
 }
 

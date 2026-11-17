@@ -14,9 +14,12 @@ class Rat : public Component
 {
 public:
 	Rat(void);					// コンストラクタ
+	~Rat(void);					// デストラクタ
 
+	void Load(void) override;	// 読み込み
 	void Init(void) override;	// 初期化
 	void Update(void) override;	// 更新
+	void Draw3D(void) override;	// 3D描画
 
 public:
 	// Transformを返す
@@ -167,6 +170,9 @@ private:
 private:
 	// ネズミ情報
 	ratInfo info_;
+
+	// ！マークの画像ハンドル
+	int exclamationMarkImage_ = -1;	
 
 	// ネズミの状態情報
 	ratStateCtrl stateCtrl_;
