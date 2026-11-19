@@ -54,7 +54,7 @@ void WaveBase::Update(void)
     {
     case WaveState::EVENT:
          // 一定までスペースキーを押したらイベントシーンをスキップする
-         if (InputManager::GetInstance()->IsNew(KEY_INPUT_SPACE))
+         if (InputManager::GetInstance()->SkipButton())
          {
              skipTimer_++;
 

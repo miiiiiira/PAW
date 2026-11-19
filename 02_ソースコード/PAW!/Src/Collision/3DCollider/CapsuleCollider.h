@@ -24,6 +24,12 @@ public:
 		capsules_.push_back({ start,end,radius });
 	}
 
+	// Transform‚ğ“n‚·
+	void SetTransform(Transform* transform)
+	{
+		transform_ = transform;
+	}
+
 	// ƒJƒvƒZƒ‹‚ğæ“¾
 	const std::vector<Capsule>& GetCapsules(void) const
 	{

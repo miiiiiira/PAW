@@ -13,6 +13,7 @@ class CapsuleCollider;
 class SphereCollider;
 class Attack1;
 class PlateAttack;
+class CutleryAttack;
 
 class CatRobot : public Component
 {
@@ -68,14 +69,16 @@ private:
 	static void InitAttack1(CatRobot& catRobot);			// 食材爆撃
 	static void InitAttack2(CatRobot& catRobot);			// お皿攻撃上下
 	static void InitAttack3(CatRobot& catRobot);			// お皿攻撃左右
-	static void InitAttack4(CatRobot& catRobot);			// ナイフ攻撃
+	static void InitAttack4(CatRobot& catRobot);			// ナイフ攻撃上下
+	static void InitAttack5(CatRobot& catRobot);			// ナイフ攻撃左右
 	static void InitAttackEnd(CatRobot& catRobot);			// 攻撃終了
 	// 状態別更新
 	static void UpdateAttackSelect(CatRobot& catRobot);		// 攻撃選択
 	static void UpdateAttack1(CatRobot& catRobot);			// 食材爆撃
 	static void UpdateAttack2(CatRobot& catRobot);			// お皿攻撃上下
 	static void UpdateAttack3(CatRobot& catRobot);			// お皿攻撃左右
-	static void UpdateAttack4(CatRobot& catRobot);			// ナイフ攻撃
+	static void UpdateAttack4(CatRobot& catRobot);			// ナイフ攻撃上下
+	static void UpdateAttack5(CatRobot& catRobot);			// ナイフ攻撃左右
 	static void UpdateAttackEnd(CatRobot& catRobot);		// 攻撃終了
 	// 攻撃状態を変更させる
 	void ChangeAttackState(CAT_ROBOT_ATTACK_STATE state);
@@ -110,9 +113,12 @@ private:
 	void ResetAttack1Pos(void);							// 座標決め
 	bool IsFarEnough(VECTOR pos, float rad, int i = 0);	// 攻撃の範囲が重なっていなかったらtrueを返す（円で見る）
 
-	// 攻撃2,3（お皿攻撃）
+	// 攻撃2（お皿攻撃）
 	void ResetPlateAttackPos(bool leftRight);		// 座標決め
-	VECTOR SelectPlateAttackDir(bool leftRight);	// 向き決め
+	VECTOR SelectAttackDir(bool leftRight);			// 向き決め
+
+	// 攻撃3（カトラリー攻撃）
+	void ResetCutleryAttackPos(bool leftRight);		// 座標決め
 
 	// ダメージを与える
 	void SetDamage(void);
@@ -132,7 +138,8 @@ private:
 
 	// 攻撃コンポーネント
 	std::vector<Attack1*> attack1_;	// 攻撃1
-	std::vector<PlateAttack*> plateAttack_;	// 攻撃2
+	std::vector<PlateAttack*> plateAttack_;	// 攻撃2,3
+	std::vector<CutleryAttack*> cutleryAttack_;// 攻撃4,5
 
 	// プレイヤーTransform
 	const Transform* playerTransform_ = nullptr;

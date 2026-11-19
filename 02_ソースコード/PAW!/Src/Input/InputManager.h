@@ -181,6 +181,9 @@ public:
 	// ポーズ終了
 	bool PauseEndButton(void);
 
+	// スキップ
+	bool SkipButton(void);
+
 	// パッドの選択キー
 	// 上
 	bool SelectUpPad(void);

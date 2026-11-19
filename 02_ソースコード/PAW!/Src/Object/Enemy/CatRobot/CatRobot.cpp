@@ -6,6 +6,7 @@
 #include "../../../Math/Easing.h"
 #include "Attack/Attack1/Attack1.h"
 #include "Attack/PlateAttack/PlateAttack.h"
+#include "Attack/CutleryAttack/CutleryAttack.h"
 #include "../../../Application.h"
 #include "../../../Audio/AudioManager.h"
 
@@ -39,7 +40,7 @@ namespace
 	constexpr int ATTACK1_RANGE = 2000;			// 攻撃範囲
 	constexpr int ATTACK1_TRY_MAX = 10;			// 最大挑戦回数
 	// 攻撃2,3の（お皿攻撃）
-	constexpr float ATTACK2_POS_Y = 70.0f;			// Y座標
+	constexpr float PLATE_POS_Y = 70.0f;			// Y座標
 	constexpr int ATTACK2_NUM = 2;					// 攻撃を行う回数
 	constexpr int ATTACK3_NUM = 2;					// 攻撃を行う回数
 	constexpr int PLATE_FLYING_NUM = 4;				// 個数
@@ -47,6 +48,11 @@ namespace
 	constexpr int PLATE_IDLE_COUNT = 60;			// 待機時間の基準値
 	// 攻撃全体の回数
 	constexpr int ATTACK_NUM_ALL = 1;
+	// 攻撃2,3の（お皿攻撃）
+	constexpr float CUTLERY_POS_Y = 30.0f;				// Y座標
+	constexpr int CUTLERY_FLYING_NUM = 4;				// 個数
+	constexpr float CUTLERY_MOVE_DISTANCE = 2000.0f;	// 攻撃距離
+	constexpr int CUTLERY_IDLE_COUNT = 50;
 
 	// ダメージ時のリアクション設定
 	constexpr COLOR_F COLOR_DIF_DEFAULT = { 1.0f, 1.0f, 1.0f, 1.0f };	// 標準の拡散光色
@@ -93,6 +99,7 @@ CatRobot::CatRobot(void)
 	stateCtrl_.initAttackTable_[CAT_ROBOT_ATTACK_2] = InitAttack2;
 	stateCtrl_.initAttackTable_[CAT_ROBOT_ATTACK_3] = InitAttack3;
 	stateCtrl_.initAttackTable_[CAT_ROBOT_ATTACK_4] = InitAttack4;
+	stateCtrl_.initAttackTable_[CAT_ROBOT_ATTACK_5] = InitAttack5;
 	stateCtrl_.initAttackTable_[CAT_ROBOT_ATTACK_END] = InitAttackEnd;
 	// 更新関数
 	stateCtrl_.updateAttackTable_[CAT_ROBOT_ATTACK_SELECT] = UpdateAttackSelect;
@@ -100,6 +107,7 @@ CatRobot::CatRobot(void)
 	stateCtrl_.updateAttackTable_[CAT_ROBOT_ATTACK_2] = UpdateAttack2;
 	stateCtrl_.updateAttackTable_[CAT_ROBOT_ATTACK_3] = UpdateAttack3;
 	stateCtrl_.updateAttackTable_[CAT_ROBOT_ATTACK_4] = UpdateAttack4;
+	stateCtrl_.updateAttackTable_[CAT_ROBOT_ATTACK_5] = UpdateAttack5;
 	stateCtrl_.updateAttackTable_[CAT_ROBOT_ATTACK_END] = UpdateAttackEnd;
 
 	// プレイヤーの攻撃チャンス状態
@@ -169,7 +177,7 @@ void CatRobot::Draw3D(void)
 {
 	if (info_.toppleTime_ > 0)
 	{
-
+		// 混乱エフェクト再生
 	}
 }
 
@@ -315,6 +323,28 @@ void CatRobot::InitAttack3(CatRobot& catRobot)
 
 void CatRobot::InitAttack4(CatRobot& catRobot)
 {
+	// 0より大きければ初期化を行わない
+	if (catRobot.info_.attackNum_ <= 0)
+	{
+		// 食材攻撃の回数初期化
+		catRobot.info_.attackNum_ = ATTACK3_NUM;
+	}
+
+	// 攻撃2の座標決め
+	catRobot.ResetCutleryAttackPos(true);
+}
+
+void CatRobot::InitAttack5(CatRobot& catRobot)
+{
+	// 0より大きければ初期化を行わない
+	if (catRobot.info_.attackNum_ <= 0)
+	{
+		// 食材攻撃の回数初期化
+		catRobot.info_.attackNum_ = ATTACK3_NUM;
+	}
+
+	// 攻撃2の座標決め
+	catRobot.ResetCutleryAttackPos(false);
 }
 
 void CatRobot::InitAttackEnd(CatRobot& catRobot)
@@ -327,7 +357,7 @@ void CatRobot::UpdateAttackSelect(CatRobot& catRobot)
 
 	int rand = GetRand(ATTACK_RAND_NUM);
 	// 0～2にする
-	rand %= 3;
+	rand %= 5;
 
 	switch (rand)
 	{
@@ -342,6 +372,14 @@ void CatRobot::UpdateAttackSelect(CatRobot& catRobot)
 	case 2:
 		// 攻撃3へ
 		catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_3);
+		break;
+	case 3:
+		// 攻撃3へ
+		catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_4);
+		break;
+	case 4:
+		// 攻撃3へ
+		catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_5);
 		break;
 	default:
 		break;
@@ -455,6 +493,50 @@ void CatRobot::UpdateAttack3(CatRobot& catRobot)
 
 void CatRobot::UpdateAttack4(CatRobot& catRobot)
 {
+	bool isAllEnd = true;
+
+	// 攻撃数分回す
+	for (const auto& attack : catRobot.cutleryAttack_)
+	{
+		// 終了していなかったら
+		if (attack->GetState() != ATTACK1_STATE_END)
+		{
+			// フラグを折る
+			isAllEnd = false;
+			break;
+		}
+	}
+
+	// すべて移動し終えていたら
+	if (isAllEnd)
+	{
+		// 攻撃終了へ
+		catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_END);
+	}
+}
+
+void CatRobot::UpdateAttack5(CatRobot& catRobot)
+{
+	bool isAllEnd = true;
+
+	// 攻撃数分回す
+	for (const auto& attack : catRobot.cutleryAttack_)
+	{
+		// 終了していなかったら
+		if (attack->GetState() != ATTACK1_STATE_END)
+		{
+			// フラグを折る
+			isAllEnd = false;
+			break;
+		}
+	}
+
+	// すべて移動し終えていたら
+	if (isAllEnd)
+	{
+		// 攻撃終了へ
+		catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_END);
+	}
 }
 
 void CatRobot::UpdateAttackEnd(CatRobot& catRobot)
@@ -607,6 +689,7 @@ void CatRobot::AddComponets(void)
 
 	attack1_.clear();
 	plateAttack_.clear();
+	cutleryAttack_.clear();
 
 	// 攻撃1(食材攻撃)個数分回す
 	for (int i = 0; i < ATTACK1_FALL_NUM; i++)
@@ -619,6 +702,13 @@ void CatRobot::AddComponets(void)
 	for (int i = 0; i < PLATE_FLYING_NUM; i++)
 	{
 		PlateAttack* attack = plateAttack_.emplace_back(owner_->AddComponent<PlateAttack>());
+		attack->Init();
+	}
+
+	// 攻撃4,5(カトラリー攻撃)個数分回す
+	for (int i = 0; i < CUTLERY_FLYING_NUM; i++)
+	{
+		CutleryAttack* attack = cutleryAttack_.emplace_back(owner_->AddComponent<CutleryAttack>());
 		attack->Init();
 	}
 }
@@ -745,8 +835,8 @@ bool CatRobot::IsFarEnough(VECTOR pos, float rad, int i)
 void CatRobot::ResetPlateAttackPos(bool leftRight)
 {
 	// 左右指定で向きを出す
-	VECTOR dir = SelectPlateAttackDir(leftRight);
-	VECTOR pos = { 0.0f,ATTACK2_POS_Y,0.0f };
+	VECTOR dir = SelectAttackDir(leftRight);
+	VECTOR pos = { 0.0f,PLATE_POS_Y,0.0f };
 
 	// 円柱の直径
 	float diameter = PlateAttack::PLATE_RADIUS * 2;
@@ -776,7 +866,7 @@ void CatRobot::ResetPlateAttackPos(bool leftRight)
 	}
 }
 
-VECTOR CatRobot::SelectPlateAttackDir(bool leftRight)
+VECTOR CatRobot::SelectAttackDir(bool leftRight)
 {
 	// ランダム用
 	int rand = GetRand(ATTACK_RAND_NUM);
@@ -813,6 +903,33 @@ VECTOR CatRobot::SelectPlateAttackDir(bool leftRight)
 	}
 
 	return dir;
+}
+
+void CatRobot::ResetCutleryAttackPos(bool leftRight)
+{
+	// 左右指定で向きを出す
+	VECTOR dir = SelectAttackDir(leftRight);
+	VECTOR pos = { 0.0f,CUTLERY_POS_Y,0.0f };
+
+	// 攻撃数分回す
+	for (int i = 0; i < cutleryAttack_.size(); i++)
+	{
+		// 左右移動なため
+		if (dir.x != 0.0f)
+		{
+			// 移動方向の反対側に配置
+			pos.x = PLATE_MOVE_DISTANCE * -dir.x;
+		}
+		// 上下移動なため
+		else if (dir.z != 0.0f)
+		{
+			// 移動方向の反対側に配置
+			pos.z = PLATE_MOVE_DISTANCE * -dir.z;
+		}
+
+		// 座標を設定
+		cutleryAttack_[i]->StartAttack(pos, dir, CUTLERY_MOVE_DISTANCE, CUTLERY_IDLE_COUNT * i);
+	}
 }
 
 void CatRobot::SetDamage(void)

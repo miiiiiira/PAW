@@ -26,7 +26,8 @@ enum CAT_ROBOT_ATTACK_STATE
 	CAT_ROBOT_ATTACK_1,			// 食材爆撃
 	CAT_ROBOT_ATTACK_2,			// お皿攻撃上下
 	CAT_ROBOT_ATTACK_3,			// お皿攻撃左右
-	CAT_ROBOT_ATTACK_4,			// ナイフ攻撃
+	CAT_ROBOT_ATTACK_4,			// ナイフ攻撃上下
+	CAT_ROBOT_ATTACK_5,			// ナイフ攻撃左右
 	CAT_ROBOT_ATTACK_END,		// 攻撃終了
 
 	CAT_ROBOT_ATTACK_MAX

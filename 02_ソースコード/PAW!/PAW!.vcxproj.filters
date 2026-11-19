@@ -47,6 +47,7 @@
     <ClCompile Include="Src\Object\Stage\Table\Table.cpp" />
     <ClCompile Include="Src\Object\Stage\Floor\Floor.cpp" />
     <ClCompile Include="Src\Object\UI\Paw\Paw.cpp" />
+    <ClCompile Include="Src\Object\Enemy\CatRobot\Attack\CutleryAttack\CutleryAttack.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Application.h" />
@@ -109,5 +110,7 @@
     <ClInclude Include="Src\Object\Stage\Table\Table.h" />
     <ClInclude Include="Src\Object\Stage\Floor\Floor.h" />
     <ClInclude Include="Src\Object\UI\Paw\Paw.h" />
+    <ClInclude Include="Src\Object\Enemy\CatRobot\Attack\CutleryAttack\CutleryAttack.h" />
+    <ClInclude Include="Src\Object\Enemy\CatRobot\Attack\CutleryAttack\CutleryAttackInfo.h" />
   </ItemGroup>
 </Project>

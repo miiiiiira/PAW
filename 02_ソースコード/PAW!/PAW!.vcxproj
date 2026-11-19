@@ -141,6 +141,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Object\Enemy\CatRobot\Attack\CutleryAttack\CutleryAttack.cpp" />
     <ClCompile Include="Src\Object\UI\Paw\Paw.cpp" />
     <ClCompile Include="Src\Collision\3DCollider\CylinderCollider.cpp" />
     <ClCompile Include="Src\Object\Enemy\CatRobot\Attack\PlateAttack\PlateAttack.cpp" />
@@ -189,6 +190,8 @@
     <ClCompile Include="Src\System\FpsControl\FpsControl.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Object\Enemy\CatRobot\Attack\CutleryAttack\CutleryAttack.h" />
+    <ClInclude Include="Src\Object\Enemy\CatRobot\Attack\CutleryAttack\CutleryAttackInfo.h" />
     <ClInclude Include="Src\Object\UI\Paw\Paw.h" />
     <ClInclude Include="Src\Collision\3DCollider\CylinderCollider.h" />
     <ClInclude Include="Src\Object\Enemy\CatRobot\Attack\PlateAttack\PlateAttack.h" />

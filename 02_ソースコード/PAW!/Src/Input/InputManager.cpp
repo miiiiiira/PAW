@@ -241,6 +241,13 @@ bool InputManager::PauseEndButton(void)
 		|| IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::START);
 }
 
+bool InputManager::SkipButton(void)
+{
+	return  FindMouse(MOUSE_INPUT_LEFT).keyNew
+		|| IsPadBtnNew(JOYPAD_NO::PAD1, JOYPAD_BTN::A)
+		|| IsNew(KEY_INPUT_SPACE);
+}
+
 bool InputManager::SelectUpPad(void)
 {
 	return IsPadBtnTrgDown(JOYPAD_NO::PAD1, JOYPAD_BTN::UP) || IsPadLStickTrgDown(JOYPAD_NO::PAD1, JOYPAD_STICK::UP);
