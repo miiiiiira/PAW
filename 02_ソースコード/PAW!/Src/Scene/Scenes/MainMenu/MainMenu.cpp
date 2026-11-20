@@ -10,9 +10,9 @@
 #include "../Confirm/Confirm.h"
 #include "../Game/GameScene.h"
 #include "../Title/TitleScene.h"
+#include "../../../Object/UI/Paw/Paw.h"
 
 #include "MainMenu.h"
-#include "../../../Object/UI/Paw/Paw.h"
 
 namespace
 {
@@ -32,6 +32,7 @@ namespace
 	constexpr float GAME_END_POS_X = Application::SCREEN_SIZE_X / 2;
 	constexpr float GAME_END_POS_Y = Application::SCREEN_SIZE_Y / 2 + 300.0f;
 
+	// 肉球のオフセット値
 	constexpr float PAW_OFFSET_X = 240.0f;
 }
 
@@ -128,7 +129,7 @@ void MainMenu::Draw(void)
 		if (button.type == currentMenu_)
 		{
 			DrawRotaGraphF(button.x, button.y, 1.0f, 0.0f, button.graphHandleOn, true);
-
+			// 肉球描画
 			Paw::GetInstance()->DrawF(button.x - PAW_OFFSET_X, button.y);
 		}
 		// 選択されていないボタン
@@ -224,6 +225,9 @@ void MainMenu::SelectUpgrade(void)
 	{
 		// ボタンに乗ったサウンドを出す
 		AudioManager::GetInstance()->PlaySE(SoundID::SYS_SELECT_ON);
+
+		// 肉球のサイズ変化用の値をリセット
+		Paw::GetInstance()->ResetValue();
 	}
 }
 

@@ -5,6 +5,7 @@
 #include "../../SceneManager.h"
 #include "../../../Collision/CollisionMath.h"
 #include "../MainMenu/MainMenu.h"
+#include "../../../Object/UI/Paw/Paw.h"
 
 #include "Confirm.h"
 
@@ -25,6 +26,9 @@ namespace
 	// 猫画像を変更するタイミング
 	constexpr int CAT_COUNT = 60;
 	constexpr int CHANGE_CAT_EYE_COUNT = 10;
+
+	// 肉球のオフセット値
+	constexpr float PAW_OFFSET_X = 145.0f;
 }
 
 Confirm::Confirm(void)
@@ -120,6 +124,9 @@ void Confirm::Update(void)
 		UpdateNo();
 		break;
 	}
+
+	// 肉球の更新
+	Paw::GetInstance()->Update();
 }
 
 void Confirm::Draw(void)
@@ -137,6 +144,8 @@ void Confirm::Draw(void)
 		if (button.type == currentSelect_)
 		{
 			DrawRotaGraphF(button.x, button.y, 1.0f, 0.0f, button.graphHandleOn, true);
+			// 肉球描画
+			Paw::GetInstance()->DrawF(button.x - PAW_OFFSET_X, button.y);
 		}
 		// 選択されていないボタン
 		else
@@ -246,6 +255,9 @@ void Confirm::UpdateSelect(void)
 	{
 		// ボタンに乗ったサウンドを出す
 		AudioManager::GetInstance()->PlaySE(SoundID::SYS_SELECT_ON);
+
+		// 肉球のサイズ変化用の値をリセット
+		Paw::GetInstance()->ResetValue();
 	}
 }
 

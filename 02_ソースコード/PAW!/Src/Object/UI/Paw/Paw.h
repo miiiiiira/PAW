@@ -26,12 +26,16 @@ public:
 	void Draw(int x, int y);		// 描画
 	void DrawF(float x, float y);	// 描画
 	void Release(void);				// 解放
+	
+public:
+	// サイズ変化用の値をリセット
+	void ResetValue(void) { value_ = 1.0f; }
 
 private:
 	// 肉球画像
 	int pawImage_ = -1;
 	
-	// 上下ふわふわさせるsin派に渡す値
+	// サイズ変化用の値
 	float value_ = 1.0f;	
 	bool isBig_ = true;
 };

@@ -9,6 +9,7 @@
 #include "../Confirm/Confirm.h"
 #include "../../../Input/MouseCursor/MouseCursor.h"
 #include "../../../Scene/Scenes/Title/TitleScene.h"
+#include "../../../Object/UI/Paw/Paw.h"
 
 #include "Pause.h"
 
@@ -29,6 +30,9 @@ namespace
 	// EXIT
 	constexpr int EXIT_POS_X = Application::SCREEN_SIZE_X / 2;
 	constexpr int EXIT_POS_Y = Application::SCREEN_SIZE_Y / 2 + 290;
+
+	// 肉球のオフセット値
+	constexpr float PAW_OFFSET_X = 240.0f;
 }
 
 Pause::Pause(void)
@@ -106,6 +110,9 @@ void Pause::Update(void)
 		UpdateExit();
 		break;
 	}
+
+	// 肉球の更新
+	Paw::GetInstance()->Update();
 }
 
 void Pause::Draw(void)
@@ -120,6 +127,8 @@ void Pause::Draw(void)
 		if (button.type == currentPause_)
 		{
 			DrawRotaGraphF(button.x, button.y, 1.0f, 0.0f, button.graphHandleOn, true);
+			// 肉球描画
+			Paw::GetInstance()->DrawF(button.x - PAW_OFFSET_X, button.y);
 		}
 		// 選択されていないボタン
 		else
@@ -222,6 +231,9 @@ void Pause::SelectUpgrade(void)
 	{
 		// ボタンに乗ったサウンドを出す
 		AudioManager::GetInstance()->PlaySE(SoundID::SYS_SELECT_ON);
+
+		// 肉球のサイズ変化用の値をリセット
+		Paw::GetInstance()->ResetValue();
 	}
 }
 
