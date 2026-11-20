@@ -18,6 +18,10 @@ class CutleryAttack;
 class CatRobot : public Component
 {
 public:
+	// 体力設定
+	static constexpr int DEFAULT_HP = 20;	// 初期HP
+
+public:
 	CatRobot(void);				// コンストラクタ
 	~CatRobot(void);			// デストラクタ
 

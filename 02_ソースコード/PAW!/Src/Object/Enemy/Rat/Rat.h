@@ -34,6 +34,8 @@ public:
 	RAT_STATE GetState(void)const { return stateCtrl_.state_; }
 	// 状態を変更させる
 	void ChangeState(RAT_STATE state);
+	// イベントシーン時の移動終了フラグを設定
+	bool IsEndEventMove(void) { return info_.eventIdleTime_ >= EVENT_IDLE_TIME; }
 
 	// 攻撃できる状態か
 	bool IsCanAttack(void);
@@ -43,6 +45,10 @@ public:
 	// 敵のパラメータをリセットする
 	void ResetRat(VECTOR pos);
 	void SetEventEndPos(VECTOR pos);	// 座標のみ
+
+private:
+	// イベントシーン時の待機時間
+	static constexpr int EVENT_IDLE_TIME = 180;
 
 private:
 	// 状態別更新処理

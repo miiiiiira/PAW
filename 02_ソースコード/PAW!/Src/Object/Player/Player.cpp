@@ -274,7 +274,7 @@ void Player::Update(void)
 	}
 
 	// イベントシーン時は更新を行わない
-	if (WaveManager::GetInstance().GetCurrentWave()->GetState() == WaveBase::WaveState::EVENT)return;
+	if (WaveManager::GetInstance().GetCurrentWave()->GetState() == WaveBase::WAVE_STATE::EVENT)return;
 
 	// 状態別更新処理
 	UpdateState();
@@ -301,7 +301,7 @@ void Player::Draw2D(void)
 	auto currentWave = WaveManager::GetInstance().GetCurrentWave();
 	if (currentWave != nullptr)
 	{
-		if (currentWave->GetState() == WaveBase::WaveState::EVENT)return;
+		if (currentWave->GetState() == WaveBase::WAVE_STATE::EVENT)return;
 	}
 
 	// HP描画
@@ -322,6 +322,19 @@ void Player::Draw3D(void)
 	// デバッグ描画
 	DebugDraw3D();
 #endif // _DEBUG
+}
+
+void Player::ResetPlayer(void)
+{
+	// 座標を初期化
+	transform_->pos_ = {};
+	MV1SetPosition(render3D_->GetHandle(), transform_->pos_);
+
+	// 球の当たり判定を行わないようタグをNONEへ
+	sphereCollder_->SetCollisionTag(CollisionTag::NONE);
+
+	// プレイヤーの状態初期化
+	ChangeState(PLAYER_STATE_IDLE);
 }
 
 void Player::UpdateState(void)
@@ -1248,10 +1261,12 @@ void Player::EndAttaking(void)
 
 bool Player::IsInAssistRange(const Transform* ratTransform)
 {
+	// プレイヤーから敵への距離を求める
 	VECTOR vec = VSub(ratTransform->pos_, transform_->pos_);
 	float distanceXZ = vec.x * vec.x + vec.z * vec.z;
 	float rad = ASSIST_RANGE * ASSIST_RANGE;
 
+	// プレイヤー周辺の円内にいればtrueを返す
 	return distanceXZ <= rad;
 }
 

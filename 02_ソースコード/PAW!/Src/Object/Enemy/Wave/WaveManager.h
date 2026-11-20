@@ -38,6 +38,7 @@ public:
     // ウェーブの追加
     void AddWave(
         std::unique_ptr<WaveBase> wave,
+        Player* player,
         std::vector<Rat*> rats,
         CatRobot* catRobot,
         Camera* camera);

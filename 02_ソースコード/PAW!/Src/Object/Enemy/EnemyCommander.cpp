@@ -42,15 +42,15 @@ void EnemyCommander::EnemyControl(void)
 {
 	switch (WaveManager::GetInstance().GetCurrentWave()->GetState())
 	{
-	case WaveBase::WaveState::RAT:
+	case WaveBase::WAVE_STATE::RAT:
 		RatControl();
 		break;
-	case WaveBase::WaveState::CAT_ROBOT:
+	case WaveBase::WAVE_STATE::CAT_ROBOT:
 		CatRobotControl();
 		break;
 
-	case WaveBase::WaveState::EVENT:
-	case WaveBase::WaveState::CLEARED:
+	case WaveBase::WAVE_STATE::EVENT:
+	case WaveBase::WAVE_STATE::CLEARED:
 	default:
 		break;
 	}

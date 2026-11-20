@@ -8,6 +8,7 @@
 
 #include "Rat.h"
 #include "../../../Audio/AudioManager.h"
+#include "../Wave/WaveManager.h"
 
 namespace
 {
@@ -59,7 +60,6 @@ namespace
 
 	// イベントシーン設定
 	constexpr float EVENT_MOVE_DISTANCE = 400.0f;	// イベントシーン時の移動距離
-	constexpr int EVENT_IDLE_TIME = 180;					// イベントシーン時の待機時間
 
 	// 範囲外判定用座標処理
 	constexpr float CLAMP_POS_RADIUS = 100.0f;
@@ -275,7 +275,7 @@ void Rat::UpdateEventIdle(Rat& rat)
 {
 	rat.info_.eventIdleTime_++;
 
-	if (rat.info_.eventIdleTime_ >= EVENT_IDLE_TIME)
+	if(WaveManager::GetInstance().GetCurrentWave()->GetState() != WaveBase::WAVE_STATE::EVENT)
 	{
 		// 待機状態へ
 		rat.ChangeState(RAT_STATE_IDLE);
@@ -419,6 +419,9 @@ void Rat::ResetRat(VECTOR pos)
 	transform_->angle_.y = atan2f(info_.moveDir_.x, info_.moveDir_.z);
 	transform_->angle_.y += DX_PI_F;
 
+	// モデルに向きを設定
+	MV1SetRotationXYZ(render3D_->GetHandle(), transform_->angle_);
+
 	// 移動スピード設定
 	info_.moveSpeed_ = MOVE_SPEED;
 
@@ -430,6 +433,12 @@ void Rat::ResetRat(VECTOR pos)
 	// 待機時間初期化
 	info_.eventIdleTime_ = 0;
 
+	// 描画フラグをtrueにする
+	render3D_->SetIsDraw(true);
+
+	// タグの設定
+	capsuleCollder_->SetCollisionTag(CollisionTag::ENEMY);
+
 	// イベントシーン用にする
 	ChangeState(RAT_STATE_EVENT_MOVE);
 }
@@ -440,6 +449,9 @@ void Rat::SetEventEndPos(VECTOR pos)
 	transform_->pos_ = 
 		VAdd(pos,
 		VScale(info_.moveDir_, EVENT_MOVE_DISTANCE));
+
+	// 待機状態へ
+	ChangeState(RAT_STATE_IDLE);
 }
 
 void Rat::InitIdleWait(Rat& rat)

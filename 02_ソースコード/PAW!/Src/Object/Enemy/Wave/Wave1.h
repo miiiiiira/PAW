@@ -6,7 +6,7 @@ class Wave1 : public WaveBase
 {
 public:
     Wave1(void);                 // コンストラクタ
-    ~Wave1(void)override;          // デストラクタ
+    ~Wave1(void)override;        // デストラクタ
 
     void Draw(void)override;    // 描画
     
@@ -19,8 +19,6 @@ protected:
     void OnStart(void) override;
 
     // ウェーブ中
-    void OnEvent(void) override;
-    void OnRat(void) override;
     void OnCatRobot(void) override;
 
     // クリア後
@@ -31,7 +29,7 @@ protected:
     bool CheckCatRobotClear(void)override;
 
     // ウェーブ状態を変更する
-    void ChangeState(WaveState state)override;
+    void ChangeState(WAVE_STATE state)override;
 
 private:
     int taositeyaruImage_ = -1;

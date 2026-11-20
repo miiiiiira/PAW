@@ -4,6 +4,7 @@
 #include "../../../Input/InputManager.h"
 
 #include "WaveBase.h"
+#include "../../../Audio/AudioManager.h"
 
 namespace
 {
@@ -47,12 +48,12 @@ WaveBase::~WaveBase(void)
 void WaveBase::Update(void)
 {
     // ウェーブクリア済みだったら処理しない
-    if (state_ == WaveState::CLEARED) return;
+    if (state_ == WAVE_STATE::CLEARED) return;
 
     // 各状態で遷移
     switch (state_)
     {
-    case WaveState::EVENT:
+    case WAVE_STATE::EVENT:
          // 一定までスペースキーを押したらイベントシーンをスキップする
          if (InputManager::GetInstance()->SkipButton())
          {
@@ -84,11 +85,11 @@ void WaveBase::Update(void)
             // カウント初期化
             ratToCatRobotCount_ = 0;
             // ネズミ行動へ
-            ChangeState(WaveState::RAT);
+            ChangeState(WAVE_STATE::RAT);
         }
         break;
 
-    case WaveState::RAT:
+    case WAVE_STATE::RAT:
         // ネズミとの戦い
         OnRat();
 
@@ -96,11 +97,11 @@ void WaveBase::Update(void)
         if (CheckRatClear())
         {
             // 猫ロボット行動へ
-            ChangeState(WaveState::CAT_ROBOT);
+            ChangeState(WAVE_STATE::CAT_ROBOT);
         }
         break;
 
-    case WaveState::CAT_ROBOT:
+    case WAVE_STATE::CAT_ROBOT:
         // 猫ロボットとの戦い
         OnCatRobot();
 
@@ -108,12 +109,12 @@ void WaveBase::Update(void)
         if (CheckCatRobotClear())
         {
             // ウェーブクリア
-            ChangeState(WaveState::CLEARED);
+            ChangeState(WAVE_STATE::CLEARED);
             OnClear();
         }
         break;
 
-    case WaveState::CLEARED:
+    case WAVE_STATE::CLEARED:
         // ウェーブクリア後は特に処理なし
         break;
     }
@@ -135,37 +136,23 @@ void WaveBase::Draw(void)
 void WaveBase::StartInWave(void)
 {
     // ウェーブ開始させる
-    ChangeState(WaveState::EVENT);
+    ChangeState(WAVE_STATE::EVENT);
 
     // 初期化処理
     OnStart();
 }
 
-void WaveBase::ChangeState(WaveState state)
+void WaveBase::OnEvent(void)
 {
-    state_ = state;
+    // BGM再生
+    AudioManager::GetInstance()->PlayBGM(SoundID::BGM_RAT_EVENT);
+}
 
-    switch (state_)
-    {
-    case WaveBase::WaveState::EVENT:
-        // カメラのモード変更
-        camera_->ChangeMode(Camera::MODE::FIXED, EVENT_CAMERA_POS, EVENT_CAMERA_ANGLE);
-        break;
-
-    case WaveBase::WaveState::RAT:
-        // カメラのモード変更
-        camera_->ChangeMode(Camera::MODE::FOLLOW);
-        break;
-
-    case WaveBase::WaveState::CAT_ROBOT:
-        break;
-
-    case WaveBase::WaveState::CLEARED:
-        break;
-
-    default:
-        break;
-    }
+void WaveBase::OnRat(void)
+{
+    // タイマーとアルファ値の初期化
+    skipTimer_ = 0;
+    alpha_ = 0;
 }
 
 bool WaveBase::CheckRatClear(void)
@@ -187,4 +174,31 @@ bool WaveBase::CheckRatClear(void)
     // カウントが指定値に達していなかったら処理を行わない
     if (ratToCatRobotCount_ < RAT_TO_CATROBOT_COUNT) return false;
     return true;
+}
+
+void WaveBase::ChangeState(WAVE_STATE state)
+{
+    state_ = state;
+
+    switch (state_)
+    {
+    case WaveBase::WAVE_STATE::EVENT:
+        // カメラのモード変更
+        camera_->ChangeMode(Camera::MODE::FIXED, EVENT_CAMERA_POS, EVENT_CAMERA_ANGLE);
+        break;
+
+    case WaveBase::WAVE_STATE::RAT:
+        // カメラのモード変更
+        camera_->ChangeMode(Camera::MODE::FOLLOW);
+        break;
+
+    case WaveBase::WAVE_STATE::CAT_ROBOT:
+        break;
+
+    case WaveBase::WAVE_STATE::CLEARED:
+        break;
+
+    default:
+        break;
+    }
 }

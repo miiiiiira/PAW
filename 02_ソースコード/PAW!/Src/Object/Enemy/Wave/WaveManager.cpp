@@ -10,11 +10,15 @@ WaveManager::~WaveManager(void)
 {
 }
 
-void WaveManager::AddWave(std::unique_ptr<WaveBase> wave, std::vector<Rat*> rats, CatRobot* catRobot, Camera* camera)
+void WaveManager::AddWave(std::unique_ptr<WaveBase> wave, Player* player, std::vector<Rat*> rats, CatRobot* catRobot, Camera* camera)
 {
 	// ウェーブの追加
-	wave->SetRatCatRobotPoint(rats, catRobot, camera);
-	wave->StartInWave();
+	wave->SetRatCatRobotPoint(player, rats, catRobot, camera);
+	if (waves_.empty())
+	{
+		// 最初のウェーブだったらウェーブ開始処理を行う
+		wave->StartInWave();
+	}
 	waves_.push_back(std::move(wave));
 }
 
@@ -29,7 +33,7 @@ void WaveManager::Update()
 	wave->Update();
 
 	// 現在のウェーブがクリアしていたら
-	if (wave->GetState() == WaveBase::WaveState::CLEARED)
+	if (wave->GetState() == WaveBase::WAVE_STATE::CLEARED)
 	{
 		// ウェーブを加算
 		currentWaveIndex_++;
@@ -37,6 +41,8 @@ void WaveManager::Update()
 		{
 			// ウェーブが終わっていなかったらクリア情報を保存する
 			waveIsClear_ = true;
+			// 次のウェーブを開始させる
+			waves_[currentWaveIndex_]->StartInWave();
 		}
 	}
 }

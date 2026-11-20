@@ -23,7 +23,7 @@ namespace
 	constexpr int NO_POS_Y = (Application::SCREEN_SIZE_Y / 2) + IMAGE_SIZE_Y;
 
 	// 猫画像を変更するタイミング
-	constexpr int CAT_COUNT = 120;
+	constexpr int CAT_COUNT = 60;
 	constexpr int CHANGE_CAT_EYE_COUNT = 10;
 }
 

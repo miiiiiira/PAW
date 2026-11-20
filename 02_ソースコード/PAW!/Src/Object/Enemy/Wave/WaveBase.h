@@ -3,6 +3,7 @@
 #include <DxLib.h>
 #include <vector>
 
+class Player;
 class Rat;
 class CatRobot;
 class Camera;
@@ -11,7 +12,7 @@ class WaveBase
 {
 public:
     // ウェーブの状態
-    enum class WaveState
+    enum class WAVE_STATE
     {
         EVENT,     // イベント
         RAT,       // ネズミ
@@ -29,15 +30,15 @@ public:
 
 public:
     // ウェーブの状態を渡す
-    WaveState GetState(void)const { return state_; }
+    WAVE_STATE GetState(void)const { return state_; }
 
     // ウェーブ開始させる
     void StartInWave(void);
 
     // ネズミと猫ロボットのポインタをセット
-    void SetRatCatRobotPoint(std::vector<Rat*>rats, CatRobot* catRobot, Camera* camera)
+    void SetRatCatRobotPoint(Player* player, std::vector<Rat*>rats, CatRobot* catRobot, Camera* camera)
     {
-        rats_ = rats, catRobot_ = catRobot, camera_ = camera;
+        player_ = player, rats_ = rats, catRobot_ = catRobot, camera_ = camera;
     }
 
 protected:
@@ -53,16 +54,17 @@ protected:
     { -10.0f * DX_PI_F / 180.0f, -40.0f * DX_PI_F / 180.0f,0.0f };
 
     // スキップ時間の最大値
-    static constexpr float MAX_SKIP_TIME = 120.0f;
+    static constexpr float MAX_SKIP_TIME = 60.0f;
 
 protected:
+    Player* player_;
     std::vector<Rat*>rats_;
     CatRobot* catRobot_;
     Camera* camera_;
 
 protected:
     // ウェーブ状態
-    WaveState state_ = WaveState::EVENT;
+    WAVE_STATE state_ = WAVE_STATE::EVENT;
 
     // ネズミから猫ロボット時のカウント
     int ratToCatRobotCount_ = 0;
@@ -85,8 +87,8 @@ protected:
     virtual void OnPrepare(void) {};    
 
     // ウェーブ中
-    virtual void OnEvent(void) {};
-    virtual void OnRat(void) {};   
+    virtual void OnEvent(void);
+    virtual void OnRat(void);   
     virtual void OnCatRobot(void) {};   
 
     // クリア後
@@ -98,5 +100,5 @@ protected:
     virtual bool CheckCatRobotClear(void) = 0;
 
 	// ウェーブ状態を変更する
-    virtual void ChangeState(WaveState state);
+    virtual void ChangeState(WAVE_STATE state);
 };

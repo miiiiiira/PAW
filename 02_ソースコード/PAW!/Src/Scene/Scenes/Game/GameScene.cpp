@@ -21,11 +21,12 @@
 #include "../../../Object/Camera/CameraUtility.h"
 #include "../../../Object/Enemy/EnemyCommander.h"
 #include "../../../Object/Stage/Table/Table.h"
+#include "../../../Object/Stage/Floor/Floor.h"
 #include "../../../Object/Enemy/Wave/WaveManager.h"
 #include "../../../Object/Enemy/Wave/Wave1.h"
+#include "../../../Object/Enemy/Wave/Wave2.h"
 
 #include "GameScene.h"
-#include "../../../Object/Stage/Floor/Floor.h"
 
 namespace
 {
@@ -55,10 +56,12 @@ void GameScene::Init(void)
 	enemyCommander_->Init(rats,catRobot);
 
 	auto camera = objectManager_->FindComponentWithTag<Camera>(TAG_3D::CAMERA);
+	auto player = objectManager_->FindComponentWithTag<Player>(TAG_3D::PLAYER);
 
 	// ウェーブの作成・各ウェーブの追加
 	WaveManager::CreateInstance();
-	WaveManager::GetInstance().AddWave(std::make_unique<Wave1>(),rats, catRobot, camera);
+	WaveManager::GetInstance().AddWave(std::make_unique<Wave1>(), player, rats, catRobot, camera);
+	WaveManager::GetInstance().AddWave(std::make_unique<Wave2>(), player, rats, catRobot, camera);
 }
 
 void GameScene::Load(void)

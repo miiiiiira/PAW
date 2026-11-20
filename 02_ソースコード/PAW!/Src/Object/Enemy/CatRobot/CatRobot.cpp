@@ -9,6 +9,7 @@
 #include "Attack/CutleryAttack/CutleryAttack.h"
 #include "../../../Application.h"
 #include "../../../Audio/AudioManager.h"
+#include "../Wave/WaveManager.h"
 
 #include "CatRobot.h"
 
@@ -21,9 +22,6 @@ namespace
 	constexpr VECTOR CAPSULE_START_OFFSET = { 0.0f,2000.0f,0.0f };
 	constexpr VECTOR CAPSULE_END_OFFSET = { 0.0f,500.0f,0.0f };
 	constexpr float CAPSULE_RADIUS = 600.0f;
-
-	// 体力設定
-	constexpr int DEFAULT_HP = 20;	// 初期HP
 
 	// 重力設定
 	constexpr float GRAVITY = -1.98f;	// 重力加速度
@@ -621,7 +619,8 @@ void CatRobot::UpdateChanceStun(CatRobot& catRobot)
 {
 	catRobot.info_.stunTime_--;
 
-	if (catRobot.info_.stunTime_ <= 0)
+	if (catRobot.info_.stunTime_ <= 0 || 
+		WaveManager::GetInstance().GetCurrentWave()->GetState() != WaveBase::WAVE_STATE::CAT_ROBOT)
 	{
 		// スタン終了状態へ
 		catRobot.ChangeChanceState(CAT_ROBOT_CHANCE_END);

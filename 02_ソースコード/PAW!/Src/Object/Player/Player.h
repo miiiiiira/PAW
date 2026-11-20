@@ -39,6 +39,8 @@ public:
 	// テーブルのポインタをもらう
 	void SetTablePoint(const Transform* tableTransform) { tableTransform_ = tableTransform; }
 
+	// プレイヤーのパラメータをリセットする
+	void ResetPlayer(void);	
 private:
 	// 状態別更新処理
 	void UpdateState(void);

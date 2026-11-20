@@ -27,7 +27,7 @@ void Wave1::Draw(void)
 {
 	switch (state_)
 	{
-	case WaveBase::WaveState::EVENT:
+	case WaveBase::WAVE_STATE::EVENT:
 		if (rats_[0]->GetState() == RAT_STATE_EVENT_IDLE)
 		{
 			// 倒してやる画像
@@ -43,13 +43,13 @@ void Wave1::Draw(void)
 		}
 		break;
 
-	case WaveBase::WaveState::RAT:
+	case WaveBase::WAVE_STATE::RAT:
 		break;
 
-	case WaveBase::WaveState::CAT_ROBOT:
+	case WaveBase::WAVE_STATE::CAT_ROBOT:
 		break;
 
-	case WaveBase::WaveState::CLEARED:
+	case WaveBase::WAVE_STATE::CLEARED:
 		break;
 
 	default:
@@ -62,21 +62,7 @@ void Wave1::Draw(void)
 
 void Wave1::OnStart(void)
 {
-	// BGM再生
 	rats_[0]->ResetRat(RAT_SPAWN_POS);
-}
-
-void Wave1::OnEvent(void)
-{
-	// BGM再生
-	AudioManager::GetInstance()->PlayBGM(SoundID::BGM_RAT_EVENT);
-}
-
-void Wave1::OnRat(void)
-{
-	// タイマーとアルファ値の初期化
-	skipTimer_ = 0;
-	alpha_ = 0;
 }
 
 void Wave1::OnCatRobot(void)
@@ -91,8 +77,7 @@ bool Wave1::CheckEventClear(void)
 {
 	// スキップ処理を一定以上押されるか、イベント移動が終了したら
 	if (skipTimer_ >= MAX_SKIP_TIME||
-		(rats_[0]->GetState() != RAT_STATE_EVENT_MOVE &&
-		rats_[0]->GetState() != RAT_STATE_EVENT_IDLE))
+		rats_[0]->IsEndEventMove())
 	{
 		// BGMを鳴らす
 		AudioManager::GetInstance()->PlayBGM(SoundID::BGM_GAME);
@@ -104,7 +89,7 @@ bool Wave1::CheckEventClear(void)
 
 bool Wave1::CheckCatRobotClear(void)
 {
-	if (catRobot_->GetNowHP() <= 0)
+	if (catRobot_->GetNowHP() <= CatRobot::DEFAULT_HP - 5)
 	{
 		return true;
 	}
@@ -112,28 +97,28 @@ bool Wave1::CheckCatRobotClear(void)
 	return false;
 }
 
-void Wave1::ChangeState(WaveState state)
+void Wave1::ChangeState(WAVE_STATE state)
 {
 	state_ = state;
 
 	switch (state_)
 	{
-	case WaveBase::WaveState::EVENT:
+	case WaveBase::WAVE_STATE::EVENT:
 		// カメラのモード変更
 		camera_->ChangeMode(Camera::MODE::FIXED, EVENT_CAMERA_POS, EVENT_CAMERA_ANGLE);
 		break;
 
-	case WaveBase::WaveState::RAT:
+	case WaveBase::WAVE_STATE::RAT:
 		rats_[0]->SetEventEndPos(RAT_SPAWN_POS);
 
 		// カメラのモード変更
 		camera_->ChangeMode(Camera::MODE::FOLLOW);
 		break;
 
-	case WaveBase::WaveState::CAT_ROBOT:
+	case WaveBase::WAVE_STATE::CAT_ROBOT:
 		break;
 
-	case WaveBase::WaveState::CLEARED:
+	case WaveBase::WAVE_STATE::CLEARED:
 		break;
 
 	default:
