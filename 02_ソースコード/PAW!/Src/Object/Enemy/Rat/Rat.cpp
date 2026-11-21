@@ -139,10 +139,8 @@ void Rat::Init(void)
 	// コンポーネントの追加
 	AddComponets();
 
-	info_.hp_ = DEFAULT_HP;
-
 	// ネズミの状態初期化
-	ChangeState(RAT_STATE_IDLE);
+	ChangeState(RAT_STATE_END);
 }
 
 void Rat::Update(void)
@@ -768,13 +766,14 @@ void Rat::AddComponets(void)
 		40.0f);
 
 	// タグの設定
-	capsuleCollder_->SetCollisionTag(CollisionTag::ENEMY);
+	capsuleCollder_->SetCollisionTag(CollisionTag::NONE);
 	capsuleCollder_->SetInverseMass(1.0f);
 
 	// 3Dモデル設定
 	render3D_ = owner_->AddComponent<Render3D>();
 	render3D_->Init();
 	render3D_->SetModel("Data/Model/Enemy/Enemy.mv1");
+	render3D_->SetIsDraw(false);
 
 	// アニメーション設定
 	animation_ = owner_->AddComponent<Animation>();
