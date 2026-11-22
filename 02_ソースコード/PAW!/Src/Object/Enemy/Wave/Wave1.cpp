@@ -3,6 +3,7 @@
 #include "../../../Audio/AudioManager.h"
 #include "../../Component/Transform/Transform.h"
 #include "../../Camera/Camera.h"
+#include "../../../System/Fader/Fader.h"
 
 #include "Wave1.h"
 
@@ -33,11 +34,11 @@ void Wave1::Draw(void)
 			// 倒してやる画像
 			DrawBillboard3D(
 				{ rats_[0]->GetTransform()->pos_.x + 60.0f ,
-				rats_[0]->GetTransform()->pos_.y + 120.0f , 
+				rats_[0]->GetTransform()->pos_.y + 120.0f ,
 				rats_[0]->GetTransform()->pos_.z - 20.0f },
 				0.7f, 0.7f,
 				64.0f,
-				-0.1f, 
+				-0.1f,
 				taositeyaruImage_,
 				true);
 		}
@@ -76,7 +77,7 @@ void Wave1::OnClear(void)
 bool Wave1::CheckEventClear(void)
 {
 	// スキップ処理を一定以上押されるか、イベント移動が終了したら
-	if (skipTimer_ >= MAX_SKIP_TIME||
+	if (skipTimer_ >= MAX_SKIP_TIME ||
 		rats_[0]->IsEndEventMove())
 	{
 		// BGMを鳴らす
@@ -97,10 +98,8 @@ bool Wave1::CheckCatRobotClear(void)
 	return false;
 }
 
-void Wave1::ChangeState(WAVE_STATE state)
+void Wave1::ChangeInit(void)
 {
-	state_ = state;
-
 	switch (state_)
 	{
 	case WaveBase::WAVE_STATE::EVENT:
@@ -119,6 +118,7 @@ void Wave1::ChangeState(WAVE_STATE state)
 		break;
 
 	case WaveBase::WAVE_STATE::CLEARED:
+		Fader::GetInstance()->SetFade(Fader::STATE::FADE_OUT, Fader::TYPE::CROSS, true);
 		break;
 
 	default:

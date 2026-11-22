@@ -73,7 +73,7 @@ void SceneManager::Init3D(void)
 	SetLightEnable(true);
 
 	SetLightDifColor(GetColorF(1.0f, 1.0f, 1.0f, 1.0f));
-	
+
 	// フォグ設定
 	SetFogEnable(false);
 	// フォグの色
@@ -231,7 +231,7 @@ void SceneManager::NextChangeScene(std::shared_ptr<SceneBase> scene, SCENE_TAG s
 
 	// 状態をフェードに
 	changeState_ = CHANGE_STATE::FADE_OUT;
-	
+
 	// フェードアウト
 	Fader::GetInstance()->SetFade(Fader::STATE::FADE_OUT, type);
 }

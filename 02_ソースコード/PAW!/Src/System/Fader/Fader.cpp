@@ -19,7 +19,7 @@ Fader::~Fader(void)
 	// シャッター画像解放
 	for (int i = 0; i < SHUTTER_IMG_NUM; ++i)
 	{
-		DeleteGraph( shutterImg_[i]);
+		DeleteGraph(shutterImg_[i]);
 	}
 }
 
@@ -46,8 +46,17 @@ void Fader::Update(void)
 		// 最大アルファ値に達したら
 		if (alpha_ > ALPHA_MAX)
 		{
-			// フェード終了
-			state_ = STATE::END;
+			alpha_ = ALPHA_MAX;
+
+			if (isOutIn_)
+			{
+				state_ = STATE::FADE_IN;
+			}
+			else
+			{
+				// フェード終了
+				state_ = STATE::END;
+			}
 		}
 
 		break;
@@ -60,6 +69,8 @@ void Fader::Update(void)
 		// 最低アルファ値に達したら
 		if (alpha_ < 0)
 		{
+			alpha_ = 0;
+
 			// フェード終了
 			state_ = STATE::END;
 		}
@@ -123,7 +134,7 @@ void Fader::Draw(void)
 		DrawRotaGraph(sizeX, -sizeY + h, 1.0, 0.0, shutterImg_[0], true);
 		DrawRotaGraph(sizeX, Application::SCREEN_SIZE_Y + sizeY - h, 1.0, 0.0, shutterImg_[1], true);
 	}
-		break;
+	break;
 	case Fader::TYPE::WIPE:
 
 		w = static_cast<int>(screenX * 0.5f * rate);
@@ -135,9 +146,9 @@ void Fader::Draw(void)
 	case Fader::TYPE::CROSS:
 
 		h = static_cast<int>(screenY * 0.5f * rate);
-		w =	static_cast<int>(screenX * 0.5f * rate);
+		w = static_cast<int>(screenX * 0.5f * rate);
 
-		DrawBox(0, 0, screenX, h, color_,true);
+		DrawBox(0, 0, screenX, h, color_, true);
 		DrawBox(0, screenY - h, screenX, screenY, color_, true);
 		DrawBox(0, 0, w, screenY, color_, true);
 		DrawBox(screenX - w, 0, screenX, screenY, color_, true);
@@ -153,10 +164,11 @@ Fader::STATE Fader::GetState(void)
 	return state_;
 }
 
-void Fader::SetFade(STATE state, TYPE type, unsigned int color)
+void Fader::SetFade(STATE state, TYPE type, bool isOutIn, unsigned int color)
 {
 	state_ = state;
 	type_ = type;
+	isOutIn_ = isOutIn;
 
 	switch (state)
 	{

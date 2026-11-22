@@ -29,8 +29,7 @@ protected:
     bool CheckCatRobotClear(void)override;
 
     // ウェーブ状態を変更する
-    void ChangeState(WAVE_STATE state)override;
-
+    void ChangeInit(void)override;
 private:
     int taositeyaruImage_ = -1;
 };

@@ -4,6 +4,7 @@
 #include "../../../Audio/AudioManager.h"
 #include "../../Component/Transform/Transform.h"
 #include "../../Camera/Camera.h"
+#include "../../../System/Fader/Fader.h"
 
 #include "Wave2.h"
 
@@ -76,10 +77,8 @@ bool Wave2::CheckCatRobotClear(void)
 	return false;
 }
 
-void Wave2::ChangeState(WAVE_STATE state)
+void Wave2::ChangeInit(void)
 {
-	state_ = state;
-
 	switch (state_)
 	{
 	case WaveBase::WAVE_STATE::EVENT:
@@ -99,6 +98,7 @@ void Wave2::ChangeState(WAVE_STATE state)
 		break;
 
 	case WaveBase::WAVE_STATE::CLEARED:
+		//Fader::GetInstance()->SetFade(Fader::STATE::FADE_OUT);
 		break;
 
 	default:

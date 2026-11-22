@@ -180,25 +180,6 @@ void WaveBase::ChangeState(WAVE_STATE state)
 {
     state_ = state;
 
-    switch (state_)
-    {
-    case WaveBase::WAVE_STATE::EVENT:
-        // カメラのモード変更
-        camera_->ChangeMode(Camera::MODE::FIXED, EVENT_CAMERA_POS, EVENT_CAMERA_ANGLE);
-        break;
-
-    case WaveBase::WAVE_STATE::RAT:
-        // カメラのモード変更
-        camera_->ChangeMode(Camera::MODE::FOLLOW);
-        break;
-
-    case WaveBase::WAVE_STATE::CAT_ROBOT:
-        break;
-
-    case WaveBase::WAVE_STATE::CLEARED:
-        break;
-
-    default:
-        break;
-    }
+    // 状態変更時の初期化
+    ChangeInit();
 }

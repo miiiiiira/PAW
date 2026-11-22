@@ -17,6 +17,9 @@
 
 namespace
 {
+	// 初期化系
+	constexpr VECTOR DEFAULT_ANGLE = { 0.0f,DX_PI_F,0.0f };
+
 	// リミット設定
 	constexpr float DAMAGE_POS_Y = -2000.0f;	// プレイヤーがダメージを受ける座標
 	constexpr int INVINCIBLE_TIME = 120;		// 無敵時間
@@ -267,14 +270,16 @@ void Player::Init(void)
 // 更新
 void Player::Update(void)
 {
+
 	// 終了していたら処理を行わない
 	if (stateCtrl_.state_ == PLAYER_STATE_END)
 	{
 		return;
 	}
 
-	// イベントシーン時は更新を行わない
+	// イベントシーン時、フェード中は更新を行わない
 	if (WaveManager::GetInstance().GetCurrentWave()->GetState() == WaveBase::WAVE_STATE::EVENT)return;
+	if (Fader::GetInstance()->GetState() != Fader::STATE::NONE)return;
 
 	// 状態別更新処理
 	UpdateState();
@@ -329,6 +334,10 @@ void Player::ResetPlayer(void)
 	// 座標を初期化
 	transform_->pos_ = {};
 	MV1SetPosition(render3D_->GetHandle(), transform_->pos_);
+
+	// 角度を初期化
+	transform_->angle_ = DEFAULT_ANGLE;
+	MV1SetRotationXYZ(render3D_->GetHandle(), transform_->angle_);
 
 	// 球の当たり判定を行わないようタグをNONEへ
 	sphereCollder_->SetCollisionTag(CollisionTag::NONE);
@@ -890,7 +899,7 @@ void Player::AddComponets(void)
 	// 座標の設定
 	transform_ = owner_->AddComponent<Transform>();
 	transform_->pos_ = {};
-	transform_->angle_ = { 0.0f,DX_PI_F,0.0f };
+	transform_->angle_ = DEFAULT_ANGLE;
 	transform_->scale_ = { 4.0f,4.0f,4.0f };
 
 	// 当たり判定の設定(カプセル)

@@ -11,94 +11,95 @@ class Camera;
 class WaveBase
 {
 public:
-    // ウェーブの状態
-    enum class WAVE_STATE
-    {
-        EVENT,     // イベント
-        RAT,       // ネズミ
-        CAT_ROBOT, // 猫ロボット
-        CLEARED    // クリア済み
-    };
+	// ウェーブの状態
+	enum class WAVE_STATE
+	{
+		EVENT,     // イベント
+		RAT,       // ネズミ
+		CAT_ROBOT, // 猫ロボット
+		CLEARED    // クリア済み
+	};
 
 public:
-    // コンストラクタで設定
-    WaveBase(void);
-    virtual ~WaveBase(void);
+	// コンストラクタで設定
+	WaveBase(void);
+	virtual ~WaveBase(void);
 
-    virtual void Update(void);  // 更新
-    virtual void Draw(void);    // 描画
+	virtual void Update(void);  // 更新
+	virtual void Draw(void);    // 描画
 
 public:
-    // ウェーブの状態を渡す
-    WAVE_STATE GetState(void)const { return state_; }
+	// ウェーブの状態を渡す
+	WAVE_STATE GetState(void)const { return state_; }
 
-    // ウェーブ開始させる
-    void StartInWave(void);
+	// ウェーブ開始させる
+	void StartInWave(void);
 
-    // ネズミと猫ロボットのポインタをセット
-    void SetRatCatRobotPoint(Player* player, std::vector<Rat*>rats, CatRobot* catRobot, Camera* camera)
-    {
-        player_ = player, rats_ = rats, catRobot_ = catRobot, camera_ = camera;
-    }
+	// ネズミと猫ロボットのポインタをセット
+	void SetRatCatRobotPoint(Player* player, std::vector<Rat*>rats, CatRobot* catRobot, Camera* camera)
+	{
+		player_ = player, rats_ = rats, catRobot_ = catRobot, camera_ = camera;
+	}
 
 protected:
-    // 固定フレーム
-    static constexpr int ONE_SECOND = 60;
+	// 固定フレーム
+	static constexpr int ONE_SECOND = 60;
 
-    // ネズミから猫ロボット時のカウント
-    static constexpr int RAT_TO_CATROBOT_COUNT = 120;
+	// ネズミから猫ロボット時のカウント
+	static constexpr int RAT_TO_CATROBOT_COUNT = 120;
 
 	// イベントシーン時のカメラ座標
-    static constexpr VECTOR EVENT_CAMERA_POS = { 200.0f,30.0f,400.0f };
-    static constexpr VECTOR EVENT_CAMERA_ANGLE =
-    { -10.0f * DX_PI_F / 180.0f, -40.0f * DX_PI_F / 180.0f,0.0f };
+	static constexpr VECTOR EVENT_CAMERA_POS = { 200.0f,30.0f,400.0f };
+	static constexpr VECTOR EVENT_CAMERA_ANGLE =
+	{ -10.0f * DX_PI_F / 180.0f, -40.0f * DX_PI_F / 180.0f,0.0f };
 
-    // スキップ時間の最大値
-    static constexpr float MAX_SKIP_TIME = 60.0f;
-
-protected:
-    Player* player_;
-    std::vector<Rat*>rats_;
-    CatRobot* catRobot_;
-    Camera* camera_;
+	// スキップ時間の最大値
+	static constexpr float MAX_SKIP_TIME = 60.0f;
 
 protected:
-    // ウェーブ状態
-    WAVE_STATE state_ = WAVE_STATE::EVENT;
-
-    // ネズミから猫ロボット時のカウント
-    int ratToCatRobotCount_ = 0;
-
-    // スキップタイマー
-    int skipTimer_ = 0;
-
-    // スキップ画像のハンドルとゲージのハンドル
-    int skipHandle_ = 0;
-    int skipGauge_ = 0;
-
-    // アルファ値
-    int alpha_ = 0;
+	Player* player_;
+	std::vector<Rat*>rats_;
+	CatRobot* catRobot_;
+	Camera* camera_;
 
 protected:
-    // システム起動
-    virtual void OnStart(void) {};   
+	// ウェーブ状態
+	WAVE_STATE state_ = WAVE_STATE::EVENT;
 
-    // 準備期間中
-    virtual void OnPrepare(void) {};    
+	// ネズミから猫ロボット時のカウント
+	int ratToCatRobotCount_ = 0;
 
-    // ウェーブ中
-    virtual void OnEvent(void);
-    virtual void OnRat(void);   
-    virtual void OnCatRobot(void) {};   
+	// スキップタイマー
+	int skipTimer_ = 0;
 
-    // クリア後
-    virtual void OnClear(void) {};       
+	// スキップ画像のハンドルとゲージのハンドル
+	int skipHandle_ = 0;
+	int skipGauge_ = 0;
 
-    // クリア条件
-    virtual bool CheckEventClear(void) = 0;
-    virtual bool CheckRatClear(void);
-    virtual bool CheckCatRobotClear(void) = 0;
+	// アルファ値
+	int alpha_ = 0;
+
+protected:
+	// システム起動
+	virtual void OnStart(void) {};
+
+	// 準備期間中
+	virtual void OnPrepare(void) {};
+
+	// ウェーブ中
+	virtual void OnEvent(void);
+	virtual void OnRat(void);
+	virtual void OnCatRobot(void) {};
+
+	// クリア後
+	virtual void OnClear(void) {};
+
+	// クリア条件
+	virtual bool CheckEventClear(void) = 0;
+	virtual bool CheckRatClear(void);
+	virtual bool CheckCatRobotClear(void) = 0;
 
 	// ウェーブ状態を変更する
-    virtual void ChangeState(WAVE_STATE state);
+	virtual void ChangeState(WAVE_STATE state);
+	virtual void ChangeInit(void) = 0;
 };

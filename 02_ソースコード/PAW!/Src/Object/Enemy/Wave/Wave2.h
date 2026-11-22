@@ -28,7 +28,6 @@ protected:
     bool CheckEventClear(void)override;
     bool CheckCatRobotClear(void)override;
 
-    // ウェーブ状態を変更する
-    void ChangeState(WAVE_STATE state)override;
-
+    // ウェーブ状態を変更時の初期化関数
+    void ChangeInit(void)override;
 };

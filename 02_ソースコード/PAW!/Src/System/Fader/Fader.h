@@ -34,7 +34,7 @@ public:
 	STATE GetState(void);
 
 	// 指定フェードを開始する
-	void SetFade(STATE state, TYPE type = TYPE::NORMAL, unsigned int color = 0x000000);
+	void SetFade(STATE state,TYPE type = TYPE::NORMAL, bool isOutIn = false, unsigned int color = 0x000000);
 
 private:
 
@@ -70,4 +70,6 @@ private:
 
 	// シャッター画像
 	int shutterImg_[SHUTTER_IMG_NUM];
+
+	bool isOutIn_ = false;
 };
