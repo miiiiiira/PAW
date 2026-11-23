@@ -189,6 +189,8 @@
     <ClCompile Include="Src\System\Fader\Fader.cpp" />
     <ClCompile Include="Src\System\FpsControl\FpsControl.cpp" />
     <ClCompile Include="Src\Object\Enemy\Wave\Wave2.cpp" />
+    <ClCompile Include="Src\Object\Enemy\Wave\Wave3.cpp" />
+    <ClCompile Include="Src\Object\Enemy\Wave\Wave4.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Object\Enemy\CatRobot\Attack\CutleryAttack\CutleryAttack.h" />
@@ -254,6 +256,8 @@
     <ClInclude Include="Src\System\Fader\Fader.h" />
     <ClInclude Include="Src\System\FpsControl\FpsControl.h" />
     <ClInclude Include="Src\Object\Enemy\Wave\Wave2.h" />
+    <ClInclude Include="Src\Object\Enemy\Wave\Wave3.h" />
+    <ClInclude Include="Src\Object\Enemy\Wave\Wave4.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

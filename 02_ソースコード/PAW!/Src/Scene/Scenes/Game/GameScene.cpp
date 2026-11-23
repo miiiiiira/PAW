@@ -25,6 +25,8 @@
 #include "../../../Object/Enemy/Wave/WaveManager.h"
 #include "../../../Object/Enemy/Wave/Wave1.h"
 #include "../../../Object/Enemy/Wave/Wave2.h"
+#include "../../../Object/Enemy/Wave/Wave3.h"
+#include "../../../Object/Enemy/Wave/Wave4.h"
 
 #include "GameScene.h"
 
@@ -62,6 +64,8 @@ void GameScene::Init(void)
 	WaveManager::CreateInstance();
 	WaveManager::GetInstance().AddWave(std::make_unique<Wave1>(), player, rats, catRobot, camera);
 	WaveManager::GetInstance().AddWave(std::make_unique<Wave2>(), player, rats, catRobot, camera);
+	WaveManager::GetInstance().AddWave(std::make_unique<Wave3>(), player, rats, catRobot, camera);
+	WaveManager::GetInstance().AddWave(std::make_unique<Wave4>(), player, rats, catRobot, camera);
 }
 
 void GameScene::Load(void)

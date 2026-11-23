@@ -10,8 +10,8 @@
 
 namespace
 {
-	constexpr VECTOR RAT_SPAWN_POS = { -100.0f, 0.0f, 1500.0f };
-	constexpr VECTOR RAT2_SPAWN_POS = { 100.0f, 0.0f, 1500.0f };
+	constexpr VECTOR RAT_SPAWN_POS = { -60.0f, 0.0f, 1500.0f };
+	constexpr VECTOR RAT2_SPAWN_POS = { 60.0f, 0.0f, 1500.0f };
 }
 
 Wave2::Wave2(void)
@@ -98,7 +98,7 @@ void Wave2::ChangeInit(void)
 		break;
 
 	case WaveBase::WAVE_STATE::CLEARED:
-		//Fader::GetInstance()->SetFade(Fader::STATE::FADE_OUT);
+		Fader::GetInstance()->SetFade(Fader::STATE::FADE_OUT, Fader::TYPE::CROSS, true);
 		break;
 
 	default:
