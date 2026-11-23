@@ -112,7 +112,7 @@ bool TitleScene::ChangeMainMenu(void)
 		AudioManager::GetInstance()->PlaySE(SoundID::SE_CHIME);
 
 		// メインメニューを積む
-		SceneManager::GetInstance()->PushScene(std::make_shared<MainMenu>());
+		SceneManager::GetInstance()->PushScene(std::make_shared<MainMenu>(), SCENE_TAG::MAINMANU);
 		return true;
 	}
 
@@ -125,7 +125,7 @@ bool TitleScene::ChangeConfirmScene(void)
 	if (InputManager::GetInstance()->IsTrgDown(KEY_INPUT_ESCAPE))
 	{
 		// 確認画面を積む
-		SceneManager::GetInstance()->PushScene(std::make_shared<Confirm>());
+		SceneManager::GetInstance()->PushScene(std::make_shared<Confirm>(), SCENE_TAG::CONFIRM);
 		return true;
 	}
 

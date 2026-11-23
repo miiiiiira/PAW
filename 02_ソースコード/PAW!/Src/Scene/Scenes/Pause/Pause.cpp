@@ -127,8 +127,12 @@ void Pause::Draw(void)
 		if (button.type == currentPause_)
 		{
 			DrawRotaGraphF(button.x, button.y, 1.0f, 0.0f, button.graphHandleOn, true);
-			// 肉球描画
-			Paw::GetInstance()->DrawF(button.x - PAW_OFFSET_X, button.y);
+			// ポーズだったら
+			if (SceneManager::GetInstance()->GetNowSceneTag() == SCENE_TAG::PAUSE)
+			{
+				// 肉球描画
+				Paw::GetInstance()->DrawF(button.x - PAW_OFFSET_X, button.y);
+			}
 		}
 		// 選択されていないボタン
 		else
@@ -179,7 +183,7 @@ void Pause::UpdateContinue(void)
 		MouseCursor::GetInstance()->SetMouseDraw(false);
 
 		// ゲームシーンへ
-		SceneManager::GetInstance()->PopScene(SCENE_TAG::GAME);
+		SceneManager::GetInstance()->PopScene();
 	}
 }
 
@@ -205,7 +209,7 @@ void Pause::UpdateExit(void)
 		AudioManager::GetInstance()->PlaySE(SoundID::SYS_BUTTON);
 
 		// 確認画面を積む
-		SceneManager::GetInstance()->PushScene(std::make_shared<Confirm>());
+		SceneManager::GetInstance()->PushScene(std::make_shared<Confirm>(), SCENE_TAG::CONFIRM);
 	}
 }
 

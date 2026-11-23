@@ -129,8 +129,12 @@ void MainMenu::Draw(void)
 		if (button.type == currentMenu_)
 		{
 			DrawRotaGraphF(button.x, button.y, 1.0f, 0.0f, button.graphHandleOn, true);
-			// 肉球描画
-			Paw::GetInstance()->DrawF(button.x - PAW_OFFSET_X, button.y);
+			// メインメニューだったら
+			if (SceneManager::GetInstance()->GetNowSceneTag() == SCENE_TAG::MAINMANU)
+			{
+				// 肉球描画
+				Paw::GetInstance()->DrawF(button.x - PAW_OFFSET_X, button.y);
+			}
 		}
 		// 選択されていないボタン
 		else
@@ -199,7 +203,7 @@ void MainMenu::UpdateExit(void)
 		AudioManager::GetInstance()->PlaySE(SoundID::SYS_BUTTON);
 
 		// 確認画面を積む
-		SceneManager::GetInstance()->PushScene(std::make_shared<Confirm>());
+		SceneManager::GetInstance()->PushScene(std::make_shared<Confirm>(), SCENE_TAG::CONFIRM);
 	}
 }
 

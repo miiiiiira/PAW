@@ -262,14 +262,6 @@ void SceneManager::ChangeScene(std::shared_ptr<SceneBase>scene)
 	load_->EndAsyncLoad();
 }
 
-void SceneManager::PushScene(std::shared_ptr<SceneBase> scene)
-{
-	//新しく積むのでもともと入っている奴はまだ削除されない
-	scenes_.push_back(scene);
-	scenes_.back()->Load();
-	scenes_.back()->Init();
-}
-
 void SceneManager::PushScene(std::shared_ptr<SceneBase> scene, SCENE_TAG sceneTag)
 {
 	//新しく積むのでもともと入っている奴はまだ削除されない
@@ -278,6 +270,7 @@ void SceneManager::PushScene(std::shared_ptr<SceneBase> scene, SCENE_TAG sceneTa
 	scenes_.back()->Init();
 
 	// シーンタグを設定
+	prevSceneTag_ = nowSceneTag_;
 	nowSceneTag_ = sceneTag;
 }
 
@@ -289,19 +282,10 @@ void SceneManager::PopScene(void)
 		scenes_.back()->Release();
 		scenes_.pop_back();
 	}
-}
 
-void SceneManager::PopScene(SCENE_TAG sceneTag)
-{
-	//積んであるものを消して、もともとあったものを末尾にする
-	if (scenes_.size() > 0)
-	{
-		scenes_.back()->Release();
-		scenes_.pop_back();
-	}
-
-	// シーンタグを設定
-	nowSceneTag_ = sceneTag;
+	// 元のシーンタグへ戻す
+	nowSceneTag_ = prevSceneTag_;
+	prevSceneTag_ = SCENE_TAG::NONE;
 }
 
 void SceneManager::JumpScene(std::shared_ptr<SceneBase> scene)

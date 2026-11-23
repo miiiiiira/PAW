@@ -144,8 +144,12 @@ void Confirm::Draw(void)
 		if (button.type == currentSelect_)
 		{
 			DrawRotaGraphF(button.x, button.y, 1.0f, 0.0f, button.graphHandleOn, true);
-			// 肉球描画
-			Paw::GetInstance()->DrawF(button.x - PAW_OFFSET_X, button.y);
+			// 確認シーンだったら
+			if (SceneManager::GetInstance()->GetNowSceneTag() == SCENE_TAG::CONFIRM)
+			{
+				// 肉球描画
+				Paw::GetInstance()->DrawF(button.x - PAW_OFFSET_X, button.y);
+			}
 		}
 		// 選択されていないボタン
 		else

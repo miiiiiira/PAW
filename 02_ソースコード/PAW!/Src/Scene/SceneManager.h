@@ -54,12 +54,10 @@ public:
 	void ChangeScene(std::shared_ptr<SceneBase> scene);
 
 	// シーンを新しく積む
-	void PushScene(std::shared_ptr<SceneBase> scene);
 	void PushScene(std::shared_ptr<SceneBase> scene, SCENE_TAG sceneTag);
 
 	// 最後に追加したシーンを削除する。
 	void PopScene(void);
-	void PopScene(SCENE_TAG sceneTag);
 
 	// 強制的に特定のシーンに飛ぶ。リセットをかけ特定のシーンのみにする。
 	void JumpScene(std::shared_ptr<SceneBase> scene);
@@ -115,5 +113,6 @@ private:
 	bool isOver_ = false;
 
 	// 現在のシーンのタグを保持
-	SCENE_TAG nowSceneTag_;
+	SCENE_TAG nowSceneTag_ = SCENE_TAG::NONE;;
+	SCENE_TAG prevSceneTag_ = SCENE_TAG::NONE;;
 };
