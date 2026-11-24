@@ -357,31 +357,34 @@ void CatRobot::UpdateAttackSelect(CatRobot& catRobot)
 	// 0Å`2Ç…Ç∑ÇÈ
 	rand %= 5;
 
-	switch (rand)
-	{
-	case 0:
-		// çUåÇ1Ç÷
-		catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_1);
-		break;
-	case 1:
-		// çUåÇ2Ç÷
-		catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_2);
-		break;
-	case 2:
-		// çUåÇ3Ç÷
-		catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_3);
-		break;
-	case 3:
-		// çUåÇ3Ç÷
-		catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_4);
-		break;
-	case 4:
-		// çUåÇ3Ç÷
-		catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_5);
-		break;
-	default:
-		break;
-	}
+	//switch (rand)
+	//{
+	//case 0:
+	//	// çUåÇ1Ç÷
+	//	catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_1);
+	//	break;
+	//case 1:
+	//	// çUåÇ2Ç÷
+	//	catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_2);
+	//	break;
+	//case 2:
+	//	// çUåÇ3Ç÷
+	//	catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_3);
+	//	break;
+	//case 3:
+	//	// çUåÇ3Ç÷
+	//	catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_4);
+	//	break;
+	//case 4:
+	//	// çUåÇ3Ç÷
+	//	catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_5);
+	//	break;
+	//default:
+	//	break;
+	//}
+
+	catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_2);
+
 }
 
 void CatRobot::UpdateAttack1(CatRobot& catRobot)

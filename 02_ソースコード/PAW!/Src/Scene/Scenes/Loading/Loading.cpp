@@ -8,7 +8,7 @@ namespace
 	constexpr int CHANGE_INTERVAL = 25;
 
 	// Å’á‚Å‚àƒ[ƒh‰æ–Ê‚ğ•\¦‚·‚éŠÔ
-	constexpr int MIN_LOAD_TIME = 60;	
+	constexpr int MIN_LOAD_TIME = 90;	
 
 	// •ªŠ„”c‰¡
 	constexpr int DIV_NUM_XY = 2;	
@@ -26,7 +26,7 @@ Loading::Loading(void)
 void Loading::Init(void)
 {
 	// •`‰æí—Ş‚Ì‰Šú‰»
-	nowType_ = Loading0;
+	nowType_ = LOADING_0;
 
 	// Å’á•`‰æŠÔ‚Ì‰Šú‰»
 	loadTimer_ = 0;
@@ -41,17 +41,14 @@ void Loading::Init(void)
 void Loading::Load(void)
 {
 	// 1–‡‚Ì‰æ‘œ‚ğ•ªŠ„‚µ‚Ä“Ç‚İ‚İ
-	for (int i = 0; i < static_cast<int>(NOW_TYPE::MAX); i++)
-	{
-		LoadDivGraph(
-			"Data/Image/Loading/Loading.png",
-			static_cast<int>(NOW_TYPE::MAX),
-			DIV_NUM_XY,
-			DIV_NUM_XY,
-			Application::SCREEN_SIZE_X,
-			Application::SCREEN_SIZE_Y,
-			handles_);
-	}
+	LoadDivGraph(
+		"Data/Image/Loading/Loading.png",
+		static_cast<int>(NOW_TYPE::MAX),
+		DIV_NUM_XY,
+		DIV_NUM_XY,
+		Application::SCREEN_SIZE_X,
+		Application::SCREEN_SIZE_Y,
+		handles_);
 }
 
 void Loading::Update(void)

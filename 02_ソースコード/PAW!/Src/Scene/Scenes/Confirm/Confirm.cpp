@@ -55,18 +55,8 @@ void Confirm::Init(void)
 void Confirm::Load(void)
 {
 	// 画像のロード
-	switch (SceneManager::GetInstance()->GetNowSceneTag())
-	{
-	case SCENE_TAG::TITLE:
-	case SCENE_TAG::MAINMANU:
-	case SCENE_TAG::PAUSE:
-		// ゲーム終了時の確認画面
-		confirmImg_ = LoadGraph("Data/Image/Confirm/ConfirmExit.png");
-		break;
-
-	default:
-		break;
-	}
+	// ゲーム終了時の確認画面
+	confirmImg_ = LoadGraph("Data/Image/Confirm/ConfirmExit.png");
 
 	// 猫画像
 	catImg_[static_cast<int>(CAT_TYPE::OPEN_EYES)] =
@@ -207,20 +197,9 @@ void Confirm::UpdateYes(void)
 	// 決定ボタンを押されたら
 	if (InputManager::GetInstance()->DecideButton())
 	{
-		// 画像のロード
-		switch (SceneManager::GetInstance()->GetNowSceneTag())
-		{
-		case SCENE_TAG::TITLE:
-		case SCENE_TAG::MAINMANU:
-		case SCENE_TAG::PAUSE:
-			// ボタン押下のSEを流す
-			AudioManager::GetInstance()->PlaySE(SoundID::SYS_BUTTON);
-			Application::GetInstance()->SetEnd(true);
-			break;
-
-		default:
-			break;
-		}
+		// ボタン押下のSEを流す
+		AudioManager::GetInstance()->PlaySE(SoundID::SYS_BUTTON);
+		Application::GetInstance()->SetEnd(true);
 	}
 }
 

@@ -51,6 +51,7 @@
     <ClCompile Include="Src\Object\Enemy\Wave\Wave2.cpp" />
     <ClCompile Include="Src\Object\Enemy\Wave\Wave3.cpp" />
     <ClCompile Include="Src\Object\Enemy\Wave\Wave4.cpp" />
+    <ClCompile Include="Src\Object\UI\DangerIndicator\DangerIndicator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Application.h" />
@@ -118,5 +119,6 @@
     <ClInclude Include="Src\Object\Enemy\Wave\Wave2.h" />
     <ClInclude Include="Src\Object\Enemy\Wave\Wave3.h" />
     <ClInclude Include="Src\Object\Enemy\Wave\Wave4.h" />
+    <ClInclude Include="Src\Object\UI\DangerIndicator\DangerIndicator.h" />
   </ItemGroup>
 </Project>

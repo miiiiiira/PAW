@@ -27,6 +27,7 @@
 #include "../../../Object/Enemy/Wave/Wave2.h"
 #include "../../../Object/Enemy/Wave/Wave3.h"
 #include "../../../Object/Enemy/Wave/Wave4.h"
+#include "../../../Object/UI/DangerIndicator/DangerIndicator.h"
 
 #include "GameScene.h"
 
@@ -66,6 +67,9 @@ void GameScene::Init(void)
 	WaveManager::GetInstance().AddWave(std::make_unique<Wave2>(), player, rats, catRobot, camera);
 	WaveManager::GetInstance().AddWave(std::make_unique<Wave3>(), player, rats, catRobot, camera);
 	WaveManager::GetInstance().AddWave(std::make_unique<Wave4>(), player, rats, catRobot, camera);
+
+	// 危険表示器の初期化
+	indicator_->Init();
 }
 
 void GameScene::Load(void)
@@ -100,6 +104,11 @@ void GameScene::Load(void)
 	// 敵司令官の生成
 	enemyCommander_ = new EnemyCommander();
 
+	// 危険表示器の生成
+	auto catRobot = objectManager_->FindComponentWithTag<CatRobot>(TAG_3D::CAT_ROBOT);
+	indicator_ = new DangerIndicator(*catRobot);
+	indicator_->Load();
+
 	// サウンド読みこみ
 	AudioManager::GetInstance()->LoadSceneSound(LoadScene::GAME);
 }
@@ -130,6 +139,9 @@ void GameScene::Update(void)
 
 	// 敵司令官の更新
 	enemyCommander_->Update();
+
+	// 危険表示器の更新
+	indicator_->Update();
 
 	// 毎フレーム登録をリセット
 	CollisionManager::GetInstance()->Clear();
@@ -180,6 +192,9 @@ void GameScene::Draw(void)
 	// ウェーブの描画
 	WaveManager::GetInstance().Draw();
 
+	// 危険表示器描画
+	indicator_->Draw();
+
 #ifdef _DEBUG
 
 	DrawString(0, 0, "Game", 0xffffff);
@@ -190,6 +205,11 @@ void GameScene::Draw(void)
 
 void GameScene::Release(void)
 {
+	// 危険表示器の解放
+	indicator_->Release();
+	delete indicator_;
+	indicator_ = nullptr;
+
 	// ウェーブの解放
 	WaveManager::GetInstance().DeleteInstance();
 

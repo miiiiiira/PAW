@@ -8,10 +8,10 @@ public:
 	// Œ»İ•`‰æ‚µ‚Ä‚¢‚é‰æ‘œ‚Ìí—Ş
 	enum NOW_TYPE
 	{
-		Loading0,
-		Loading1,
-		Loading2,
-		Loading3,
+		LOADING_0,
+		LOADING_1,
+		LOADING_2,
+		LOADING_3,
 
 		MAX,
 	};

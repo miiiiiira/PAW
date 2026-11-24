@@ -9,6 +9,7 @@
 
 class ObjectManager;
 class EnemyCommander;
+class DangerIndicator;
 
 class GameScene : public SceneBase
 {
@@ -29,6 +30,9 @@ private:
 
 	// 敵司令官
 	EnemyCommander* enemyCommander_ = nullptr;
+
+	// 危険表示器
+	DangerIndicator* indicator_ = nullptr;
 
 private:
 	// オブジェクト作成

@@ -37,6 +37,7 @@ public:
 
 	// 状態を取得
 	CAT_ROBOT_STATE GetState(void)const { return stateCtrl_.state_; }
+	CAT_ROBOT_ATTACK_STATE GetAttackState(void)const { return stateCtrl_.attackState_; }
 
 	// 状態を変更させる
 	void ChangeState(CAT_ROBOT_STATE state);
@@ -46,6 +47,10 @@ public:
 
 	// HPを返す
 	int GetNowHP(void) { return info_.hp_; }
+
+	// 攻撃のポインタを返す
+	const std::vector<PlateAttack*>& GetPlateAttack(void) { return plateAttack_; }
+	const std::vector<CutleryAttack*>& GetCutleryAttack(void) { return cutleryAttack_; }
 
 private:
 	// 状態別更新処理
