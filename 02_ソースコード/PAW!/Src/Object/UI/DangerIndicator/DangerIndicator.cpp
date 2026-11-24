@@ -81,8 +81,6 @@ void DangerIndicator::Update(void)
 		break;
 
 	case CAT_ROBOT_ATTACK_SELECT:
-		break;
-
 	case CAT_ROBOT_ATTACK_1:
 	case CAT_ROBOT_ATTACK_END:
 	case CAT_ROBOT_ATTACK_MAX:
@@ -111,26 +109,26 @@ void DangerIndicator::Release(void)
 
 void DangerIndicator::CheckPlateAttack(void)
 {
-	if (isOnce_)
-	{
-		for (const auto& plate : catRobot_.GetPlateAttack())
-		{
-			if (CheckCameraViewClip(plate->GetTransform()->pos_))continue;
+	//if (isOnce_)
+	//{
+	//	for (const auto& plate : catRobot_.GetPlateAttack())
+	//	{
+	//		if (CheckCameraViewClip(plate->GetTransform()->pos_))continue;
 
-			// ƒJƒƒ‰‚ÌŽ‹ŠE‚É“ü‚Á‚Ä‚¢‚ê‚Î‰Šú‰»
-			arrowType_ = ARROW_MAX;
-			drawCounter_ = DRAW_COUNT;
-			isOnce_ = false;
-		}
-		return;
-	}
+	//		// ƒJƒƒ‰‚ÌŽ‹ŠE‚É“ü‚Á‚Ä‚¢‚ê‚Î‰Šú‰»
+	//		arrowType_ = ARROW_MAX;
+	//		drawCounter_ = DRAW_COUNT;
+	//		isOnce_ = false;
+	//	}
+	//	return;
+	//}
 
 	for (const auto& plate : catRobot_.GetPlateAttack())
 	{
 		// ƒJƒƒ‰‚ÌŽ‹ŠE‚É“ü‚Á‚Ä‚¢‚ê‚Îˆ—‚ðs‚í‚È‚¢
-		if (!CheckCameraViewClip(plate->GetTransform()->pos_))break;
+		if (!CheckCameraViewClip(plate->GetTransform()->pos_)) continue;
 
-		if (plate->GetState() != PLATE_ATTACK_STATE::PLATE_ATTACK_STATE_IDLE)break;
+		if (plate->GetState() == PLATE_ATTACK_STATE_END) continue;
 
 		// •`‰æ‚·‚é–îˆó‚ÌŽí—Þ‚ðÝ’è
 		SelectArrowType(plate->GetTransform()->pos_);
