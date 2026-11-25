@@ -15,6 +15,9 @@ namespace
 
 	// 描画する時間
 	constexpr int ALPHA_MAX = 255;
+
+	// 後ろと判定する範囲
+	const float BACK_RANGE = 120.0f * DX_PI_F / 180.0f;
 }
 
 DangerIndicator::DangerIndicator(CatRobot& catRobot)
@@ -52,6 +55,7 @@ void DangerIndicator::Load(void)
 
 void DangerIndicator::Update(void)
 {
+	// アルファ値があれば
 	if (alpha_ > 0)
 	{
 		// カウンタを減少させる
@@ -136,13 +140,8 @@ void DangerIndicator::CheckPlateAttack(void)
 		return;
 	}
 
-	VECTOR attackPos = catRobot_.GetPlateCutleryAttackPos();
-	// カメラの視界に入っていれば処理を行わない
-	if (!CheckCameraViewClip(attackPos)) return;
-
-	// 描画する矢印の種類を設定
-	SelectArrowType(attackPos);
-	alpha_ = ALPHA_MAX;
+	// カメラ内に入っているか確認
+	CheckCameraView();
 }
 
 void DangerIndicator::CheckCutleryAttack(void)
@@ -154,7 +153,7 @@ void DangerIndicator::CheckCutleryAttack(void)
 		for (const auto& cutlery : catRobot_.GetCutleryAttack())
 		{
 			// 終了状態になっていなければ
-			if (cutlery->GetState() != PLATE_ATTACK_STATE_END)
+			if (cutlery->GetState() != CUTLERY_ATTACK_STATE_END)
 			{
 				// フラグ折る
 				isAllEnd = false;
@@ -170,7 +169,13 @@ void DangerIndicator::CheckCutleryAttack(void)
 
 		return;
 	}
+	
+	// カメラ内に入っているか確認
+	CheckCameraView();
+}
 
+void DangerIndicator::CheckCameraView(void)
+{
 	VECTOR attackPos = catRobot_.GetPlateCutleryAttackPos();
 	// カメラの視界に入っていれば処理を行わない
 	if (!CheckCameraViewClip(attackPos)) return;
@@ -205,14 +210,10 @@ void DangerIndicator::SelectArrowType(VECTOR pos)
 	// 後ろ側にあると判断した場合
 	if (forward < 0)
 	{
-		// 0 = 正面、±π = 真後ろ
 		float angle = std::atan2(side, forward);
 
 		// 後ろと判定する範囲(全体で120度 → 片側60度)
-		const float BACK_RANGE = 120.0f * DX_PI_F / 180.0f;
-		const float halfBack = BACK_RANGE * 0.5f;
-
-		if (std::fabs(angle) >= DX_PI_F - halfBack)
+		if (std::fabs(angle) >= DX_PI_F - BACK_RANGE * 0.5f)
 		{
 			// 一定の角度以上であれば後ろにあると判断
 			arrowType_ = ARROW_2;

@@ -47,6 +47,9 @@ private:
 	// カトラリー攻撃の確認
 	void CheckCutleryAttack(void);
 
+	// カメラ内に入っているか
+	void CheckCameraView(void);
+
 	// 描画する画像の種類を選択
 	void SelectArrowType(VECTOR pos);
 };

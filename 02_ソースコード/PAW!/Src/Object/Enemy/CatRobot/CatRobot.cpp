@@ -146,7 +146,7 @@ void CatRobot::Init(void)
 void CatRobot::Update(void)
 {
 	// 完全に死亡していたら処理を行わない
-	if (stateCtrl_.state_ == CAT_ROBOT_STATE_END)	return;
+	if (stateCtrl_.state_ == CAT_ROBOT_STATE_END) return;
 
 	// 状態別更新処理
 	UpdateState();
@@ -157,6 +157,7 @@ void CatRobot::Update(void)
 
 void CatRobot::Draw2D(void)
 {
+	// スタン中であれば
 	if (stateCtrl_.state_ == CAT_ROBOT_STATE_CHANCE &&
 		stateCtrl_.chanceState_ == CAT_ROBOT_CHANCE_STUN)
 	{
@@ -363,22 +364,27 @@ void CatRobot::UpdateAttackSelect(CatRobot& catRobot)
 		// 攻撃1へ
 		catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_1);
 		break;
+
 	case 1:
 		// 攻撃2へ
 		catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_2);
 		break;
+
 	case 2:
 		// 攻撃3へ
 		catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_3);
 		break;
+
 	case 3:
 		// 攻撃3へ
 		catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_4);
 		break;
+
 	case 4:
 		// 攻撃3へ
 		catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_5);
 		break;
+
 	default:
 		break;
 	}
@@ -576,6 +582,7 @@ void CatRobot::InitChanceStart(CatRobot& catRobot)
 	// 倒れるまでの時間初期化
 	catRobot.info_.toppleTime_ = TOPPLE_TIME;
 
+	// シェイプ変更
 	MV1SetShapeRate(catRobot.render3D_->GetHandle(), 4, 1.0f);
 }
 
@@ -592,6 +599,7 @@ void CatRobot::InitChanceEnd(CatRobot& catRobot)
 	// イージング用時間初期化
 	catRobot.info_.easingTime_ = 0.0f;
 
+	// シェイプ変更
 	MV1SetShapeRate(catRobot.render3D_->GetHandle(), 4, 0.0f);
 }
 
@@ -881,7 +889,7 @@ VECTOR CatRobot::SelectAttackDir(bool leftRight)
 	// ランダム用
 	int rand = GetRand(ATTACK_RAND_NUM);
 	// 0か1にする
-	rand %= 2;;
+	rand %= 2;
 
 	VECTOR dir = {};
 
@@ -942,6 +950,14 @@ void CatRobot::ResetCutleryAttackPos(bool leftRight)
 	}
 
 	// 攻撃開始される座標を保存しておく(攻撃の中心)
+	if (leftRight)
+	{
+		pos.z = 0.0f;
+	}
+	else
+	{
+		pos.x = 0.0f;
+	}
 	info_.plateCutleryAttackPos_ = pos;
 }
 
