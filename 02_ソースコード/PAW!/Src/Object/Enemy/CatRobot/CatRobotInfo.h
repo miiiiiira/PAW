@@ -89,6 +89,8 @@ struct catRobotInfo
 	int invincibleTime_ = 0;	// –³“GŠÔ
 
 	int toppleTime_ = 0;	// “|‚ê‚é‚Ü‚Å‚ÌŠÔ
+
+	VECTOR plateCutleryAttackPos_ = {};	// UŒ‚2,3,4,5‚ÌÀ•W‚ğ•Ô‚·‚½‚ß‚Ì•Ï”
 };
 
 enum class CAT_ROBOT_ANIMATION

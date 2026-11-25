@@ -1,3 +1,4 @@
+#include <cmath>
 #include <DxLib.h>
 #include "../../../Application.h"
 #include "../../Camera/CameraUtility.h"
@@ -9,14 +10,11 @@
 
 namespace
 {
-	// チカチカさせる間隔
-	constexpr int BLINK_INTERVAL = 25;
-
 	// 分割数縦横
 	constexpr int DIV_NUM_Y = 3;
 
 	// 描画する時間
-	constexpr int DRAW_COUNT = 100;
+	constexpr int ALPHA_MAX = 255;
 }
 
 DangerIndicator::DangerIndicator(CatRobot& catRobot)
@@ -54,13 +52,15 @@ void DangerIndicator::Load(void)
 
 void DangerIndicator::Update(void)
 {
-	if (drawCounter_ > 0)
+	if (alpha_ > 0)
 	{
-		drawCounter_--;
+		// カウンタを減少させる
+		alpha_ -= 3;
 
-		if (drawCounter_ <= 0)
+		if (alpha_ <= 0)
 		{
-			arrowType_ = ARROW_MAX;
+			// 初期化
+			alpha_ = 0;
 		}
 	}
 
@@ -91,11 +91,14 @@ void DangerIndicator::Update(void)
 
 void DangerIndicator::Draw(void)
 {
-	if (arrowType_ != ARROW_TYPE::ARROW_MAX)
-	{
-		// 危険知らせる矢印を描画
-		DrawGraph(0, 0, handles_[static_cast<int>(arrowType_)], true);
-	}
+	// アルファ値を設定
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha_);
+
+	// 危険知らせる矢印を描画
+	DrawGraph(0, 0, handles_[static_cast<int>(arrowType_)], true);
+
+	// アルファ値を元に戻す
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }
 
 void DangerIndicator::Release(void)
@@ -109,75 +112,84 @@ void DangerIndicator::Release(void)
 
 void DangerIndicator::CheckPlateAttack(void)
 {
-	//if (isOnce_)
-	//{
-	//	for (const auto& plate : catRobot_.GetPlateAttack())
-	//	{
-	//		if (CheckCameraViewClip(plate->GetTransform()->pos_))continue;
-
-	//		// カメラの視界に入っていれば初期化
-	//		arrowType_ = ARROW_MAX;
-	//		drawCounter_ = DRAW_COUNT;
-	//		isOnce_ = false;
-	//	}
-	//	return;
-	//}
-
-	for (const auto& plate : catRobot_.GetPlateAttack())
+	// 表示が行われていたら
+	if (arrowType_ != ARROW_TYPE::ARROW_MAX)
 	{
-		// カメラの視界に入っていれば処理を行わない
-		if (!CheckCameraViewClip(plate->GetTransform()->pos_)) continue;
+		bool isAllEnd = true;
+		for (const auto& plate : catRobot_.GetPlateAttack())
+		{
+			// 終了状態になっていなければ
+			if (plate->GetState() != PLATE_ATTACK_STATE_END)
+			{
+				// フラグ折る
+				isAllEnd = false;
+			}
+		}
 
-		if (plate->GetState() == PLATE_ATTACK_STATE_END) continue;
+		if (isAllEnd)
+		{
+			// すべて終了状態であれば初期化
+			arrowType_ = ARROW_MAX;
+			alpha_ = 0;
+		}
 
-		// 描画する矢印の種類を設定
-		SelectArrowType(plate->GetTransform()->pos_);
-		drawCounter_ = DRAW_COUNT;
-		isOnce_ = true;
-		break;
+		return;
 	}
+
+	VECTOR attackPos = catRobot_.GetPlateCutleryAttackPos();
+	// カメラの視界に入っていれば処理を行わない
+	if (!CheckCameraViewClip(attackPos)) return;
+
+	// 描画する矢印の種類を設定
+	SelectArrowType(attackPos);
+	alpha_ = ALPHA_MAX;
 }
 
 void DangerIndicator::CheckCutleryAttack(void)
 {
-	if (isOnce_)
+	// 表示が行われていたら
+	if (arrowType_ != ARROW_TYPE::ARROW_MAX)
 	{
+		bool isAllEnd = true;
 		for (const auto& cutlery : catRobot_.GetCutleryAttack())
 		{
-			if (CheckCameraViewClip(cutlery->GetTransform()->pos_))continue;
-
-			// カメラの視界に入っていれば初期化
-			arrowType_ = ARROW_MAX;
-			drawCounter_ = DRAW_COUNT;
+			// 終了状態になっていなければ
+			if (cutlery->GetState() != PLATE_ATTACK_STATE_END)
+			{
+				// フラグ折る
+				isAllEnd = false;
+			}
 		}
+
+		if (isAllEnd)
+		{
+			// すべて終了状態であれば初期化
+			arrowType_ = ARROW_MAX;
+			alpha_ = 0;
+		}
+
 		return;
 	}
 
-	for (const auto& cutlery : catRobot_.GetCutleryAttack())
-	{
-		// 攻撃準備中でなければ処理を行わない
-		if (cutlery->GetState() != CUTLERY_ATTACK_STATE::CUTLERY_ATTACK_STATE_IDLE)break;
+	VECTOR attackPos = catRobot_.GetPlateCutleryAttackPos();
+	// カメラの視界に入っていれば処理を行わない
+	if (!CheckCameraViewClip(attackPos)) return;
 
-		// カメラの視界に入っていなければ
-		if (CheckCameraViewClip(cutlery->GetTransform()->pos_))
-		{
-			// 描画する矢印の種類を設定
-			SelectArrowType(cutlery->GetTransform()->pos_);
-			drawCounter_ = DRAW_COUNT;
-			isOnce_ = true;
-			break;
-		}
-	}
+	// 描画する矢印の種類を設定
+	SelectArrowType(attackPos);
+	alpha_ = ALPHA_MAX;
 }
 
 void DangerIndicator::SelectArrowType(VECTOR pos)
 {
 	VECTOR vec = VSub(pos, CameraUtility::GetCameraPos());
+	vec.y = 0.0f;
 
 	MATRIX mat = CameraUtility::GetCameraMatrix();
 
-	float side = VDot(vec, { mat.m[0][0], mat.m[0][1], mat.m[0][2] });    // + なら右側、- なら左側
-	float forward = VDot(vec, { mat.m[2][0], mat.m[2][1], mat.m[2][2] });  // + なら前方、- なら背後
+	// 向きを調べる
+	float side = VDot(vec, { mat.m[0][0], 0.0f, mat.m[0][2] });    // + なら右側、- なら左側
+	float forward = VDot(vec, { mat.m[2][0], 0.0f, mat.m[2][2] });  // + なら前方、- なら背後
 
 	if (side < 0)
 	{
@@ -190,9 +202,20 @@ void DangerIndicator::SelectArrowType(VECTOR pos)
 		arrowType_ = ARROW_3;
 	}
 
+	// 後ろ側にあると判断した場合
 	if (forward < 0)
 	{
-		// 下向きの矢印
-		arrowType_ = ARROW_2;
+		// 0 = 正面、±π = 真後ろ
+		float angle = std::atan2(side, forward);
+
+		// 後ろと判定する範囲(全体で120度 → 片側60度)
+		const float BACK_RANGE = 120.0f * DX_PI_F / 180.0f;
+		const float halfBack = BACK_RANGE * 0.5f;
+
+		if (std::fabs(angle) >= DX_PI_F - halfBack)
+		{
+			// 一定の角度以上であれば後ろにあると判断
+			arrowType_ = ARROW_2;
+		}
 	}
 }

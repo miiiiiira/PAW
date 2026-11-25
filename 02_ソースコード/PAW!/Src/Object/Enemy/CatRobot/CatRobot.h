@@ -52,6 +52,9 @@ public:
 	const std::vector<PlateAttack*>& GetPlateAttack(void) { return plateAttack_; }
 	const std::vector<CutleryAttack*>& GetCutleryAttack(void) { return cutleryAttack_; }
 
+	// 攻撃の座標参照を返す
+	const VECTOR& GetPlateCutleryAttackPos(void) { return info_.plateCutleryAttackPos_; }
+
 private:
 	// 状態別更新処理
 	void UpdateState(void);
@@ -76,18 +79,18 @@ private:
 	// 状態別初期化
 	static void InitAttackSelect(CatRobot& catRobot);		// 攻撃選択
 	static void InitAttack1(CatRobot& catRobot);			// 食材爆撃
-	static void InitAttack2(CatRobot& catRobot);			// お皿攻撃上下
-	static void InitAttack3(CatRobot& catRobot);			// お皿攻撃左右
-	static void InitAttack4(CatRobot& catRobot);			// ナイフ攻撃上下
-	static void InitAttack5(CatRobot& catRobot);			// ナイフ攻撃左右
+	static void InitAttack2(CatRobot& catRobot);			// お皿攻撃左右
+	static void InitAttack3(CatRobot& catRobot);			// お皿攻撃上下
+	static void InitAttack4(CatRobot& catRobot);			// ナイフ攻撃左右
+	static void InitAttack5(CatRobot& catRobot);			// ナイフ攻撃上下
 	static void InitAttackEnd(CatRobot& catRobot);			// 攻撃終了
 	// 状態別更新
 	static void UpdateAttackSelect(CatRobot& catRobot);		// 攻撃選択
 	static void UpdateAttack1(CatRobot& catRobot);			// 食材爆撃
-	static void UpdateAttack2(CatRobot& catRobot);			// お皿攻撃上下
-	static void UpdateAttack3(CatRobot& catRobot);			// お皿攻撃左右
-	static void UpdateAttack4(CatRobot& catRobot);			// ナイフ攻撃上下
-	static void UpdateAttack5(CatRobot& catRobot);			// ナイフ攻撃左右
+	static void UpdateAttack2(CatRobot& catRobot);			// お皿攻撃左右
+	static void UpdateAttack3(CatRobot& catRobot);			// お皿攻撃上下
+	static void UpdateAttack4(CatRobot& catRobot);			// ナイフ攻撃左右
+	static void UpdateAttack5(CatRobot& catRobot);			// ナイフ攻撃上下
 	static void UpdateAttackEnd(CatRobot& catRobot);		// 攻撃終了
 	// 攻撃状態を変更させる
 	void ChangeAttackState(CAT_ROBOT_ATTACK_STATE state);

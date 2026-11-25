@@ -357,34 +357,31 @@ void CatRobot::UpdateAttackSelect(CatRobot& catRobot)
 	// 0`2‚É‚·‚é
 	rand %= 5;
 
-	//switch (rand)
-	//{
-	//case 0:
-	//	// UŒ‚1‚Ö
-	//	catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_1);
-	//	break;
-	//case 1:
-	//	// UŒ‚2‚Ö
-	//	catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_2);
-	//	break;
-	//case 2:
-	//	// UŒ‚3‚Ö
-	//	catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_3);
-	//	break;
-	//case 3:
-	//	// UŒ‚3‚Ö
-	//	catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_4);
-	//	break;
-	//case 4:
-	//	// UŒ‚3‚Ö
-	//	catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_5);
-	//	break;
-	//default:
-	//	break;
-	//}
-
-	catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_2);
-
+	switch (rand)
+	{
+	case 0:
+		// UŒ‚1‚Ö
+		catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_1);
+		break;
+	case 1:
+		// UŒ‚2‚Ö
+		catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_2);
+		break;
+	case 2:
+		// UŒ‚3‚Ö
+		catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_3);
+		break;
+	case 3:
+		// UŒ‚3‚Ö
+		catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_4);
+		break;
+	case 4:
+		// UŒ‚3‚Ö
+		catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_5);
+		break;
+	default:
+		break;
+	}
 }
 
 void CatRobot::UpdateAttack1(CatRobot& catRobot)
@@ -438,7 +435,7 @@ void CatRobot::UpdateAttack2(CatRobot& catRobot)
 		}
 	}
 
-	// ‚·‚×‚Ä‰º‚Ö—‚¿Ø‚Á‚Ä‚¢‚½‚ç
+	// ‚·‚×‚ÄˆÚ“®‚µ‚«‚Á‚Ä‚¢‚½‚ç
 	if (isAllEnd)
 	{
 		// UŒ‚‰ñ”‚ğŒ¸‚ç‚·
@@ -473,7 +470,7 @@ void CatRobot::UpdateAttack3(CatRobot& catRobot)
 		}
 	}
 
-	// ‚·‚×‚Ä‰º‚Ö—‚¿Ø‚Á‚Ä‚¢‚½‚ç
+	// ‚·‚×‚ÄˆÚ“®‚µ‚«‚Á‚Ä‚¢‚½‚ç
 	if (isAllEnd)
 	{
 		// UŒ‚‰ñ”‚ğŒ¸‚ç‚·
@@ -866,6 +863,17 @@ void CatRobot::ResetPlateAttackPos(bool leftRight)
 		// À•W‚ğİ’è
 		plateAttack_[i]->StartAttack(pos, dir, PLATE_MOVE_DISTANCE, PLATE_IDLE_COUNT * i);
 	}
+
+	// UŒ‚ŠJn‚³‚ê‚éÀ•W‚ğ•Û‘¶‚µ‚Ä‚¨‚­(UŒ‚‚Ì’†S)
+	if (leftRight)
+	{
+		pos.z = 0.0f;
+	}
+	else
+	{
+		pos.x = 0.0f;
+	}
+	info_.plateCutleryAttackPos_ = pos;
 }
 
 VECTOR CatRobot::SelectAttackDir(bool leftRight)
@@ -932,6 +940,9 @@ void CatRobot::ResetCutleryAttackPos(bool leftRight)
 		// À•W‚ğİ’è
 		cutleryAttack_[i]->StartAttack(pos, dir, CUTLERY_MOVE_DISTANCE, CUTLERY_IDLE_COUNT * i);
 	}
+
+	// UŒ‚ŠJn‚³‚ê‚éÀ•W‚ğ•Û‘¶‚µ‚Ä‚¨‚­(UŒ‚‚Ì’†S)
+	info_.plateCutleryAttackPos_ = pos;
 }
 
 void CatRobot::SetDamage(void)

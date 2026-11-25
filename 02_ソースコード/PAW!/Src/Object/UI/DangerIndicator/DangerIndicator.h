@@ -38,10 +38,7 @@ private:
 	ARROW_TYPE arrowType_ = ARROW_MAX;
 
 	// 描画カウンター
-	int drawCounter_ = 0;
-
-	// 一度でもカウンタが動いたか
-	bool isOnce_ = false;
+	int alpha_ = 0;
 
 private:
 	// お皿攻撃の確認
