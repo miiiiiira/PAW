@@ -49,12 +49,15 @@ protected:
 	static constexpr int RAT_TO_CATROBOT_COUNT = 120;
 
 	// イベントシーン時のカメラ座標
-	static constexpr VECTOR EVENT_CAMERA_POS = { 200.0f,30.0f,400.0f };
+	static constexpr VECTOR EVENT_CAMERA_POS = { 150.0f,30.0f,400.0f };
 	static constexpr VECTOR EVENT_CAMERA_ANGLE =
-	{ -10.0f * DX_PI_F / 180.0f, -40.0f * DX_PI_F / 180.0f,0.0f };
+	{ -10.0f * DX_PI_F / 180.0f, -30.0f * DX_PI_F / 180.0f,0.0f };
 
 	// スキップ時間の最大値
 	static constexpr float MAX_SKIP_TIME = 60.0f;
+
+	// アルファ最大値
+	static constexpr int ALPHA_MAX = 255;
 
 protected:
 	Player* player_;

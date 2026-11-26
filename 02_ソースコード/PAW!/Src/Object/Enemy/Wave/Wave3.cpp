@@ -10,9 +10,10 @@
 
 namespace
 {
-	constexpr VECTOR RAT_SPAWN_POS = { -130.0f, 0.0f, 1500.0f };
-	constexpr VECTOR RAT2_SPAWN_POS = { 130.0f, 0.0f, 1500.0f };
-	constexpr VECTOR RAT3_SPAWN_POS = { 0.0f, 0.0f, 1550.0f };
+	// イベントシーン時のネズミの開始座標
+	constexpr VECTOR RAT_SPAWN_POS = { 0.0f, 0.0f, 1600.0f };
+	constexpr VECTOR RAT2_SPAWN_POS = { -130.0f, 0.0f, 1500.0f };
+	constexpr VECTOR RAT3_SPAWN_POS = { 130.0f, 0.0f, 1500.0f };
 }
 
 Wave3::Wave3(void)
@@ -84,6 +85,9 @@ void Wave3::ChangeInit(void)
 	switch (state_)
 	{
 	case WaveBase::WAVE_STATE::EVENT:
+		// BGM再生
+		AudioManager::GetInstance()->PlayBGM(SoundID::BGM_RAT_EVENT);
+
 		// カメラのモード変更
 		camera_->ChangeMode(Camera::MODE::FIXED, EVENT_CAMERA_POS, EVENT_CAMERA_ANGLE);
 		break;

@@ -86,6 +86,22 @@ struct ratStateCtrl
 	ratStateFunction updateHitTable_[RAT_HIT_MAX];
 };
 
+enum class RAT_ANIMATION
+{
+	IDLE,
+	MOVE,
+	MOVECLOSER,
+	DEAD,
+	ATTACK_START,
+	ATTACK,
+	ATTACK_END,
+	ORDER,
+	SUPPORT,
+	SUPPORT2,
+
+	MAX
+};
+
 struct ratInfo
 {
 	float velocityY_ = 0.0f;	// 現在の落下速度
@@ -113,22 +129,9 @@ struct ratInfo
 	bool isApproaching_ = true;		// 近づき中か	　true / 近づく , false/ 遠ざかる
 
 	// イベントシーン用
-	VECTOR goalPos_ = {};			// 目標座標
-	int eventIdleTime_ = 0;			// 待機時間
-};
-
-enum class RAT_ANIMATION
-{
-	IDLE,
-	MOVE,
-	MOVECLOSER, 
-	DEAD,
-	ATTACK_START,
-	ATTACK,
-	ATTACK_END,
-	ORDER,
-	SUPPORT,
-	SUPPORT2,
-
-	MAX
+	VECTOR goalPos_ = {};								// 目標座標
+	int eventIdleTime_ = 0;								// 待機時間
+	RAT_ANIMATION eventAnimation_ = RAT_ANIMATION::MAX;	// イベントシーン時に変更させるアニメーション
+	int eventAnimationChangeTime_ = 0;					// イベントシーン時のアニメーション変更時間
+	bool isAnimationLoop_ = true;						// アニメーションをループさせるかどうか
 };

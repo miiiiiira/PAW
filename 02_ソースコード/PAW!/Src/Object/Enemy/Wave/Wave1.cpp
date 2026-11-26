@@ -9,52 +9,44 @@
 
 namespace
 {
+	// イベントシーン時のネズミの開始座標
 	constexpr VECTOR RAT_SPAWN_POS = { 0.0f, 0.0f, 1500.0f };
+
+	// イベントシーン時のアニメーション変更時間
+	constexpr int EVENT_CHANGE_ANIM_TIME = 50;
+
+	// アルファ値設定
+	constexpr int ALPHA_STEP = 10;	// アルファ値の増減量
 }
 
 Wave1::Wave1(void)
 {
 	// 画像読み込み
-	taositeyaruImage_ = LoadGraph("Data/Image/Game/taositeyaru.png");
+	defeatYouImage_ = LoadGraph("Data/Image/Game/defeatYou.png");
 }
 
 Wave1::~Wave1(void)
 {
 	// 画像解放
-	DeleteGraph(taositeyaruImage_);
+	DeleteGraph(defeatYouImage_);
 }
 
 void Wave1::Draw(void)
 {
-	switch (state_)
+	if(state_ == WaveBase::WAVE_STATE::EVENT)
 	{
-	case WaveBase::WAVE_STATE::EVENT:
-		if (rats_[0]->GetState() == RAT_STATE_EVENT_IDLE)
-		{
-			// 倒してやる画像
-			DrawBillboard3D(
-				{ rats_[0]->GetTransform()->pos_.x + 60.0f ,
-				rats_[0]->GetTransform()->pos_.y + 120.0f ,
-				rats_[0]->GetTransform()->pos_.z - 20.0f },
-				0.7f, 0.7f,
-				64.0f,
-				-0.1f,
-				taositeyaruImage_,
-				true);
-		}
-		break;
-
-	case WaveBase::WAVE_STATE::RAT:
-		break;
-
-	case WaveBase::WAVE_STATE::CAT_ROBOT:
-		break;
-
-	case WaveBase::WAVE_STATE::CLEARED:
-		break;
-
-	default:
-		break;
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha_);
+		// 倒してやる画像
+		DrawBillboard3D(
+			{ rats_[0]->GetTransform()->pos_.x + 80.0f ,
+			rats_[0]->GetTransform()->pos_.y + 120.0f ,
+			rats_[0]->GetTransform()->pos_.z - 10.0f },
+			0.7f, 0.7f,
+			80.0f,
+			-0.1f,
+			defeatYouImage_,
+			true);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	}
 
 	// 基底クラスの描画処理
@@ -63,7 +55,30 @@ void Wave1::Draw(void)
 
 void Wave1::OnStart(void)
 {
-	rats_[0]->ResetRat(RAT_SPAWN_POS);
+	rats_[0]->ResetRat(RAT_SPAWN_POS, RAT_ANIMATION::ORDER, EVENT_CHANGE_ANIM_TIME, false);
+}
+
+void Wave1::OnEvent(void)
+{
+	// 基底クラスのイベント処理
+	WaveBase::OnEvent();
+
+	if (alpha_ > 0)
+	{
+		alpha_ += ALPHA_STEP;
+		if (alpha_ > ALPHA_MAX)
+		{
+			alpha_ = ALPHA_MAX;
+		}
+	}
+	else
+	{
+		// ネズミがイベント待機状態になったらアルファ値を増やす
+		if (rats_[0]->GetState() == RAT_STATE_EVENT_IDLE)
+		{
+			alpha_++;
+		}
+	}
 }
 
 void Wave1::OnCatRobot(void)
@@ -103,6 +118,8 @@ void Wave1::ChangeInit(void)
 	switch (state_)
 	{
 	case WaveBase::WAVE_STATE::EVENT:
+		// BGM再生
+		AudioManager::GetInstance()->PlayBGM(SoundID::BGM_RAT_EVENT);
 		// カメラのモード変更
 		camera_->ChangeMode(Camera::MODE::FIXED, EVENT_CAMERA_POS, EVENT_CAMERA_ANGLE);
 		break;

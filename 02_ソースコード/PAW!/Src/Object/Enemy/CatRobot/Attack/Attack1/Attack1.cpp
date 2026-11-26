@@ -62,9 +62,9 @@ void Attack1::Draw3D(void)
 	);
 
 	DrawCone3D(
-		{ transform_->pos_.x,2.0f,transform_->pos_.z },
 		{ transform_->pos_.x,-1.0f,transform_->pos_.z },
-		130.0f,
+		{ transform_->pos_.x,1.0f,transform_->pos_.z },
+		100.0f,
 		16,
 		0xff0000,
 		0xff0000,

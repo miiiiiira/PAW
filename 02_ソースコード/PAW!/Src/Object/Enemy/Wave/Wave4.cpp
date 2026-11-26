@@ -86,6 +86,9 @@ void Wave4::ChangeInit(void)
 	switch (state_)
 	{
 	case WaveBase::WAVE_STATE::EVENT:
+		// BGM再生
+		AudioManager::GetInstance()->PlayBGM(SoundID::BGM_RAT_EVENT);
+
 		// カメラのモード変更
 		camera_->ChangeMode(Camera::MODE::FIXED, EVENT_CAMERA_POS, EVENT_CAMERA_ANGLE);
 		break;

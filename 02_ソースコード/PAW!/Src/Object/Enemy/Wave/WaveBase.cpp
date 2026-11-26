@@ -20,7 +20,6 @@ namespace
     constexpr int GAUGE_POS_Y = Application::SCREEN_SIZE_Y - SKIP_IMAGE_SIZE / 2;
 
     // アルファ値設定
-    constexpr int ALPHA_MAX = 255;	// 最大値
     constexpr int ALPHA_STEP = 10;	// アルファ値の増減量
 
     // ゲージの最大値
@@ -54,27 +53,6 @@ void WaveBase::Update(void)
     switch (state_)
     {
     case WAVE_STATE::EVENT:
-         // 一定までスペースキーを押したらイベントシーンをスキップする
-         if (InputManager::GetInstance()->SkipButton())
-         {
-             skipTimer_++;
-
-             alpha_ += ALPHA_STEP;
-             if (alpha_ >= ALPHA_MAX)
-             {
-                 alpha_ = ALPHA_MAX;
-             }
-         }
-         else
-         {
-             skipTimer_ = 0;
-
-             alpha_ -= ALPHA_STEP;
-             if (alpha_ <= 0)
-             {
-                 alpha_ = 0;
-             }
-         }
 
         // イベント中
         OnEvent();
@@ -125,6 +103,7 @@ void WaveBase::Draw(void)
     // アルファ値を設定
     SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha_);
 
+	// スキップゲージを描画
     float rate = (static_cast<float>(skipTimer_) / MAX_SKIP_TIME) * GAUGE_MAX_PERCENT;
     DrawCircleGauge(GAUGE_POS_X, GAUGE_POS_Y, rate, skipGauge_, GAUGE_START_PERCENT);
     DrawGraph(SKIP_POS_X, SKIP_POS_Y, skipHandle_, true);
@@ -144,8 +123,27 @@ void WaveBase::StartInWave(void)
 
 void WaveBase::OnEvent(void)
 {
-    // BGM再生
-    AudioManager::GetInstance()->PlayBGM(SoundID::BGM_RAT_EVENT);
+    // 一定までスペースキーを押したらイベントシーンをスキップする
+    if (InputManager::GetInstance()->SkipButton())
+    {
+        skipTimer_++;
+
+        alpha_ += ALPHA_STEP;
+        if (alpha_ >= ALPHA_MAX)
+        {
+            alpha_ = ALPHA_MAX;
+        }
+    }
+    else
+    {
+        skipTimer_ = 0;
+
+        alpha_ -= ALPHA_STEP;
+        if (alpha_ <= 0)
+        {
+            alpha_ = 0;
+        }
+    }
 }
 
 void WaveBase::OnRat(void)

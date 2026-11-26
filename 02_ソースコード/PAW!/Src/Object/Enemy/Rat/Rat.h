@@ -43,7 +43,7 @@ public:
 	bool IsAttackEnd(void) { return stateCtrl_.state_ == RAT_STATE_ATTACK && stateCtrl_.attackState_ == RAT_ATTACK_AFTER; }
 
 	// 敵のパラメータをリセットする
-	void ResetRat(VECTOR pos);
+	void ResetRat(VECTOR pos, RAT_ANIMATION anim = RAT_ANIMATION::MAX,int eventIdleTime = 0, bool isLoop = true);
 	void SetEventEndPos(VECTOR pos);	// 座標のみ
 
 private:
@@ -178,7 +178,7 @@ private:
 	ratInfo info_;
 
 	// ！マークの画像ハンドル
-	int exclamationMarkImage_ = -1;	
+	int exclamationMarkImage_ = -1;
 
 	// ネズミの状態情報
 	ratStateCtrl stateCtrl_;

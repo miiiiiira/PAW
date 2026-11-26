@@ -48,8 +48,8 @@ namespace
 	constexpr float ANIM_SPEED_ATTACK_START = 0.1f;
 	constexpr float ANIM_SPEED_ATTACK = 0.8f;
 	constexpr float ANIM_SPEED_ATTACK_END = 0.6f;
-	constexpr float ANIM_SPEED_ORDER = 0.8f;
-	constexpr float ANIM_SPEED_SUPPORT = 0.8f;
+	constexpr float ANIM_SPEED_ORDER = 0.5f;
+	constexpr float ANIM_SPEED_SUPPORT = 0.6f;
 	constexpr float ANIM_SPEED_SUPPORT2 = 0.8f;
 
 	// リミット設定
@@ -273,6 +273,19 @@ void Rat::UpdateEventIdle(Rat& rat)
 {
 	rat.info_.eventIdleTime_++;
 
+	if(rat.info_.eventAnimation_ != RAT_ANIMATION::MAX &&
+		rat.info_.eventIdleTime_ > rat.info_.eventAnimationChangeTime_)
+	{
+		// 待機アニメーション再生
+		rat.animation_->Play(static_cast<int>(rat.info_.eventAnimation_), rat.info_.isAnimationLoop_);
+		rat.info_.eventAnimation_ = RAT_ANIMATION::MAX;
+	}
+	else if(rat.animation_->IsEnd())
+	{
+		// 待機アニメーション再生
+		rat.animation_->Play(static_cast<int>(RAT_ANIMATION::IDLE));
+	}
+
 	if(WaveManager::GetInstance().GetCurrentWave()->GetState() != WaveBase::WAVE_STATE::EVENT)
 	{
 		// 待機状態へ
@@ -404,10 +417,19 @@ bool Rat::IsCanAttack(void)
 	return stateCtrl_.state_ == RAT_STATE_IDLE && isDistance;
 }
 
-void Rat::ResetRat(VECTOR pos)
+void Rat::ResetRat(VECTOR pos, RAT_ANIMATION anim, int eventIdleTime, bool isLoop)
 {
 	// 指定の座標を設定
 	transform_->pos_ = pos;
+
+	// イベントシーン時の待機アニメーションを設定
+	info_.eventAnimation_ = anim;
+
+	// イベントシーン時の待機時間を設定
+	info_.eventAnimationChangeTime_ = eventIdleTime;
+
+	// アニメーションをループさせるかどうかを設定
+	info_.isAnimationLoop_ = isLoop;
 
 	// HPを初期化
 	info_.hp_ = DEFAULT_HP;
@@ -809,15 +831,15 @@ void Rat::AddComponets(void)
 		static_cast<int>(RAT_ANIMATION::ATTACK_END));
 	animation_->AddInFbx(
 		static_cast<int>(RAT_ANIMATION::ORDER),
-		ANIM_SPEED_ATTACK,
+		ANIM_SPEED_ORDER,
 		static_cast<int>(RAT_ANIMATION::ORDER));
 	animation_->AddInFbx(
 		static_cast<int>(RAT_ANIMATION::SUPPORT),
-		ANIM_SPEED_ATTACK,
+		ANIM_SPEED_SUPPORT,
 		static_cast<int>(RAT_ANIMATION::SUPPORT));
 	animation_->AddInFbx(
 		static_cast<int>(RAT_ANIMATION::SUPPORT2),
-		ANIM_SPEED_ATTACK,
+		ANIM_SPEED_SUPPORT2,
 		static_cast<int>(RAT_ANIMATION::SUPPORT2));
 
 }

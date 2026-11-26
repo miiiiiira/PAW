@@ -11,10 +11,6 @@ public:
 	void Draw(void)override;    // 描画
 
 protected:
-	// 準備時間
-	static constexpr int PREPARE_TIME = ONE_SECOND * 20;
-
-protected:
 	// システム起動
 	void OnStart(void) override;
 

@@ -11,10 +11,6 @@ public:
     void Draw(void)override;    // 描画
 
 protected:
-    // 準備時間
-    static constexpr int PREPARE_TIME = ONE_SECOND * 20;
-
-protected:
     // システム起動
     void OnStart(void) override;
 
@@ -22,6 +18,7 @@ protected:
     void OnCatRobot(void) override;
 
     // クリア後
+    void OnEvent(void)override;
     void OnClear(void) override;
 
     // クリア条件
@@ -30,4 +27,10 @@ protected:
 
     // ウェーブ状態を変更時の初期化関数
     void ChangeInit(void)override;
+private:
+    // 画像ハンドル
+    int vsImage_ = -1;
+
+    // アルファ値
+    int alpha_ = 0;
 };

@@ -11,14 +11,11 @@ public:
     void Draw(void)override;    // 描画
     
 protected:
-    // 準備時間
-     static constexpr int PREPARE_TIME = ONE_SECOND * 20;
-
-protected:
     // システム起動
     void OnStart(void) override;
 
     // ウェーブ中
+    void OnEvent(void)override;
     void OnCatRobot(void) override;
 
     // クリア後
@@ -31,5 +28,9 @@ protected:
     // ウェーブ状態を変更する
     void ChangeInit(void)override;
 private:
-    int taositeyaruImage_ = -1;
+    // 画像ハンドル
+    int defeatYouImage_ = -1;
+
+	// アルファ値
+    int alpha_ = 0;
 };
