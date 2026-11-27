@@ -11,11 +11,11 @@
 namespace
 {
 	// イベントシーン時のネズミの開始座標
-	constexpr VECTOR RAT_SPAWN_POS = { -60.0f, 0.0f, 1500.0f };
-	constexpr VECTOR RAT2_SPAWN_POS = { 60.0f, 0.0f, 1500.0f };
+	constexpr VECTOR RAT_SPAWN_POS = { -70.0f, 0.0f, 1500.0f };
+	constexpr VECTOR RAT2_SPAWN_POS = { 70.0f, 0.0f, 1500.0f };
 
 	// イベントシーン時のアニメーション変更時間
-	constexpr int EVENT_CHANGE_ANIM_TIME = 20;
+	constexpr int EVENT_CHANGE_ANIM_TIME = 40;
 
 	// アルファ値設定
 	constexpr int ALPHA_STEP = 10;	// アルファ値の増減量
@@ -40,11 +40,11 @@ void Wave2::Draw(void)
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha_);
 		// 倒してやる画像
 		DrawBillboard3D(
-			{ rats_[0]->GetTransform()->pos_.x + 80.0f ,
-			rats_[0]->GetTransform()->pos_.y + 150.0f ,
+			{ rats_[0]->GetTransform()->pos_.x + 95.0f ,
+			rats_[0]->GetTransform()->pos_.y + 170.0f ,
 			rats_[0]->GetTransform()->pos_.z - 10.0f },
 			0.7f, 0.7f,
-			100.0f,
+			120.0f,
 			0.0f,
 			vsImage_,
 			true);
@@ -59,7 +59,7 @@ void Wave2::OnStart(void)
 {
 	player_->ResetPlayer();
 	rats_[0]->ResetRat(RAT_SPAWN_POS, RAT_ANIMATION::SUPPORT, EVENT_CHANGE_ANIM_TIME);
-	rats_[1]->ResetRat(RAT2_SPAWN_POS, RAT_ANIMATION::SUPPORT, EVENT_CHANGE_ANIM_TIME);
+	rats_[1]->ResetRat(RAT2_SPAWN_POS, RAT_ANIMATION::SUPPORT2, EVENT_CHANGE_ANIM_TIME);
 }
 
 void Wave2::OnCatRobot(void)

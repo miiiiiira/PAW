@@ -59,7 +59,7 @@ namespace
 	constexpr int RANDOM_RIMIT = 1000;		// ランダム用の最大係数
 
 	// イベントシーン設定
-	constexpr float EVENT_MOVE_DISTANCE = 400.0f;	// イベントシーン時の移動距離
+	constexpr float EVENT_MOVE_DISTANCE = 430.0f;	// イベントシーン時の移動距離
 
 	// 範囲外判定用座標処理
 	constexpr float CLAMP_POS_RADIUS = 100.0f;

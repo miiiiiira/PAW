@@ -10,7 +10,7 @@ namespace
 	// 攻撃させるネズミの最大数
 	constexpr int RAT_ATTACK_NUM = 2;
 	// 時間を空けて攻撃させるため用のカウント
-	constexpr int ATTACK_START_COUNT = 360;
+	constexpr int ATTACK_START_COUNT = 300;
 }
 
 EnemyCommander::EnemyCommander(void)

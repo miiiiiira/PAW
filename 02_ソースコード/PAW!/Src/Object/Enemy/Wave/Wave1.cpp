@@ -42,7 +42,7 @@ void Wave1::Draw(void)
 			rats_[0]->GetTransform()->pos_.y + 120.0f ,
 			rats_[0]->GetTransform()->pos_.z - 10.0f },
 			0.7f, 0.7f,
-			80.0f,
+			100.0f,
 			-0.1f,
 			defeatYouImage_,
 			true);
