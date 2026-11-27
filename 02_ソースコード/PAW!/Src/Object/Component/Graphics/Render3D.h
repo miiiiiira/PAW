@@ -18,7 +18,6 @@ public:
 	void Release(void) override;	// 解放
 
 public:
-
 	// 外部からモデルを設定
 	void SetModel(std::string path);
 	void SetModelHandles(std::string path);
@@ -38,12 +37,10 @@ public:
 	std::vector<int> GetAllHandles(void)const { return handles_; }
 
 private:
-
 	// Transform
 	Transform* transform_ = nullptr;
 
 private:
-
 	// 描画フラグ
 	bool isDraw_ = true;
 };
