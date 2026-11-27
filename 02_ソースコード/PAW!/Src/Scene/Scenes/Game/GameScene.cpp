@@ -63,10 +63,10 @@ void GameScene::Init(void)
 
 	// ウェーブの作成・各ウェーブの追加
 	WaveManager::CreateInstance();
+	WaveManager::GetInstance().AddWave(std::make_unique<Wave4>(), player, rats, catRobot, camera);
 	WaveManager::GetInstance().AddWave(std::make_unique<Wave1>(), player, rats, catRobot, camera);
 	WaveManager::GetInstance().AddWave(std::make_unique<Wave2>(), player, rats, catRobot, camera);
 	WaveManager::GetInstance().AddWave(std::make_unique<Wave3>(), player, rats, catRobot, camera);
-	WaveManager::GetInstance().AddWave(std::make_unique<Wave4>(), player, rats, catRobot, camera);
 
 	// 危険表示器の初期化
 	indicator_->Init();

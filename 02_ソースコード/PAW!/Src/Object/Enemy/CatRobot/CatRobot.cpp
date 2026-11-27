@@ -358,9 +358,6 @@ void CatRobot::UpdateAttackSelect(CatRobot& catRobot)
 	// 0Å`2Ç…Ç∑ÇÈ
 	rand %= 5;
 
-	catRobot.ChangeAttackState(CAT_ROBOT_ATTACK_1);
-	return;
-
 	switch (rand)
 	{
 	case 0:

@@ -16,6 +16,7 @@ namespace
 
 	// イベントシーン時のアニメーション変更時間
 	constexpr int EVENT_CHANGE_ANIM_TIME = 40;
+	constexpr int EVENT_CHANGE_ANIM_TIME_2 = 40;
 
 	// アルファ値設定
 	constexpr int ALPHA_STEP = 10;	// アルファ値の増減量
@@ -38,7 +39,7 @@ void Wave2::Draw(void)
 	if (state_ == WaveBase::WAVE_STATE::EVENT)
 	{
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha_);
-		// 倒してやる画像
+		// 2たい1だ画像
 		DrawBillboard3D(
 			{ rats_[0]->GetTransform()->pos_.x + 95.0f ,
 			rats_[0]->GetTransform()->pos_.y + 170.0f ,
@@ -59,7 +60,7 @@ void Wave2::OnStart(void)
 {
 	player_->ResetPlayer();
 	rats_[0]->ResetRat(RAT_SPAWN_POS, RAT_ANIMATION::SUPPORT, EVENT_CHANGE_ANIM_TIME);
-	rats_[1]->ResetRat(RAT2_SPAWN_POS, RAT_ANIMATION::SUPPORT2, EVENT_CHANGE_ANIM_TIME);
+	rats_[1]->ResetRat(RAT2_SPAWN_POS, RAT_ANIMATION::SUPPORT2, EVENT_CHANGE_ANIM_TIME_2);
 }
 
 void Wave2::OnCatRobot(void)

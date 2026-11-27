@@ -27,6 +27,7 @@ protected:
 
     // ウェーブ状態を変更時の初期化関数
     void ChangeInit(void)override;
+
 private:
     // 画像ハンドル
     int vsImage_ = -1;

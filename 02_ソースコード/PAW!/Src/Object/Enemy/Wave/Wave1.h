@@ -27,6 +27,7 @@ protected:
 
     // ウェーブ状態を変更する
     void ChangeInit(void)override;
+
 private:
     // 画像ハンドル
     int defeatYouImage_ = -1;
